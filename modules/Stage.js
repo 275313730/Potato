@@ -40,17 +40,33 @@ class Stage {
         window.addEventListener('keydown', function (e) {
             switch (e.key) {
                 case 'a':
-                    if (this.player.x - this.player.width <= 0) { return true }
+                    if (this.player.x - this.player.width <= 0 && this.direction === e.key) {
+                        return true
+                    }
                     this.direction = e.key
-                    this.player.x -= this.player.speed
+                    this.moving = true
                     break
                 case 'd':
-                    if (this.player.x + this.player.width >= this.width) { return true }
+                    if (this.player.x + this.player.width >= this.width && this.direction === e.key) {
+                        return true
+                    }
                     this.direction = e.key
-                    this.player.x += this.player.speed
+                    this.moving = true
                     break
                 case ' ':
-                    this.jump(this.timer)
+                    this.jump()
+                    break
+            }
+        }.bind(this))
+        window.addEventListener('keyup', function (e) {
+            switch (e.key) {
+                case 'a':
+                    if (this.direction === 'd') { return }
+                    this.moving = false
+                    break
+                case 'd':
+                    if (this.direction === 'a') { return }
+                    this.moving = false
                     break
             }
         }.bind(this))
@@ -71,6 +87,7 @@ class Stage {
     draw() {
         this.clear()
         this.drawBackground()
+        this.physicsEngine()
         this.drawPlayer()
     }
 
@@ -102,15 +119,54 @@ class Stage {
         this.ctx.fill();
     }
 
+    drawDialog() {
+        this.ctx.strokeStyle = 'black'
+        this.ctx.strokeRect(this.width / 4, this.height / 2, this.width / 2, this.height / 3)
+    }
+
+    drawText() {
+        this.ctx.font = "48px serif";
+        this.ctx.strokeText("Hello world", this.width / 3, this.height / 1.5);
+    }
+
     /*
-        Gravity Module
+        Physics Engine Module
     */
+
+    physicsEngine() {
+        this.jumping && this.gravity()
+        this.moving && this.move()
+    }
+
+    gravity() {
+        this.player.y -= this.player.v
+        if (this.player.y + this.player.height < this.height) {
+            this.player.v -= 2
+        } else {
+            this.player.v = 0
+            this.player.y = this.height - this.player.height
+            this.jumping = false
+        }
+    }
 
     // 跳跃
     jump() {
-        if (this.player.y > 0) {
+        if (this.jumping) {
             return
         }
-        this.player.v = speed
+        this.jumping = true
+        this.player.v = 20
+    }
+
+    move() {
+        if (this.direction === 'd' && this.player.x + this.player.width < this.width) {
+            this.player.x += this.player.speed
+            return
+        }
+        if (this.direction === 'a' && this.player.x - this.player.width > 0) {
+            this.player.x -= this.player.speed
+            return
+        }
+        this.moving = false
     }
 }

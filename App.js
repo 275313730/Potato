@@ -4,7 +4,7 @@ new Stage({
     height: 400,
     player: {
         color: 'red',
-        speed: 10,
+        speed: 5,
         width: 50,
         height: 60,
         x: 200
