@@ -2,10 +2,15 @@ new Stage({
     el: 'stage',
     width: 500,
     height: 300,
-    player: {
-        color: 'red',
-        speed: 5,
-        radius: 20,
-        x: 200
+    player: player(),
+    // 全局事件
+    events: {
+        createStar
     }
-}) 
+}, () => {
+    // 初始化后执行的函数
+    star()
+})
+
+
+

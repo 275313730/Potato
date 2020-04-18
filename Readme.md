@@ -1,0 +1,1 @@
+CanvasGame是一个用Canvas和Js来制作游戏的框架

@@ -1,11 +1,16 @@
 class Canvas {
+    static init() {
+        Canvas.draws['backGround'] = this.drawBackground.bind(this)
+        Canvas.draws['player'] = this.drawPlayer.bind(this)
+        Canvas.draws['text'] = this.drawText.bind(this)
+    }
+
     // 页面绘制
     static draw() {
         this.clear()
-        this.drawBackground()
-        this.drawPlayer(Stage.player)
-        this.drawStar(Stage.star)
-        this.drawText(Stage.player, Stage.star)
+        for (const key in Canvas.draws) {
+            Canvas.draws[key]()
+        }
     }
 
     // 清除页面
@@ -19,28 +24,12 @@ class Canvas {
         this.ctx.fillRect(0, 0, this.width, this.height);
     }
 
-    // 绘制玩家
-    static drawPlayer(player) {
+    static drawPlayer() {
+        const player = Stage.player
         this.ctx.fillStyle = player.color
         this.ctx.beginPath();
         this.ctx.arc(player.x, player.y - player.radius, player.radius, 0, Math.PI * 2);
         this.ctx.fill();
-    }
-
-    // 绘制星星
-    static drawStar(star) {  // R:外接圆半径，x: x方向圆心位置 y: y方向圆心位置，rot:旋转角度
-        if (star) {
-            this.ctx.fillStyle = 'yellow'
-            this.ctx.beginPath();
-            for (var i = 0; i < 5; i++) {
-                //因为角度是逆时针计算的，而旋转是顺时针旋转，所以是度数是负值。
-                this.ctx.lineTo(star.x + Math.cos((18 + 72 * i - star.rot) / 180 * Math.PI) * star.R,
-                    star.y - Math.sin((18 + 72 * i - star.rot) / 180 * Math.PI) * star.R);
-                this.ctx.lineTo(star.x + Math.cos((54 + 72 * i - star.rot) / 180 * Math.PI) * star.R / 2,
-                    star.y - Math.sin((54 + 72 * i - star.rot) / 180 * Math.PI) * star.R / 2);
-            }
-            this.ctx.fill();
-        }
     }
 
     // 绘制对话框
@@ -50,7 +39,9 @@ class Canvas {
     }
 
     // 绘制文字
-    static drawText(player,star) {
+    static drawText() {
+        const player = Stage.player,
+            star = Sprite.sprites['star']
         if (player.jumping && !star) {
             this.ctx.fillStyle = 'red'
         } else {
@@ -60,3 +51,5 @@ class Canvas {
         this.ctx.fillText(`Scroe:${player.score}`, 10, 30);
     }
 }
+
+Canvas.draws = {}

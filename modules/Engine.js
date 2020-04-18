@@ -1,12 +1,13 @@
-class PyhsicsEngine {
-    // 物理引擎
+class Engine {
+    // 执行引擎事件
     static run() {
-        this.gravity(Stage.player)
-        this.move(Stage.player)
+        this.gravity()
+        this.move()
     }
 
-    // 重力系统
-    static gravity(player) {
+    // 重力事件
+    static gravity() {
+        const player = Stage.player
         if (!player.jumping) { return }
         player.y -= player.v
         if (player.y < Canvas.height) {
@@ -18,8 +19,10 @@ class PyhsicsEngine {
         }
     }
 
-    // 移动
-    static move(player) {
+    // 移动事件
+    static move() {
+        const player = Stage.player
+
         if (!player.moving) { return }
 
         if (player.direction === 'd' && player.x + player.radius < Canvas.width) {
@@ -34,9 +37,10 @@ class PyhsicsEngine {
         player.moving = false
     }
 
-    // 碰撞
-    static touch(player, unit) {
-        if (Math.abs(player.x - unit.x) < player.radius && Math.abs(player.y - unit.y) < player.radius) {
+    // 碰撞事件
+    static touch() {
+        const player = Stage.player
+        if (Math.abs(player.x - this.x) < player.radius + this.R && Math.abs(player.y - this.y) < player.radius + this.R) {
             return true
         }
         return false
