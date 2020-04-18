@@ -1,12 +1,11 @@
 new Stage({
     el: 'stage',
-    width: 800,
-    height: 400,
+    width: 500,
+    height: 300,
     player: {
         color: 'red',
         speed: 5,
-        width: 50,
-        height: 60,
+        radius: 20,
         x: 200
     }
-})
+}) 
