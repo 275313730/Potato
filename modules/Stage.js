@@ -1,63 +1,62 @@
 class Stage {
-    constructor(options, fn) {
-        this.canvas = document.getElementById(options.el);
-        this.ctx = this.canvas.getContext('2d');
-        this.width = options.width
-        this.height = options.height
-        Stage.player = options.player
+    constructor(options) {
+        Stage.canvas = this.canvas = document.getElementById(options.el);
+        Stage.ctx = this.ctx = this.canvas.getContext('2d');
+        Stage.width = this.width = options.width
+        Stage.height = this.height = options.height
         Stage.events = options.events
 
-        this.init()
-        fn()
-    }
-
-    init() {
         // 设置页面宽高
         this.canvas.setAttribute('width', this.width + 'px')
         this.canvas.setAttribute('height', this.height + 'px')
 
-        // 初始化Canvas
-        Canvas.init()
-        Canvas.ctx = this.ctx
-        Canvas.width = this.width
-        Canvas.height = this.height
-        Canvas.bgColor = 'rgb(150,200,150)'
+        // 创建新进程
+        this.create()
 
-        // 设置玩家初始属性
-        Stage.player.direction = 'd'
-        Stage.player.y = this.height
-        Stage.player.v = 0
-        Stage.player.score = 0
-
-        // 监听键盘事件
-        KeyBoard.keyListen()
-
-        // 游戏循环
-        this.loop()
+        return this
     }
 
-    // 游戏循环
-    loop() {
-        // 绘制初始页面
-        Canvas.draw()
-
-        // 定时刷新页面
+    // 创建新进程
+    create() {
         this.timer = setInterval(() => {
-            if (Stage.player.moving || Stage.player.jumping) {
-                Engine.run()
+            if (this.refresh()) {
                 this.executeEvents()
-                Canvas.draw()
+                this.draw()
             }
         }, 16)
     }
 
+    // 初始设置
+    init(fn) {
+        fn.call(this)
+        this.draw()
+    }
+
     // 执行事件
     executeEvents() {
-        for (const key in Stage.events) {
-            Stage.events[key]()
+        for (const id in Sprite.units) {
+            Sprite.units[id].event && Sprite.units[id].event()
         }
+    }
+
+    // 绘制页面
+    draw() {
+        this.ctx.clearRect(0, 0, this.width, this.height)
+        for (const key in Sprite.units) {
+            if (!Sprite.units[key].draw) { continue }
+            let unit = JSON.parse(JSON.stringify(Sprite.units[key]))
+            if (unit.sticky) {
+                unit.x += unit.sticky.x
+                unit.y += unit.sticky.y
+            }
+            Sprite.units[key].draw.call(unit)
+        }
+    }
+
+    refresh() {
+        return true
     }
 }
 
-Stage.events = {}
+
 
