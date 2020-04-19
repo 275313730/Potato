@@ -1,13 +1,12 @@
-function staticBackGround(name, url) {
+function staticBackGround(id, url) {
     const options = {
-        id: name,
+        id,
         x: 0,
         y: 0,
-        url: url
     }
 
     return new Sprite(options)
-        .loadImage()
+        .loadImage(url)
 }
 
 function stickyBackGround(id, url, sticky) {
@@ -15,11 +14,20 @@ function stickyBackGround(id, url, sticky) {
         id,
         x: 0,
         y: 0,
-        url,
-        sticky
+        stickyMove: function (speed) {
+            if (this.sticky) {
+                this.sticky.x -= speed
+                if (speed < 0) {
+                    speed += 0.5
+                } else {
+                    speed -= 0.5
+                }
+                this.sticky.stickyMove && this.sticky.stickyMove(speed)
+            }
+        }
     }
 
     return new Sprite(options)
         .stick(sticky)
-        .loadImage()
+        .loadImage(url)
 }

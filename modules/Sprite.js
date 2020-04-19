@@ -15,10 +15,10 @@ class Sprite {
         return this
     }
 
-    loadImage() {
+    loadImage(url) {
         this.img = new Image()
         this.img.onload = () => {
-            const ctx = Stage.ctx
+            const ctx = Game.ctx
             if (this.sticky) {
                 this.draw = () => {
                     let unit = JSON.parse(JSON.stringify(this))
@@ -35,12 +35,12 @@ class Sprite {
                 }
             }
         }
-        this.img.src = this.url
-        return
+        this.img.src = url
+        return this
     }
 
-    stick(id) {
-        this.sticky = Sprite.find(id)
+    stick(sticky) {
+        this.sticky = Sprite.find(sticky)
         return this
     }
 
@@ -50,14 +50,18 @@ class Sprite {
     }
 
     bindKey(fn, type) {
-        window.addEventListener(type, function (e) {
+        this.keys = this.keys || []
+        const bindFn = function (e) {
             fn.call(this, e.key)
-        }.bind(this))
+        }.bind(this)
+        window.addEventListener(type, bindFn)
+        this.keys.push({ type, bindFn })
         return this
     }
 
     execute(fn) {
         fn.call(this)
+        return this
     }
 
     static find(id) {
@@ -65,6 +69,14 @@ class Sprite {
     }
 
     static delete(id) {
+        Sprite.units[id].unBindKeys()
         delete Sprite.units[id]
+    }
+
+    unBindKeys() {
+        if (!this.keys) { return }
+        this.keys.forEach(key => {
+            window.removeEventListener(key.type, key.bindFn)
+        });
     }
 }

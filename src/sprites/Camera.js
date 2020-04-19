@@ -1,4 +1,4 @@
-function camera() {
+function camera(sticky) {
     const options = {
         id: 'camera',
         x: 0,
@@ -10,21 +10,23 @@ function camera() {
             case 'ArrowRight':
                 if (this.sticky.x > -270) {
                     this.sticky.x -= 2
-                    this.sticky.sticky.x -= 1.5
-                    this.sticky.sticky.sticky.x -= 1
+                    console.log(0)
+                    this.sticky.stickyMove && this.sticky.stickyMove(1.5)
                 }
                 break
             case 'ArrowLeft':
                 if (this.sticky.x < 0) {
                     this.sticky.x += 2
-                    this.sticky.sticky.x += 1.5
-                    this.sticky.sticky.sticky.x += 1
+                    this.sticky.stickyMove && this.sticky.stickyMove(-1.5)
                 }
+                break
+            case ' ':
+                Game.jump('static')
                 break
         }
     }
 
     return new Sprite(options)
-        .stick('treeNear')
+        .stick(sticky)
         .bindKey(keyDown, 'keydown')
 }
