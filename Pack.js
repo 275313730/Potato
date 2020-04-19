@@ -3,7 +3,7 @@ modules.forEach(module => {
     document.write(`<script src="modules/${module}.js"></script>`)
 })
 
-const sprites = ['Sky', 'MounFar', 'MounNear', 'TreeFar', 'TreeNear']
+const sprites = ['BackGround', 'Player']
 sprites.forEach(sprite => {
     document.write(`<script src="src/sprites/${sprite}.js"></script>`)
 })

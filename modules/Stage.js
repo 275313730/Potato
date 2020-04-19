@@ -44,12 +44,7 @@ class Stage {
         this.ctx.clearRect(0, 0, this.width, this.height)
         for (const key in Sprite.units) {
             if (!Sprite.units[key].draw) { continue }
-            let unit = JSON.parse(JSON.stringify(Sprite.units[key]))
-            if (unit.sticky) {
-                unit.x += unit.sticky.x
-                unit.y += unit.sticky.y
-            }
-            Sprite.units[key].draw.call(unit)
+            Sprite.units[key].draw()
         }
     }
 

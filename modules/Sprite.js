@@ -34,7 +34,16 @@ class Sprite {
     loadImage() {
         this.img = new Image()
         this.img.onload = () => {
-            this.draw = () => Stage.ctx.drawImage(this.img, this.x, this.y)
+            if (this.sticky) {
+                this.draw = () => {
+                    let unit = JSON.parse(JSON.stringify(this))
+                    unit.x += unit.sticky.x
+                    unit.y += unit.sticky.y
+                    Stage.ctx.drawImage(this.img, this.x, this.y)
+                }
+            } else {
+                this.draw = () => Stage.ctx.drawImage(this.img, this.x, this.y)
+            }
         }
         this.img.src = this.src
         return this

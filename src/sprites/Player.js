@@ -1,11 +1,11 @@
-function sky() {
+function player() {
     const options = {
-        id: 'sky',
+        id: 'player',
         x: 0,
         y: 0,
-        src: 'src/imgs/sky.png'
+        src: ''
     }
 
     return new Sprite(options)
-        .loadImage()
+
 }
