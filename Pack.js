@@ -3,12 +3,12 @@ modules.forEach(module => {
     document.write(`<script src="modules/${module}.js"></script>`)
 })
 
-const sprites = ['BackGround', 'Player']
+const sprites = ['BackGround', 'Camera']
 sprites.forEach(sprite => {
     document.write(`<script src="src/sprites/${sprite}.js"></script>`)
 })
 
-const events = ['Move']
+const events = []
 events.forEach(event => {
     document.write(`<script src="src/events/${event}.js"></script>`)
 })

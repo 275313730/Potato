@@ -11,7 +11,32 @@ class Sprite {
             this[key] = options[key]
         }
         Sprite.units[options.id] = this
+
         return this
+    }
+
+    loadImage() {
+        this.img = new Image()
+        this.img.onload = () => {
+            const ctx = Stage.ctx
+            if (this.sticky) {
+                this.draw = () => {
+                    let unit = JSON.parse(JSON.stringify(this))
+                    unit.x += unit.sticky.x
+                    unit.y += unit.sticky.y
+                    ctx.drawImage(this.img, this.x, this.y)
+                }
+            } else {
+                this.draw = () => {
+                    ctx.globalAlpha = this.alpha || 1
+                    ctx.beginPath()
+                    ctx.drawImage(this.img, this.x, this.y)
+                    ctx.closePath()
+                }
+            }
+        }
+        this.img.src = this.url
+        return
     }
 
     stick(id) {
@@ -28,24 +53,6 @@ class Sprite {
         window.addEventListener(type, function (e) {
             fn.call(this, e.key)
         }.bind(this))
-        return this
-    }
-
-    loadImage() {
-        this.img = new Image()
-        this.img.onload = () => {
-            if (this.sticky) {
-                this.draw = () => {
-                    let unit = JSON.parse(JSON.stringify(this))
-                    unit.x += unit.sticky.x
-                    unit.y += unit.sticky.y
-                    Stage.ctx.drawImage(this.img, this.x, this.y)
-                }
-            } else {
-                this.draw = () => Stage.ctx.drawImage(this.img, this.x, this.y)
-            }
-        }
-        this.img.src = this.src
         return this
     }
 
