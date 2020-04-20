@@ -13,30 +13,32 @@ class Sprite {
         Sprite.units[options.id] = this
     }
 
-    loadImage(url) {
+    bindDraw(fn) {
+        this.draw = () => {
+            fn.call(this)
+        }
+        return this
+    }
+
+    bindImage(url) {
         let img = new Image()
         img.onload = () => {
+            this.width = img.width
+            this.height = img.height
             const ctx = Game.ctx
-            if (this.direction === undefined) {
-                this.draw = () => {
-                    ctx.globalAlpha = this.alpha || 1
+            this.draw = () => {
+                ctx.globalAlpha = this.alpha || 1
+                if (this.direction === undefined || this.direction === 'right') {
                     ctx.drawImage(img, this.x, this.y)
-                }
-            } else {
-                this.draw = () => {
-                    ctx.globalAlpha = this.alpha || 1
-                    if (this.direction === true) {
-                        ctx.drawImage(img, this.x, this.y)
-                    } else {
-                        // 水平翻转画布
-                        ctx.translate(this.stageWidth, 0);
-                        ctx.scale(-1, 1);
-                        // 绘制图片
-                        ctx.drawImage(img, this.stageWidth - this.img.width - this.x, this.y);
-                        // 画布恢复正常
-                        ctx.translate(this.stageWidth, 0);
-                        ctx.scale(-1, 1);
-                    }
+                } else {
+                    // 水平翻转画布
+                    ctx.translate(this.stageWidth, 0);
+                    ctx.scale(-1, 1);
+                    // 绘制图片
+                    ctx.drawImage(img, this.stageWidth - this.img.width - this.x, this.y);
+                    // 画布恢复正常
+                    ctx.translate(this.stageWidth, 0);
+                    ctx.scale(-1, 1);
                 }
             }
         }
@@ -44,21 +46,29 @@ class Sprite {
         return this
     }
 
-    playAnimation(name, time) {
+    bindAnimation(name, time) {
         let ctx = Game.ctx,
             index = 0,
             count = 0,
             images = this.animations[name]
         this.draw = () => {
             ctx.globalAlpha = this.alpha || 1
-            if (this.direction === 'right') {
-                ctx.drawImage(images[index], this.x, this.y)
+            let relX, relY
+            if (this.sticky) {
+                relX = this.x + this.sticky.x
+                relY = this.y + this.sticky.y
+            } else {
+                relX = this.x
+                relY = this.y
+            }
+            if (this.direction === 'right' || this.direction === undefined) {
+                ctx.drawImage(images[index], relX, relY)
             } else {
                 // 水平翻转画布
                 ctx.translate(Stage.width, 0);
                 ctx.scale(-1, 1);
                 // 绘制图片
-                ctx.drawImage(images[index], Stage.width - images[index].width - this.x, this.y);
+                ctx.drawImage(images[index], Stage.width - images[index].width - relX, relY);
                 // 画布恢复正常
                 ctx.translate(Stage.width, 0);
                 ctx.scale(-1, 1);
@@ -72,6 +82,7 @@ class Sprite {
                 }
             }
         }
+
         return this
     }
 
@@ -81,7 +92,8 @@ class Sprite {
     }
 
     bindEvent(fn) {
-        this.event = fn.bind(this)
+        this.events = this.events || []
+        this.events.push(fn.bind(this))
         return this
     }
 
@@ -92,11 +104,6 @@ class Sprite {
         }.bind(this)
         window.addEventListener(type, bindFn)
         this.keys.push({ type, bindFn })
-        return this
-    }
-
-    execute(fn) {
-        fn.call(this)
         return this
     }
 

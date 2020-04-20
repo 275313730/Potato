@@ -8,17 +8,19 @@ class Game {
         Game.animations = {}
     }
 
+    // 设置初始内容
     set(fn) {
         fn.call(this)
         return this
     }
 
-    create(stage) {
+    // 载入Stage
+    start(stage, ...args) {
         Promise.all(Game.promises)
             .then(() => {
-                Game.currStage = stage()
-                return this
+                Game.currStage = stage(args)
             })
+            .catch(err => console.log(err))
     }
 
     loadAnimation(id, ...args) {
@@ -45,8 +47,8 @@ class Game {
         return this
     }
 
-    static jump(stage) {
+    static switchStage(stage, ...args) {
         Game.currStage.destory()
-        Game.currStage = stage()
+        Game.currStage = stage(args)
     }
 }

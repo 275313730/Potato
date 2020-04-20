@@ -14,9 +14,8 @@ class Stage {
         return this
     }
 
-    // 创建单位
-    createUnit(sprite, ...args) {
-        let unit = sprite.call(this, ...args)
+    // 加载单位
+    loadUnit(unit) {
         this.units[unit.id] = unit
         return this
     }
@@ -48,7 +47,12 @@ class Stage {
             this.events[key].call(this)
         }
         for (const id in Sprite.units) {
-            Sprite.units[id].event && Sprite.units[id].event()
+            const events = Sprite.units[id].events
+            if (events) {
+                events.forEach(event => {
+                    event()
+                });
+            }
         }
     }
 
