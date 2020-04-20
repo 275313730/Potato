@@ -2,9 +2,9 @@ class Stage {
     constructor(options) {
         Stage.width = this.width = options.width || Game.width
         Stage.height = this.height = options.height || Game.height
-        Stage.events = this.events = options.events
+        this.events = options.events
+        this.id = options.id
         this.units = {}
-        return this
     }
 
     // 初始设置
@@ -15,16 +15,22 @@ class Stage {
     }
 
     // 创建单位
-    createUnit(unit) {
+    createUnit(sprite, ...args) {
+        let unit = sprite.call(this, ...args)
         this.units[unit.id] = unit
         return this
+    }
+
+    // 查找单位
+    findUnit(id) {
+        return this.units[id]
     }
 
     // 创建Stage
     create() {
         // 设置页面宽高
-        Game.canvas.setAttribute('width', Stage.width + 'px')
-        Game.canvas.setAttribute('height', Stage.height + 'px')
+        Game.canvas.setAttribute('width', this.width + 'px')
+        Game.canvas.setAttribute('height', this.height + 'px')
 
         this.timer = setInterval(() => {
             if (this.refresh()) {
@@ -38,6 +44,9 @@ class Stage {
 
     // 执行事件
     executeEvents() {
+        for (const key in this.events) {
+            this.events[key].call(this)
+        }
         for (const id in Sprite.units) {
             Sprite.units[id].event && Sprite.units[id].event()
         }
@@ -45,10 +54,9 @@ class Stage {
 
     // 绘制页面
     draw() {
-        Game.ctx.clearRect(0, 0, Stage.width, Stage.height)
+        Game.ctx.clearRect(0, 0, this.width, this.height)
         for (const key in Sprite.units) {
-            if (!Sprite.units[key].draw) { continue }
-            Sprite.units[key].draw()
+            Sprite.units[key].draw && Sprite.units[key].draw()
         }
     }
 
@@ -59,6 +67,7 @@ class Stage {
 
     // 摧毁
     destory() {
+        clearInterval(this.timer)
         for (const key in this.units) {
             Sprite.delete(this.units[key].id)
         }

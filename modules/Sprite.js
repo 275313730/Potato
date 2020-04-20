@@ -11,31 +11,67 @@ class Sprite {
             this[key] = options[key]
         }
         Sprite.units[options.id] = this
-
-        return this
     }
 
     loadImage(url) {
-        this.img = new Image()
-        this.img.onload = () => {
+        let img = new Image()
+        img.onload = () => {
             const ctx = Game.ctx
-            if (this.sticky) {
+            if (this.direction === undefined) {
                 this.draw = () => {
-                    let unit = JSON.parse(JSON.stringify(this))
-                    unit.x += unit.sticky.x
-                    unit.y += unit.sticky.y
-                    ctx.drawImage(this.img, this.x, this.y)
+                    ctx.globalAlpha = this.alpha || 1
+                    ctx.drawImage(img, this.x, this.y)
                 }
             } else {
                 this.draw = () => {
                     ctx.globalAlpha = this.alpha || 1
-                    ctx.beginPath()
-                    ctx.drawImage(this.img, this.x, this.y)
-                    ctx.closePath()
+                    if (this.direction === true) {
+                        ctx.drawImage(img, this.x, this.y)
+                    } else {
+                        // 水平翻转画布
+                        ctx.translate(this.stageWidth, 0);
+                        ctx.scale(-1, 1);
+                        // 绘制图片
+                        ctx.drawImage(img, this.stageWidth - this.img.width - this.x, this.y);
+                        // 画布恢复正常
+                        ctx.translate(this.stageWidth, 0);
+                        ctx.scale(-1, 1);
+                    }
                 }
             }
         }
-        this.img.src = url
+        img.src = url
+        return this
+    }
+
+    playAnimation(name, time) {
+        let ctx = Game.ctx,
+            index = 0,
+            count = 0,
+            images = this.animations[name]
+        this.draw = () => {
+            ctx.globalAlpha = this.alpha || 1
+            if (this.direction === 'right') {
+                ctx.drawImage(images[index], this.x, this.y)
+            } else {
+                // 水平翻转画布
+                ctx.translate(Stage.width, 0);
+                ctx.scale(-1, 1);
+                // 绘制图片
+                ctx.drawImage(images[index], Stage.width - images[index].width - this.x, this.y);
+                // 画布恢复正常
+                ctx.translate(Stage.width, 0);
+                ctx.scale(-1, 1);
+            }
+            count++
+            if (count === time) {
+                count = 0
+                index++
+                if (index === images.length) {
+                    index = 0
+                }
+            }
+        }
         return this
     }
 
