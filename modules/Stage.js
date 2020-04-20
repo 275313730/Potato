@@ -1,7 +1,7 @@
 class Stage {
     constructor(options) {
-        Stage.width = this.width = options.width || Game.width
-        Stage.height = this.height = options.height || Game.height
+        Stage.width = options.width || Game.width
+        Stage.height = options.height || Game.height
         this.events = options.events
         this.id = options.id
         this.units = {}
@@ -11,6 +11,14 @@ class Stage {
     set(fn) {
         fn.call(this)
         this.draw()
+        return this
+    }
+
+    // 播放音乐
+    switchMusic(name) {
+        this.music = Game.audio[name]
+        this.music.loop = true
+        this.music.play()
         return this
     }
 
@@ -28,8 +36,8 @@ class Stage {
     // 创建Stage
     create() {
         // 设置页面宽高
-        Game.canvas.setAttribute('width', this.width + 'px')
-        Game.canvas.setAttribute('height', this.height + 'px')
+        Game.canvas.setAttribute('width', Stage.width + 'px')
+        Game.canvas.setAttribute('height', Stage.height + 'px')
 
         this.timer = setInterval(() => {
             if (this.refresh()) {
@@ -72,6 +80,7 @@ class Stage {
     // 摧毁
     destory() {
         clearInterval(this.timer)
+        this.music.stop()
         for (const key in this.units) {
             Sprite.delete(this.units[key].id)
         }
