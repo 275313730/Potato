@@ -7,34 +7,9 @@ class Stage {
         this.units = {}
     }
 
-    // 初始设置
-    set(fn) {
-        fn.call(this)
-        this.draw()
-        return this
-    }
-
-    // 播放音乐
-    switchMusic(name) {
-        this.music = Game.audio[name]
-        this.music.loop = true
-        this.music.play()
-        return this
-    }
-
-    // 加载单位
-    loadUnit(unit) {
-        this.units[unit.id] = unit
-        return this
-    }
-
-    // 查找单位
-    findUnit(id) {
-        return this.units[id]
-    }
-
     // 创建Stage
-    create() {
+    create(fn) {
+        fn.call(this)
         // 设置页面宽高
         Game.canvas.setAttribute('width', Stage.width + 'px')
         Game.canvas.setAttribute('height', Stage.height + 'px')
@@ -45,8 +20,24 @@ class Stage {
                 this.draw()
             }
         }, 16)
-
         return this
+    }
+
+    // 加载单位
+    loadUnit(unit) {
+        this.units[unit.id] = unit
+    }
+
+    // 查找单位
+    findUnit(id) {
+        return this.units[id]
+    }
+
+    // 播放音乐
+    switchMusic(name) {
+        this.music = Game.audio[name]
+        this.music.loop = true
+        this.music.play()
     }
 
     // 执行事件
@@ -80,7 +71,8 @@ class Stage {
     // 摧毁
     destory() {
         clearInterval(this.timer)
-        this.music.stop()
+        this.music.pause();
+        this.music.currentTime = 0;
         for (const key in this.units) {
             Sprite.delete(this.units[key].id)
         }

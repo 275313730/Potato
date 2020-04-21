@@ -1,19 +1,38 @@
 class Sprite {
     constructor(options) {
-        Sprite.units = Sprite.units || {}
+
+        this.check(options)
+
+        // 初始化变量
+        this.id = ''
+        this.x = 0
+        this.y = 0
+        this.width = 0
+        this.height = 0
+        this.stick = null
+        this.direction = 6
+        this.animations = null
+
+        for (const key in options) {
+            this[key] = options[key]
+        }
+
+        Sprite.units[options.id] = this
+    }
+
+    check(options) {
+        if (!Sprite.units) {
+            Sprite.units = {}
+        }
         if (!options.id) {
             throw new Error('Sprite needs an id.')
         }
         if (Sprite.units.id) {
             throw new Error('Sprite exists.')
         }
-        for (const key in options) {
-            this[key] = options[key]
-        }
-        Sprite.units[options.id] = this
     }
 
-    set(fn) {
+    create(fn) {
         fn.call(this)
         return this
     }
@@ -22,7 +41,6 @@ class Sprite {
         this.draw = () => {
             fn.call(this)
         }
-        return this
     }
 
     bindImage(name) {
@@ -32,23 +50,23 @@ class Sprite {
         this.height = img.height
         this.draw = () => {
             ctx.globalAlpha = this.alpha || 1
-            if (this.direction === undefined || this.direction === 'right') {
+            if (this.direction === undefined || this.direction === 6) {
                 ctx.drawImage(img, this.x, this.y)
             } else {
                 // 水平翻转画布
                 ctx.translate(this.stageWidth, 0);
                 ctx.scale(-1, 1);
                 // 绘制图片
-                ctx.drawImage(img, this.stageWidth - this.img.width - this.x, this.y);
+                ctx.drawImage(img, Stage.width - img.width - this.x, this.y);
                 // 画布恢复正常
                 ctx.translate(this.stageWidth, 0);
                 ctx.scale(-1, 1);
             }
         }
-        return this
     }
 
     bindAnimation(name, time) {
+        time = time || Sprite.AnimationInterval || 16
         let ctx = Game.ctx,
             index = 0,
             count = 0,
@@ -56,14 +74,14 @@ class Sprite {
         this.draw = () => {
             ctx.globalAlpha = this.alpha || 1
             let relX, relY
-            if (this.sticky) {
-                relX = this.x + this.sticky.x
-                relY = this.y + this.sticky.y
+            if (this.stick) {
+                relX = this.x + this.stick.x
+                relY = this.y + this.stick.y
             } else {
                 relX = this.x
                 relY = this.y
             }
-            if (this.direction === 'right' || this.direction === undefined) {
+            if (this.direction === 6 || this.direction === undefined) {
                 ctx.drawImage(images[index], relX, relY)
             } else {
                 // 水平翻转画布
@@ -84,29 +102,20 @@ class Sprite {
                 }
             }
         }
-
-        return this
-    }
-
-    stick(sticky) {
-        this.sticky = Sprite.find(sticky)
-        return this
     }
 
     bindEvent(fn) {
         this.events = this.events || []
         this.events.push(fn.bind(this))
-        return this
     }
 
-    bindKey(fn, type) {
+    bindUserEvent(fn, eventType) {
         this.keys = this.keys || []
         const bindFn = function (e) {
-            fn.call(this, e.key)
+            fn.call(this, e)
         }.bind(this)
-        window.addEventListener(type, bindFn)
-        this.keys.push({ type, bindFn })
-        return this
+        window.addEventListener(eventType, bindFn)
+        this.keys.push({ type: eventType, bindFn })
     }
 
     static find(id) {
