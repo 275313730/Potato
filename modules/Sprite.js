@@ -1,9 +1,21 @@
 class Sprite {
     constructor(options) {
-
         this.check(options)
+        this.setDefalutProperty()
+        this.setProperty(options)
+        this.bind = this.bind()
+    }
 
-        // 初始化变量
+    // 检查options
+    check(options) {
+        // 检查id是否填写
+        if (!options.id) {
+            throw new Error('Sprite needs an id.')
+        }
+    }
+
+    // 初始化数据
+    setDefalutProperty() {
         this.id = ''
         this.x = 0
         this.y = 0
@@ -12,125 +24,128 @@ class Sprite {
         this.stick = null
         this.direction = 6
         this.animations = null
+    }
 
+    // 设置数据
+    setProperty(options) {
         for (const key in options) {
+            switch (key) {
+                case 'check':
+                    continue
+                case 'create':
+                    continue
+                case 'bind':
+                    continue
+                case 'setProperty':
+                    continue
+            }
             this[key] = options[key]
         }
-
-        Sprite.units[options.id] = this
     }
 
-    check(options) {
-        if (!Sprite.units) {
-            Sprite.units = {}
-        }
-        if (!options.id) {
-            throw new Error('Sprite needs an id.')
-        }
-        if (Sprite.units.id) {
-            throw new Error('Sprite exists.')
-        }
-    }
-
+    // 创建
     create(fn) {
         fn.call(this)
         return this
     }
 
-    bindDraw(fn) {
-        this.draw = () => {
-            fn.call(this)
-        }
-    }
-
-    bindImage(name) {
-        let img = Game.images[name],
-            ctx = Game.ctx
-        this.width = img.width
-        this.height = img.height
-        this.draw = () => {
-            ctx.globalAlpha = this.alpha || 1
-            if (this.direction === undefined || this.direction === 6) {
-                ctx.drawImage(img, this.x, this.y)
-            } else {
-                // 水平翻转画布
-                ctx.translate(this.stageWidth, 0);
-                ctx.scale(-1, 1);
-                // 绘制图片
-                ctx.drawImage(img, Stage.width - img.width - this.x, this.y);
-                // 画布恢复正常
-                ctx.translate(this.stageWidth, 0);
-                ctx.scale(-1, 1);
+    // 绑定
+    bind() {
+        // 绑定形状(几何图形)
+        function bindShape(fn) {
+            this.draw = () => {
+                fn.call(this)
             }
         }
-    }
 
-    bindAnimation(name, time) {
-        time = time || Sprite.AnimationInterval || 16
-        let ctx = Game.ctx,
-            index = 0,
-            count = 0,
-            images = this.animations[name]
-        this.draw = () => {
-            ctx.globalAlpha = this.alpha || 1
-            let relX, relY
-            if (this.stick) {
-                relX = this.x + this.stick.x
-                relY = this.y + this.stick.y
-            } else {
-                relX = this.x
-                relY = this.y
-            }
-            if (this.direction === 6 || this.direction === undefined) {
-                ctx.drawImage(images[index], relX, relY)
-            } else {
-                // 水平翻转画布
-                ctx.translate(Stage.width, 0);
-                ctx.scale(-1, 1);
-                // 绘制图片
-                ctx.drawImage(images[index], Stage.width - images[index].width - relX, relY);
-                // 画布恢复正常
-                ctx.translate(Stage.width, 0);
-                ctx.scale(-1, 1);
-            }
-            count++
-            if (count === time) {
-                count = 0
-                index++
-                if (index === images.length) {
-                    index = 0
+        // 绑定图片
+        function bindImage(name) {
+            let img = Game.images[name],
+                ctx = Game.ctx
+            this.width = img.width
+            this.height = img.height
+            this.draw = () => {
+                ctx.globalAlpha = this.alpha || 1
+                if (this.direction === undefined || this.direction === 6) {
+                    ctx.drawImage(img, this.x, this.y)
+                } else {
+                    // 水平翻转画布
+                    ctx.translate(this.stageWidth, 0);
+                    ctx.scale(-1, 1);
+                    // 绘制图片
+                    ctx.drawImage(img, Stage.width - img.width - this.x, this.y);
+                    // 画布恢复正常
+                    ctx.translate(this.stageWidth, 0);
+                    ctx.scale(-1, 1);
                 }
             }
         }
-    }
 
-    bindEvent(fn) {
-        this.events = this.events || []
-        this.events.push(fn.bind(this))
-    }
+        // 绑定动画
+        function bindAnimation(name, time) {
+            // 动画间隔帧
+            time = time || Game.AnimationInterval || 16
+            let ctx = Game.ctx,
+                index = 0,
+                count = 0,
+                images = this.animations[name]
+            this.draw = () => {
+                ctx.globalAlpha = this.alpha || 1
+                let relX, relY
+                if (this.stick) {
+                    relX = this.x + this.stick.x
+                    relY = this.y + this.stick.y
+                } else {
+                    relX = this.x
+                    relY = this.y
+                }
+                if (this.direction === 6 || this.direction === undefined) {
+                    ctx.drawImage(images[index], relX, relY)
+                } else {
+                    // 水平翻转画布
+                    ctx.translate(Stage.width, 0);
+                    ctx.scale(-1, 1);
+                    // 绘制图片
+                    ctx.drawImage(images[index], Stage.width - images[index].width - relX, relY);
+                    // 画布恢复正常
+                    ctx.translate(Stage.width, 0);
+                    ctx.scale(-1, 1);
+                }
+                count++
+                if (count === time) {
+                    count = 0
+                    index++
+                    if (index === images.length) {
+                        index = 0
+                    }
+                }
+            }
+        }
 
-    bindUserEvent(fn, eventType) {
-        this.keys = this.keys || []
-        const bindFn = function (e) {
-            fn.call(this, e)
-        }.bind(this)
-        window.addEventListener(eventType, bindFn)
-        this.keys.push({ type: eventType, bindFn })
-    }
+        // 绑定事件
+        function bindEvent(fn) {
+            this.events = this.events || []
+            this.events.push(fn.bind(this))
+        }
 
-    static find(id) {
-        return Sprite.units[id]
-    }
+        // 绑定玩家事件(键盘事件or鼠标事件等)
+        function bindUserEvent(fn, eventType, isBreak) {
+            this.userEvents = this.userEvents || []
+            const bindFn = function (e) {
+                if (isBreak && e.key === Game.key) { return }
+                Game.key = e.key
+                fn.call(this, e)
+            }.bind(this)
+            window.addEventListener(eventType, bindFn)
+            this.userEvents.push({ eventType, bindFn })
+        }
 
-    static delete(id) {
-        Sprite.units[id].unBindKeys()
-        delete Sprite.units[id]
-    }
-
-    unBindKeys() {
-        if (!this.keys) { return }
-        this.keys.forEach(key => {
-            window.removeEventListener(key.type, key.bindFn)
-        });
+        return {
+            shape: bindShape.bind(this),
+            image: bindImage.bind(this),
+            animation: bindAnimation.bind(this),
+            event: bindEvent.bind(this),
+            userEvent: bindUserEvent.bind(this)
+        }
     }
 }

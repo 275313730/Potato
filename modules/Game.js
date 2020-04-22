@@ -4,13 +4,18 @@ class Game {
         Game.ctx = Game.canvas.getContext('2d');
         Game.width = options.width
         Game.height = options.height
-        Game.currStage = null
         Game.animations = {}
         Game.images = {}
         Game.audio = {}
+        Game.sounds = []
         Game.imagePath = ''
         Game.audioPath = ''
+        Game.frames = 60
+
         this.promises = []
+
+        this.load = this.load()
+        Game.music = Game.music()
     }
 
     // 创建游戏
@@ -19,59 +24,67 @@ class Game {
     }
 
     // 创建场景
-    startWith(stage, ...args) {
+    start(stage, ...args) {
         Game.canvas.setAttribute('width', Game.width)
         Game.canvas.setAttribute('height', Game.height)
 
         Promise.all(this.promises)
             .then(() => {
-                Game.currStage = stage(args)
+                Game.stage = stage(args)
             })
             .catch(err => console.log(err))
     }
 
-    // 载入图片
-    loadImage(id, url) {
-        let img = Game.images[id] = new Image()
-        this.promises.push(
-            new Promise((resolve, reject) => {
-                img.onload = () => {
-                    if (img.fileSize > 0 || (img.width > 0 && img.height > 0)) {
-                        resolve('load')
-                    } else {
-                        reject(img.src)
-                    }
-                }
-            })
-        )
-        img.src = Game.imagePath + url
-    }
-
-    // 载入动画
-    loadAnimation(id, name, url, length, type) {
-        Game.animations[id] = Game.animations[id] || {}
-        let images = Game.animations[id][name] = []
-        type = type || 'png'
-        for (let i = 0; i < length; i++) {
-            images[i] = new Image()
+    load() {
+        // 载入图片
+        function image(id, url) {
+            let img = Game.images[id] = new Image()
             this.promises.push(
                 new Promise((resolve, reject) => {
-                    images[i].onload = () => {
-                        if (images[i].fileSize > 0 || (images[i].width > 0 && images[i].height > 0)) {
+                    img.onload = () => {
+                        if (img.fileSize > 0 || (img.width > 0 && img.height > 0)) {
                             resolve('load')
                         } else {
-                            reject(images[i].src)
+                            reject(img.src)
                         }
                     }
                 })
             )
-            images[i].src = `${Game.imagePath}${url}${i + 1}.${type}`
+            img.src = Game.imagePath + url
         }
-    }
 
-    // 载入音频
-    loadAudio(audio) {
-        Game.audio[audio.id] = new Audio(Game.audioPath + audio.url)
+        // 载入动画
+        function animation(id, name, url, length, type) {
+            Game.animations[id] = Game.animations[id] || {}
+            let images = Game.animations[id][name] = []
+            type = type || 'png'
+            for (let i = 0; i < length; i++) {
+                images[i] = new Image()
+                this.promises.push(
+                    new Promise((resolve, reject) => {
+                        images[i].onload = () => {
+                            if (images[i].fileSize > 0 || (images[i].width > 0 && images[i].height > 0)) {
+                                resolve('load')
+                            } else {
+                                reject(images[i].src)
+                            }
+                        }
+                    })
+                )
+                images[i].src = `${Game.imagePath}${url}${i + 1}.${type}`
+            }
+        }
+
+        // 载入音频
+        function audio(id, url) {
+            Game.audio[id] = new Audio(Game.audioPath + url)
+        }
+
+        return {
+            image: image.bind(this),
+            animation: animation.bind(this),
+            audio: audio.bind(this)
+        }
     }
 
     // 转场
@@ -82,10 +95,62 @@ class Game {
 
     // 切换场景
     static switchStage(stage, ...args) {
-        this.currStage.destory()
+        this.stage.destory()
         this.cutscenes()
         setTimeout(() => {
-            this.currStage = stage(args)
-        }, 300)
+            this.stage = stage(args)
+        }, 100)
     }
+
+
+    static music() {
+        let music = null
+
+        function play(name) {
+            if (music === this.audio[name]) {
+                music.play()
+            } else {
+                music = this.audio[name]
+                music.play()
+            }
+        }
+
+        function pause() {
+            music.pause()
+        }
+
+        function stop() {
+            music.currentTime = 0
+        }
+
+        function loop(boolean) {
+            music.loop = boolean
+        }
+
+        return {
+            play: play.bind(this),
+            pause: pause.bind(this),
+            stop: stop.bind(this),
+            loop: loop.bind(this)
+        }
+    }
+
+    static sound() {
+        function play(name, extra) {
+            if (extra) {
+                let sound = this.audio[name].cloneNode()
+                sound.play()
+                sound.addEventListener('ended', () => {
+                    sound = null
+                })
+            } else {
+                this.audio[name].play()
+            }
+        }
+
+        return {
+            play: play.bind(this)
+        }
+    }
+
 }
