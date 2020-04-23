@@ -3,8 +3,9 @@ class Sprite {
         this.check(options)
         this.setDefalutProperty()
         this.setProperty(options)
-        this.bind = this.bind()
-        this.unBind = this.unBind()
+        this.draw = this.draw()
+        this.event = this.event()
+        this.userEvent = this.userEvent()
         fn && fn.call(this)
     }
 
@@ -46,17 +47,13 @@ class Sprite {
         }
     }
 
-    // 销毁
-    destroy() {
-        Game.stage.get().unit.del(this.id)
-    }
-
-    // 绑定
-    bind() {
+    // 绘制
+    draw() {
+        let drawFunction = function () { }
         return {
             // 绑定形状(几何图形)
             shape: fn => {
-                this.draw = () => {
+                drawFunction = () => {
                     fn.call(this)
                 }
             },
@@ -66,7 +63,7 @@ class Sprite {
                     ctx = Game.ctx
                 this.width = img.width
                 this.height = img.height
-                this.draw = () => {
+                drawFunction = () => {
                     ctx.globalAlpha = this.alpha || 1
                     if (this.direction === undefined || this.direction === 6) {
                         ctx.drawImage(img, this.relX, this.y)
@@ -90,7 +87,7 @@ class Sprite {
                     index = 0,
                     count = 0,
                     images = this.animations[name]
-                this.draw = () => {
+                drawFunction = () => {
                     ctx.globalAlpha = this.alpha || 1
                     if (this.direction === 6 || this.direction === undefined) {
                         ctx.drawImage(images[index], this.relX, this.y)
@@ -114,44 +111,51 @@ class Sprite {
                     }
                 }
             },
-            // 绑定事件
-            event: fn => {
-                this.events = this.events || []
-                this.events.push(fn.bind(this))
+            unBind: () => {
+                drawFunction = function () { }
             },
-            // 绑定玩家事件(键盘事件or鼠标事件等)
-            userEvent: (fn, eventType, isBreak) => {
-                this.userEvents = this.userEvents || []
+            execute: () => {
+                drawFunction()
+            }
+        }
+    }
+
+    // 事件
+    event() {
+        let events = []
+        return {
+            add: fn => {
+                events.push(fn)
+            },
+            del: fn => {
+                for (const key in events) {
+                    events[key] === fn
+                    events.splice(key, 1)
+                    return
+                }
+            },
+            execute: () => {
+                events.forEach(event => {
+                    event.call(this)
+                })
+            }
+        }
+    }
+
+    // 用户事件
+    userEvent() {
+        let userEvents = []
+        return {
+            add: (fn, eventType, isBreak) => {
                 const bindFn = function (e) {
                     if (isBreak && e.key === Game.key) { return }
                     Game.key = e.key
                     fn.call(this, e)
                 }.bind(this)
                 window.addEventListener(eventType, bindFn)
-                this.userEvents.push({ eventType, bindFn })
-            }
-        }
-    }
-
-    // 解绑
-    unBind() {
-        return {
-            // 解绑画面
-            draw: () => {
-                this.draw = null
+                userEvents.push({ eventType, bindFn })
             },
-            // 解绑事件
-            event: fn => {
-                for (const key in this.events) {
-                    this.events[key] === fn.bind(this)
-                    this.events.splice(key, 1)
-                    return
-                }
-            },
-            // 解绑用户事件
-            userEvent: eventType => {
-                let userEvents = this.userEvents
-                if (!this.userEvents) { return }
+            del: eventType => {
                 if (eventType) {
                     for (let i = 0; i < userEvents.length; i++) {
                         let event = userEvents[i]
@@ -162,7 +166,7 @@ class Sprite {
                         }
                     }
                 } else {
-                    this.userEvents.forEach(event => {
+                    userEvents.forEach(event => {
                         window.removeEventListener(event.eventType, event.bindFn)
                     });
                 }

@@ -1,45 +1,41 @@
 class Stage {
     constructor(options, fn) {
+        // 初始化场景数据
         Stage.width = options.width || Game.width
         Stage.height = options.height || Game.height
-
-        this.events = options.events
+        Game.canvas.setAttribute('width', Stage.width + 'px')
+        Game.canvas.setAttribute('height', Stage.height + 'px')
         this.unit = this.unit()
+        this.event = this.event()
         this.execute = this.execute()
         fn && fn.call(this)
 
-        // 设置页面宽高
-        Game.canvas.setAttribute('width', Stage.width + 'px')
-        Game.canvas.setAttribute('height', Stage.height + 'px')
-
         // 进入场景循环
         this.timer = setInterval(() => {
-            this.execute.events()
-            this.execute.calPosition()
             this.execute.draw()
+            this.execute.events()
         }, 1000 / Game.frames)
 
         return this
     }
 
+    // 场景单位
     unit() {
         let units = {}
         return {
             // 添加单位
             add: newUnit => {
-                let exist = false
-                this.unit.travel(unit => {
-                    if (unit.id === newUnit.id) {
-                        exist = true
+                for (const key in units) {
+                    if (key === newUnit.id) {
+                        return false
                     }
-                })
-                if (!exist) {
-                    units[newUnit.id] = newUnit
                 }
+                units[newUnit.id] = newUnit
+                return true
             },
             // 删除单位
             del: id => {
-                units[id].unBind.userEvent()
+                units[id].userEvent.del()
                 delete units[id]
             },
             // 查找单位
@@ -48,9 +44,9 @@ class Stage {
             },
             // 删除所有单位
             delAll: () => {
-                this.unit.travel(unit => {
-                    this.unit.del(unit.id)
-                })
+                for (const key in units) {
+                    this.unit.del(key)
+                }
             },
             // 遍历单位
             travel: fn => {
@@ -61,41 +57,59 @@ class Stage {
         }
     }
 
-    // 执行函数
+    // 场景事件
+    event() {
+        let events = {}
+        return {
+            // 添加
+            add: (fn, ...args) => {
+                if (events[fn.name]) {
+                    return false
+                }
+                events[fn.name] = fn.bind(this, ...args)
+                return true
+            },
+            // 删除
+            del: name => {
+                if (!events[name]) {
+                    return false
+                }
+                delete events[name]
+                return true
+            },
+            // 遍历
+            travel: fn => {
+                for (const key in events) {
+                    fn(events[key])
+                }
+            }
+        }
+    }
+
+    // 场景自调用函数
     execute() {
         return {
-            // 事件
+            // 事件(包括场景事件和单位事件)
             events: () => {
-                for (const key in this.events) {
-                    this.events[key].call(this)
-                }
+                this.event.travel(event => {
+                    event.call(this)
+                })
                 this.unit.travel(unit => {
-                    const events = unit.events
-                    if (events) {
-                        events.forEach(event => {
-                            event()
-                        });
-                    }
+                    unit.event.execute()
                 })
             },
-            // 画面
+            // 单位绘制
             draw: () => {
+                // 清除画面
                 Game.ctx.clearRect(0, 0, this.width, this.height)
                 this.unit.travel(unit => {
-                    unit.draw && unit.draw()
+                    // 计算单位真实位置
+                    unit.relX = unit.stick ? unit.x + unit.stick.x : unit.x
+                    // 绘制画面
+                    unit.draw.execute()
                 })
             },
-            // 计算真实位置
-            calPosition: () => {
-                this.unit.travel(unit => {
-                    if (unit.stick) {
-                        unit.relX = unit.x + unit.stick.x
-                    } else {
-                        unit.relX = unit.x
-                    }
-                })
-            },
-            // 销毁
+            // 场景销毁
             destory: () => {
                 clearInterval(this.timer)
                 this.unit.delAll()
@@ -103,6 +117,3 @@ class Stage {
         }
     }
 }
-
-
-

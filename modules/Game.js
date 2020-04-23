@@ -25,7 +25,6 @@ class Game {
     start(stage, ...args) {
         Game.canvas.setAttribute('width', Game.width)
         Game.canvas.setAttribute('height', Game.height)
-
         Promise.all(this.promises)
             .then(() => {
                 Game.stage.switch(stage, ...args)
@@ -88,17 +87,13 @@ class Game {
                 currStage && currStage.execute.destory()
                 this.stage.cutscenes()
                 setTimeout(() => {
-                    currStage = newStage(args)
+                    currStage = newStage(...args)
                 }, 100)
             },
             // 转场
             cutscenes: () => {
                 this.ctx.fillStyle = 'black'
                 this.ctx.fillRect(0, 0, this.width, this.height)
-            },
-            // 获取当前场景
-            get: () => {
-                return currStage
             }
         }
     }
