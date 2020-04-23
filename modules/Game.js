@@ -1,5 +1,5 @@
 class Game {
-    constructor(options) {
+    constructor(options, fn) {
         Game.canvas = document.getElementById(options.el);
         Game.ctx = Game.canvas.getContext('2d');
         Game.width = options.width
@@ -18,10 +18,6 @@ class Game {
         Game.sound = Game.sound()
         Game.music = Game.music()
         Game.stage = Game.stage()
-    }
-
-    // 创建游戏
-    create(fn) {
         fn.call(this)
     }
 

@@ -6,7 +6,6 @@ class Sprite {
         this.bind = this.bind()
         this.unBind = this.unBind()
         fn && fn.call(this)
-        return this
     }
 
     // 检查options

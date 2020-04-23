@@ -7,15 +7,18 @@ class Stage {
         this.unit = this.unit()
         this.execute = this.execute()
         fn && fn.call(this)
+
         // 设置页面宽高
         Game.canvas.setAttribute('width', Stage.width + 'px')
         Game.canvas.setAttribute('height', Stage.height + 'px')
 
+        // 进入场景循环
         this.timer = setInterval(() => {
             this.execute.events()
             this.execute.calPosition()
             this.execute.draw()
         }, 1000 / Game.frames)
+
         return this
     }
 
