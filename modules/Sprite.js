@@ -1,4 +1,7 @@
-class Sprite {
+import { Game } from "./Game.js";
+import { Stage } from "../modules/Stage.js";
+
+export class Sprite {
     constructor(options, fn) {
         this.check(options)
         this.setDefalutProperty()
@@ -54,7 +57,7 @@ class Sprite {
             // 绑定形状(几何图形)
             shape: fn => {
                 drawFunction = () => {
-                    fn.call(this)
+                    fn.call(this, Game.ctx)
                 }
             },
             // 绑定图片
@@ -69,12 +72,12 @@ class Sprite {
                         ctx.drawImage(img, this.relX, this.y)
                     } else {
                         // 水平翻转画布
-                        ctx.translate(this.stageWidth, 0);
+                        ctx.translate(Stage.width, 0);
                         ctx.scale(-1, 1);
                         // 绘制图片
                         ctx.drawImage(img, Stage.width - img.width - this.relX, this.y);
                         // 画布恢复正常
-                        ctx.translate(this.stageWidth, 0);
+                        ctx.translate(Stage.width, 0);
                         ctx.scale(-1, 1);
                     }
                 }
@@ -134,6 +137,9 @@ class Sprite {
                     return
                 }
             },
+            delAll: () => {
+                events = []
+            },
             execute: () => {
                 events.forEach(event => {
                     event.call(this)
@@ -147,29 +153,30 @@ class Sprite {
         let userEvents = []
         return {
             add: (fn, eventType, isBreak) => {
-                const bindFn = function (e) {
+                const bindFn = e => {
                     if (isBreak && e.key === Game.key) { return }
                     Game.key = e.key
                     fn.call(this, e)
-                }.bind(this)
+                }
                 window.addEventListener(eventType, bindFn)
                 userEvents.push({ eventType, bindFn })
             },
             del: eventType => {
-                if (eventType) {
-                    for (let i = 0; i < userEvents.length; i++) {
-                        let event = userEvents[i]
-                        if (event.eventType === eventType) {
-                            window.removeEventListener(eventType, event.bindFn)
-                            userEvents.splice(i, 1)
-                            i--
-                        }
+                if (!eventType) { return }
+                for (let i = 0; i < userEvents.length; i++) {
+                    let event = userEvents[i]
+                    if (event.eventType === eventType) {
+                        window.removeEventListener(eventType, event.bindFn)
+                        userEvents.splice(i, 1)
+                        i--
                     }
-                } else {
-                    userEvents.forEach(event => {
-                        window.removeEventListener(event.eventType, event.bindFn)
-                    });
+
                 }
+            },
+            delAll: () => {
+                userEvents.forEach(event => {
+                    window.removeEventListener(event.eventType, event.bindFn)
+                });
             }
         }
     }

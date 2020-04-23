@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1">
+    <title>Canvas Game</title>
+
+    <style type="text/css">
+        @font-face {
+            font-family: pixel;
+            src: url('src/assets/font/Pixel.ttf');
+        }
+
+        body {
+            user-select: none;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        canvas {
+            margin-top: 10vh;
+            height: 45vh;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="app"></canvas>
+</body>
+
+<script src="modules/Canvas.js"></script>
+<script type="module">
+    import { Stage } from "./modules/Stage.js";
+    import { Sprite } from "./modules/Sprite.js";
+    import { title } from "./src/stages/Title.js";
+    import { App } from "./App.js";
+</script>
+
+</html>

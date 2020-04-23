@@ -1,4 +1,4 @@
-class Game {
+export class Game {
     constructor(options, fn) {
         Game.canvas = document.getElementById(options.el);
         Game.ctx = Game.canvas.getContext('2d');
@@ -17,7 +17,7 @@ class Game {
         this.load = this.load()
         Game.sound = Game.sound()
         Game.music = Game.music()
-        Game.stage = Game.stage()
+        Game.stage = Game.stage(options.stages)
         fn.call(this)
     }
 
@@ -79,7 +79,7 @@ class Game {
     }
 
     // 场景
-    static stage() {
+    static stage(stages) {
         let currStage = null
         return {
             // 切换
@@ -87,7 +87,7 @@ class Game {
                 currStage && currStage.execute.destory()
                 this.stage.cutscenes()
                 setTimeout(() => {
-                    currStage = newStage(...args)
+                    currStage = stages[newStage](...args)
                 }, 100)
             },
             // 转场
@@ -129,15 +129,16 @@ class Game {
     // 音效
     static sound() {
         return {
-            play: (name, extra) => {
-                if (extra) {
+            play: (name, vol, single) => {
+                if (single) {
+                    this.audio[name].play()
+                } else {
                     let sound = this.audio[name].cloneNode()
+                    sound.volume = vol || 1
                     sound.play()
                     sound.addEventListener('ended', () => {
                         sound = null
                     })
-                } else {
-                    this.audio[name].play()
                 }
             }
         }

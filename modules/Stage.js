@@ -1,8 +1,10 @@
-class Stage {
+import { Game } from "./Game.js";
+
+export class Stage {
     constructor(options, fn) {
         // 初始化场景数据
-        Stage.width = options.width || Game.width
-        Stage.height = options.height || Game.height
+        Stage.width = this.width = options.width || Game.width
+        Stage.height = this.height = options.height || Game.height
         Game.canvas.setAttribute('width', Stage.width + 'px')
         Game.canvas.setAttribute('height', Stage.height + 'px')
         this.unit = this.unit()
@@ -35,7 +37,7 @@ class Stage {
             },
             // 删除单位
             del: id => {
-                units[id].userEvent.del()
+                units[id].userEvent.delAll()
                 delete units[id]
             },
             // 查找单位
