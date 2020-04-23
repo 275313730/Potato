@@ -18,6 +18,28 @@ export class Sprite {
         if (!options.id) {
             throw new Error('Sprite needs an id.')
         }
+        // 检查width和height
+        if (options.width && options.width < 0) {
+            throw new Error('Width must be greater than 0')
+        }
+        if (options.height && options.height < 0) {
+            throw new Error('Height must be greater than 0')
+        }
+        // 检查方向
+        if (options.direction) {
+            switch (options.direction) {
+                case 2:
+                    break
+                case  4:
+                    break
+                case 6:
+                    break
+                case 8:
+                    break
+                default:
+                    throw new Error(`Direnction isn't correct.`)
+            }
+        }
     }
 
     // 初始化数据
