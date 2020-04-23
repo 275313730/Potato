@@ -1,12 +1,11 @@
 import { Sprite } from "../../modules/Sprite.js";
-import { Stage } from "../../modules/Stage.js";
 
-export function npc(id, x, y, animations, textArr, stick) {
+export function npc(id, x, y, sh, animations, textArr, stick) {
     const options = {
         // sprite属性
         id,
         x,
-        y: Stage.height - y,
+        y: sh - y,
         width: 40,
         speed: 1,
         direction: 4,

@@ -1,7 +1,6 @@
-import { Stage } from "../../modules/Stage.js";
 import { Sprite } from "../../modules/Sprite.js";
 
-export function bullet(player, stick) {
+export function bullet(sw, player, stick) {
     const options = {
         id: 'bullet',
         x: player.x + player.direction * 4,
@@ -16,7 +15,7 @@ export function bullet(player, stick) {
     }
 
     function move() {
-        if (this.relX < Stage.width && this.relX >= 0) {
+        if (this.relX < sw && this.relX >= 0) {
             if (this.direction === 6) {
                 this.x += 5
             } else {

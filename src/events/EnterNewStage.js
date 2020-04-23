@@ -9,6 +9,6 @@ export function enterNewStage(mapId) {
     if (player.relX <= 0 && mapId > 0) {
         const playerX = player.stick.width - player.width,
             stickX = this.width - player.stick.width - 10
-        Game.stage.switch('forest', mapId + 1, playerX, stickX)
+        Game.stage.switch('forest', mapId - 1, playerX, stickX)
     }
 }

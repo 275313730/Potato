@@ -39,7 +39,7 @@ export function forest(mapId, playerX, stickX) {
         })
 
         // 载入地图名
-        this.unit.add(mapName(mapId))
+        this.unit.add(mapName(this.width, mapId))
 
         // 校正背景位置
         const stick = this.unit.find('treeNear')
@@ -49,18 +49,18 @@ export function forest(mapId, playerX, stickX) {
         if (mapId % 2 === 0) {
             // 添加NPC
             npcs.forEach(n => {
-                this.unit.add(npc(n.id, n.x, n.y, Game.animations[n.id], n.textArr, stick))
+                this.unit.add(npc(n.id, n.x, n.y, this.height, Game.animations[n.id], n.textArr, stick))
             })
             // 添加事件
             this.event.add(addNpc)
         }
 
         // 添加玩家
-        const newPlayer = player(stick, Stage.width, Stage.height, Game.animations.player, playerX || 10)
+        const newPlayer = player(stick, this.width, this.height, Game.animations.player, playerX || 10)
         this.unit.add(newPlayer)
 
         // 添加对话框
-        const newDialog = dialog(Stage.width, Stage.height)
+        const newDialog = dialog(this.width, this.height)
         this.unit.add(newDialog)
 
         // 添加事件

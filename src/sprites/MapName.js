@@ -1,10 +1,9 @@
 import { Sprite } from "../../modules/Sprite.js";
-import { Stage } from "../../modules/Stage.js";
 
-export function mapName(mapId) {
+export function mapName(sw, mapId) {
     const options = {
         id: `Forest ${mapId}`,
-        x: Stage.width / 2,
+        x: sw / 2,
         y: 15
     }
 
