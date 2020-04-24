@@ -1,11 +1,13 @@
 import { Game } from "./Game.js";
-import { Stage } from "../modules/Stage.js";
 
 export class Sprite {
     constructor(options, fn) {
+        // 设置参数
         this.check(options)
         this.setDefalutProperty()
         this.setProperty(options)
+
+        // 初始化Sprite方法
         this.draw = this.draw()
         this.event = this.event()
         this.userEvent = this.userEvent()
@@ -20,25 +22,14 @@ export class Sprite {
         }
         // 检查width和height
         if (options.width && options.width < 0) {
-            throw new Error('Width must be greater than 0')
+            throw new Error(`Sprite's width must be greater than 0`)
         }
         if (options.height && options.height < 0) {
-            throw new Error('Height must be greater than 0')
+            throw new Error(`Sprite's height must be greater than 0`)
         }
         // 检查方向
-        if (options.direction) {
-            switch (options.direction) {
-                case 2:
-                    break
-                case  4:
-                    break
-                case 6:
-                    break
-                case 8:
-                    break
-                default:
-                    throw new Error(`Direnction isn't correct.`)
-            }
+        if (options.direction && options.direction !== 'right' && options.direction !== 'left') {
+            throw new Error(`Direction isn't correct.`)
         }
     }
 
@@ -50,8 +41,12 @@ export class Sprite {
         this.width = 0
         this.height = 0
         this.stick = null
-        this.direction = 6
+        this.direction = 'right'
         this.animations = null
+        this.game = {
+            width: Game.width,
+            height: Game.height
+        }
     }
 
     // 设置数据
@@ -79,27 +74,30 @@ export class Sprite {
             // 绑定形状(几何图形)
             shape: fn => {
                 drawFunction = () => {
-                    fn.call(this, Game.ctx)
+                    const translateY = Game.flipVertical ? Game.height - this.y - this.height : this.y
+                    fn.call(this, Game.ctx, translateY)
                 }
             },
             // 绑定图片
             image: name => {
-                let img = Game.images[name],
+                let img = Game.image.get(name),
                     ctx = Game.ctx
                 this.width = img.width
                 this.height = img.height
                 drawFunction = () => {
+                    // 垂直翻转
+                    const translateY = Game.flipVertical ? Game.height - this.y - this.height : this.y
                     ctx.globalAlpha = this.alpha || 1
-                    if (this.direction === undefined || this.direction === 6) {
-                        ctx.drawImage(img, this.relX, this.y)
+                    if (this.direction === undefined || this.direction === 'right') {
+                        ctx.drawImage(img, this.relX, translateY)
                     } else {
                         // 水平翻转画布
-                        ctx.translate(Stage.width, 0);
+                        ctx.translate(Game.width, 0);
                         ctx.scale(-1, 1);
                         // 绘制图片
-                        ctx.drawImage(img, Stage.width - img.width - this.relX, this.y);
+                        ctx.drawImage(img, Game.width - img.width - this.relX, translateY);
                         // 画布恢复正常
-                        ctx.translate(Stage.width, 0);
+                        ctx.translate(Game.width, 0);
                         ctx.scale(-1, 1);
                     }
                 }
@@ -111,19 +109,25 @@ export class Sprite {
                 let ctx = Game.ctx,
                     index = 0,
                     count = 0,
-                    images = this.animations[name]
+                    images = Game.animation.get(this.id, name)
+                this.width = images[0].width
+                this.height = images[0].height
                 drawFunction = () => {
+                    // 垂直翻转
+                    const translateY = Game.flipVertical ? Game.height - this.y - this.height : this.y
+
                     ctx.globalAlpha = this.alpha || 1
-                    if (this.direction === 6 || this.direction === undefined) {
-                        ctx.drawImage(images[index], this.relX, this.y)
+
+                    if (this.direction === undefined || this.direction === 'right') {
+                        ctx.drawImage(images[index], this.relX, translateY)
                     } else {
                         // 水平翻转画布
-                        ctx.translate(Stage.width, 0);
+                        ctx.translate(Game.width, 0);
                         ctx.scale(-1, 1);
                         // 绘制图片
-                        ctx.drawImage(images[index], Stage.width - images[index].width - this.relX, this.y);
+                        ctx.drawImage(images[index], Game.width - images[index].width - this.relX, translateY);
                         // 画布恢复正常
-                        ctx.translate(Stage.width, 0);
+                        ctx.translate(Game.width, 0);
                         ctx.scale(-1, 1);
                     }
                     count++
@@ -176,8 +180,13 @@ export class Sprite {
         return {
             add: (fn, eventType, isBreak) => {
                 const bindFn = e => {
-                    if (isBreak && e.key === Game.key) { return }
-                    Game.key = e.key
+                    if (isBreak) {
+                        if (e.key === Game.key) { return }
+                        Game.key = e.key
+                    }
+                    if (eventType === 'keyup') {
+                        Game.key = null
+                    }
                     fn.call(this, e)
                 }
                 window.addEventListener(eventType, bindFn)
@@ -199,6 +208,19 @@ export class Sprite {
                 userEvents.forEach(event => {
                     window.removeEventListener(event.eventType, event.bindFn)
                 });
+            }
+        }
+    }
+
+    // 状态
+    state() {
+        let states = {}
+        return {
+            set: (key, value) => {
+                states[key] = value
+            },
+            get: key => {
+                return states[key]
             }
         }
     }

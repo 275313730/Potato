@@ -7,13 +7,13 @@ import { backGround } from "../sprites/BackGround.js";
 export function title() {
     const bgs = ['sky', 'mounFar', 'mounNear', 'treeFar', 'treeNear']
 
-    return new Stage({}, function () {
+    return new Stage({ id: 'title' }, function () {
         // 载入背景
         bgs.forEach(bg => {
             this.unit.add(backGround(bg))
         })
 
-        this.unit.add(titleFrame(Stage.width, Stage.height))
+        this.unit.add(titleFrame())
 
         Game.music.play('forest')
         Game.music.loop(true)

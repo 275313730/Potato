@@ -1,11 +1,8 @@
 import { Sprite } from "../../modules/Sprite.js";
 
-export function dialog(sw, sh) {
+export function dialog() {
     const options = {
         id: 'dialog',
-        x: sw / 2,
-        y: sh / 2,
-
         show: false,
         text: '',
         tempArr: [],
@@ -17,17 +14,19 @@ export function dialog(sw, sh) {
     }
 
     function draw(ctx) {
+        const gw = this.game.width,
+            gh = this.game.height
         if (this.show) {
             this.typeText()
             ctx.fillStyle = 'grey'
-            ctx.centerRect(this.x, this.y, sw / 2, sh / 3)
+            ctx.centerRect(this.x, this.y, gw / 2, gh / 3)
             ctx.fillStyle = 'white'
-            ctx.centerRect(this.x, this.y, sw / 2 - 2, sh / 3 - 2)
+            ctx.centerRect(this.x, this.y, gw / 2 - 2, gh / 3 - 2)
             ctx.fillStyle = '#5f3511'
-            ctx.centerRect(this.x, this.y, sw / 2 - 4, sh / 3 - 4)
+            ctx.centerRect(this.x, this.y, gw / 2 - 4, gh / 3 - 4)
             ctx.fillStyle = 'white'
             ctx.font = '8px pixel'
-            ctx.wrapText(this.text, this.x - 55, this.y - 12, sw / 2 - 20, 10)
+            ctx.wrapText(this.text, this.x - 55, this.y - 12, gw / 2 - 20, 10)
         } else {
             this.typing = 0
             this.text = ''
@@ -76,6 +75,8 @@ export function dialog(sw, sh) {
     }
 
     return new Sprite(options, function () {
+        this.x = this.game.width / 2
+        this.y = this.game.height / 2
         this.draw.shape(draw)
     })
 }

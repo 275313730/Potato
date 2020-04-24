@@ -9,7 +9,9 @@ export function App(e) {
     if (e.key !== ' ') {
         return
     }
+
     window.removeEventListener('keydown', App)
+
     const images = [
         {
             id: 'sky',
@@ -123,10 +125,9 @@ export function App(e) {
 
     // 创建游戏实例
     new Game(options, function () {
-        // 设置全局变量
+        // 设置文件路径
         Game.imagePath = 'src/assets/imgs/'
         Game.audioPath = 'src/assets/audio/'
-        Game.AnimationInterval = 16
 
         // 载入图片
         images.forEach(item => {

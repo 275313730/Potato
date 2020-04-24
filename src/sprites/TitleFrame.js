@@ -1,15 +1,12 @@
 import { Sprite } from "../../modules/Sprite.js";
 import { Game } from "../../modules/Game.js";
 
-export function titleFrame(sw, sh) {
+export function titleFrame() {
     const options = {
         id: 'titleFrame',
-        x: sw / 2,
-        y: sh / 2,
-
         title: 'Lost Forest',
         start: 'Start Game',
-        egg: `Don't Click`,
+        egg: `Don't Press!`,
         arrow: '→',
         arrowY: 10,
         selection: 0,
@@ -18,18 +15,20 @@ export function titleFrame(sw, sh) {
     }
 
     function draw(ctx) {
+        const width = this.game.width,
+            height = this.game.height
         // drawTitle
         ctx.fillStyle = '#CD2626'
         ctx.font = '18px pixel'
-        ctx.centerText(this.title, sw / 2, sh / 3)
+        ctx.centerText(this.title, width / 2, height / 3)
 
         // drawSelectFrame
         ctx.fillStyle = 'rgba(150,150,150,0.5)'
-        ctx.centerRect(this.x, this.y + 15, sw / 2, sh / 2.7)
+        ctx.centerRect(this.x, this.y + 15, width / 2, height / 2.7)
         ctx.fillStyle = 'rgba(255,255,255,0.5)'
-        ctx.centerRect(this.x, this.y + 15, sw / 2 - 2, sh / 2.7 - 2)
+        ctx.centerRect(this.x, this.y + 15, width / 2 - 2, height / 2.7 - 2)
         ctx.fillStyle = 'rgba(125,100,58,0.5)'
-        ctx.centerRect(this.x, this.y + 15, sw / 2 - 4, sh / 2.7 - 4)
+        ctx.centerRect(this.x, this.y + 15, width / 2 - 4, height / 2.7 - 4)
 
         // drawSelection
         ctx.fillStyle = 'red'
@@ -79,6 +78,8 @@ export function titleFrame(sw, sh) {
     }
 
     return new Sprite(options, function () {
+        this.x = this.game.width / 2
+        this.y = this.game.height / 2
         this.userEvent.add(select, 'keydown', true)
         this.event.add(twinkling)
         this.draw.shape(draw)

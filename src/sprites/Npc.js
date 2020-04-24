@@ -1,16 +1,13 @@
 import { Sprite } from "../../modules/Sprite.js";
 
-export function npc(id, x, y, sh, animations, textArr, stick) {
+export function npc(id, x, textArr, stick) {
     const options = {
         // sprite属性
         id,
         x,
-        y: sh - y,
-        width: 40,
-        speed: 1,
-        direction: 4,
+        y: 1,
+        direction: 'left',
         stick,
-        animations,
 
         // 自定义属性
         type: 'npc',
@@ -18,6 +15,7 @@ export function npc(id, x, y, sh, animations, textArr, stick) {
         textArr,
         textCount: 0,
         moveStatus: 0,
+        speed: 1,
         stop
     }
 
@@ -30,7 +28,7 @@ export function npc(id, x, y, sh, animations, textArr, stick) {
                 if (Math.random() > 0.5) {
                     this.speed = -this.speed
                 }
-                this.direction = this.speed > 0 ? 6 : 4
+                this.direction = this.speed > 0 ? 'right' : 'left'
                 this.draw.animation('walk')
                 clearTimeout(this.moveTimer)
                 // 移动=>静止
@@ -52,11 +50,10 @@ export function npc(id, x, y, sh, animations, textArr, stick) {
             this.x += this.speed
             if (this.x < 0 || this.x > this.stick.width - this.width) {
                 this.speed = -this.speed
-                this.direction = this.speed > 0 ? 6 : 4
+                this.direction = this.speed > 0 ? 'right' : 'left'
             }
         }
     }
-
 
     function stop() {
         this.moveStatus = 0

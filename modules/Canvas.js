@@ -1,5 +1,6 @@
 (function Canvas() {
-    const canvasProto = CanvasRenderingContext2D.prototype
+    const canvasProto = CanvasRenderingContext2D.prototype,
+        methods = Object.create(canvasProto)
     canvasProto.wrapText = function (text, x, y, maxWidth, lineHeight) {
         if (typeof text != 'string' || typeof x != 'number' || typeof y != 'number') {
             return;

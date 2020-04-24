@@ -2,11 +2,17 @@ import { Game } from "./Game.js";
 
 export class Stage {
     constructor(options, fn) {
-        // 初始化场景数据
-        Stage.width = this.width = options.width || Game.width
-        Stage.height = this.height = options.height || Game.height
-        Game.canvas.setAttribute('width', Stage.width + 'px')
-        Game.canvas.setAttribute('height', Stage.height + 'px')
+        if (options.id == null) {
+            throw new Error(`Stage need an id.`)
+        }
+        if (!Stage.states) {
+            Stage.states = {}
+        }
+        // 设置数据
+        this.id = options.id
+        this.alive = options.alive
+
+        // 初始化场景方法
         this.unit = this.unit()
         this.event = this.event()
         this.execute = this.execute()
@@ -32,13 +38,19 @@ export class Stage {
                         return false
                     }
                 }
+                newUnit.stage = {
+                    width: Game.width,
+                    height: Game.height
+                }
                 units[newUnit.id] = newUnit
                 return true
             },
             // 删除单位
             del: id => {
-                units[id].userEvent.delAll()
-                delete units[id]
+                if (units[id]) {
+                    units[id].userEvent.delAll()
+                    delete units[id]
+                }
             },
             // 查找单位
             find: id => {
@@ -103,7 +115,7 @@ export class Stage {
             // 单位绘制
             draw: () => {
                 // 清除画面
-                Game.ctx.clearRect(0, 0, this.width, this.height)
+                Game.ctx.clearRect(0, 0, Game.width, Game.height)
                 this.unit.travel(unit => {
                     // 计算单位真实位置
                     unit.relX = unit.stick ? unit.x + unit.stick.x : unit.x
@@ -113,6 +125,12 @@ export class Stage {
             },
             // 场景销毁
             destory: () => {
+                if (this.alive) {
+                    Stage.states[this.id] = {}
+                    this.unit.travel(unit => {
+                        Stage.states[this.id][unit.id] = unit
+                    })
+                }
                 clearInterval(this.timer)
                 this.unit.delAll()
             }

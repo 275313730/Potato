@@ -1,20 +1,17 @@
 import { Sprite } from "../../modules/Sprite.js";
 
-export function player(stick, sw, sh, animations, x) {
+export function player(x, stick) {
     const options = {
         // Sprite属性
         id: 'player',
         x,
-        y: sh - 48,
-        height: 48,
-        width: 40,
-        direction: x === 10 ? 6 : 4,
+        direction: x === 10 ? 'right' : 'left',
         stick,
-        animations,
 
         // 自定义属性和事件
         isAdd: false,
         shoot: false,
+        gun: true,
         speed: 2,
         walking: false,
         space: false,
@@ -25,10 +22,10 @@ export function player(stick, sw, sh, animations, x) {
     function keyDown(e) {
         switch (e.key) {
             case 'ArrowRight':
-                this.move(6)
+                this.move('right')
                 break
             case 'ArrowLeft':
-                this.move(4)
+                this.move('left')
                 break
             case ' ':
                 this.space = true
@@ -37,7 +34,12 @@ export function player(stick, sw, sh, animations, x) {
                 this.isAdd = true
                 break
             case 'z':
-                this.shoot = true
+                if (this.gun) {
+                    this.shoot = true
+                }
+                break
+            case 'x':
+                this.gun = !this.gun
                 break
         }
     }
@@ -45,11 +47,11 @@ export function player(stick, sw, sh, animations, x) {
     function keyUp(e) {
         switch (e.key) {
             case 'ArrowRight':
-                if (this.direction === 4) { return }
+                if (this.direction === 'left') { return }
                 this.stop()
                 break
             case 'ArrowLeft':
-                if (this.direction === 6) { return }
+                if (this.direction === 'right') { return }
                 this.stop()
                 break
             case ' ':
@@ -76,30 +78,23 @@ export function player(stick, sw, sh, animations, x) {
 
     function walk() {
         if (!this.walking) { return }
-        switch (this.direction) {
-            case 6:
-                // 玩家实际位置移动
-                if (this.x < this.stick.width) {
-                    this.x += this.speed
-                    // 移动背景使得玩家相对位置不变
-                    if (this.relX > sw / 2 - 10 && this.x < this.stick.width - sw / 2) {
-                        this.stick.x -= this.speed
-                    }
-                }
-                break
-            case 4:
-                if (this.x > 0) {
-                    this.x -= this.speed
-                    if (this.relX < sw / 2 - 10 && this.stick.x < 0) {
-                        this.stick.x += this.speed
-                    }
-                }
-                break
+        if (this.direction === 'right' && this.x < this.stick.width) {
+            // 玩家实际位置移动
+            this.x += this.speed
+            // 移动背景使得玩家相对位置不变
+            if (this.relX > this.game.width / 2 - 10 && this.x < this.stick.width - this.game.width / 2) {
+                this.stick.x -= this.speed
+            }
+        } else if (this.direction === 'left' && this.x > 0) {
+            this.x -= this.speed
+            if (this.relX < this.game.width / 2 - 10 && this.stick.x < 0) {
+                this.stick.x += this.speed
+            }
         }
     }
 
     return new Sprite(options, function () {
-        this.userEvent.add(keyDown, 'keydown')
+        this.userEvent.add(keyDown, 'keydown', true)
         this.userEvent.add(keyUp, 'keyup')
         this.event.add(walk)
         this.draw.animation('stay')

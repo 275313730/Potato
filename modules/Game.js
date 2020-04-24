@@ -1,32 +1,39 @@
 export class Game {
     constructor(options, fn) {
+        // 画面
         Game.canvas = document.getElementById(options.el);
         Game.ctx = Game.canvas.getContext('2d');
         Game.width = options.width
         Game.height = options.height
-        Game.animations = {}
-        Game.images = {}
-        Game.audio = {}
-        Game.sounds = []
+        Game.canvas.setAttribute('width', Game.width + 'px')
+        Game.canvas.setAttribute('height', Game.height + 'px')
+
+        // 全局参数
         Game.imagePath = ''
         Game.audioPath = ''
         Game.frames = 60
+        Game.flipVertical = true
+        Game.key = null
 
-        this.promises = []
-
-        this.load = this.load()
+        // 初始化方法
+        Game.audio = Game.audio()
+        Game.image = Game.image()
+        Game.animation = Game.animation()
         Game.sound = Game.sound()
         Game.music = Game.music()
         Game.stage = Game.stage(options.stages)
+        this.promises = []
+        this.load = this.load()
+
+        // 回调
         fn.call(this)
     }
 
     // 创建场景
     start(stage, ...args) {
-        Game.canvas.setAttribute('width', Game.width)
-        Game.canvas.setAttribute('height', Game.height)
         Promise.all(this.promises)
             .then(() => {
+                this.promises = null
                 Game.stage.switch(stage, ...args)
             })
             .catch(err => console.log(err))
@@ -36,7 +43,8 @@ export class Game {
         return {
             // 载入图片
             image: (id, url) => {
-                let img = Game.images[id] = new Image()
+                let img = new Image()
+                Game.image.add(id, img)
                 this.promises.push(
                     new Promise((resolve, reject) => {
                         img.onload = () => {
@@ -52,8 +60,8 @@ export class Game {
             },
             // 载入动画
             animation: (id, name, url, length, type) => {
-                Game.animations[id] = Game.animations[id] || {}
-                let images = Game.animations[id][name] = []
+                let images = []
+                Game.animation.add(id, name, images)
                 type = type || 'png'
                 for (let i = 0; i < length; i++) {
                     images[i] = new Image()
@@ -73,7 +81,47 @@ export class Game {
             },
             // 载入音频
             audio: (id, url) => {
-                Game.audio[id] = new Audio(Game.audioPath + url)
+                Game.audio.add(id, url)
+            }
+        }
+    }
+
+    // 音频
+    static audio() {
+        let audio = {}
+        return {
+            add: (id, url) => {
+                audio[id] = new Audio(Game.audioPath + url)
+            },
+            get: id => {
+                return audio[id]
+            }
+        }
+    }
+
+    // 图片
+    static image() {
+        let images = {}
+        return {
+            add: (id, img) => {
+                images[id] = img
+            },
+            get: id => {
+                return images[id]
+            }
+        }
+    }
+
+    // 动画
+    static animation() {
+        let animations = {}
+        return {
+            add: (id, name, images) => {
+                animations[id] = animations[id] || {}
+                animations[id][name] = images
+            },
+            get: (id, name) => {
+                return animations[id][name]
             }
         }
     }
@@ -82,9 +130,10 @@ export class Game {
     static stage(stages) {
         let currStage = null
         return {
-            // 切换
+            // 切换场景
             switch: (newStage, ...args) => {
                 currStage && currStage.execute.destory()
+                Game.key = null
                 this.stage.cutscenes()
                 setTimeout(() => {
                     currStage = stages[newStage](...args)
@@ -94,7 +143,7 @@ export class Game {
             cutscenes: () => {
                 this.ctx.fillStyle = 'black'
                 this.ctx.fillRect(0, 0, this.width, this.height)
-            }
+            },
         }
     }
 
@@ -104,10 +153,10 @@ export class Game {
         return {
             // 播放
             play: name => {
-                if (music === this.audio[name]) {
+                if (music === this.audio.get(name)) {
                     music.play()
                 } else {
-                    music = this.audio[name]
+                    music = this.audio.get(name)
                     music.play()
                 }
             },
@@ -131,9 +180,9 @@ export class Game {
         return {
             play: (name, vol, single) => {
                 if (single) {
-                    this.audio[name].play()
+                    this.audio.get(name).play()
                 } else {
-                    let sound = this.audio[name].cloneNode()
+                    let sound = this.audio.get(name).cloneNode()
                     sound.volume = vol || 1
                     sound.play()
                     sound.addEventListener('ended', () => {

@@ -1,4 +1,4 @@
-import { Game } from "../../modules/Game.js";
+import { Game } from "../../modules/Game.js"
 import { bullet } from "../sprites/Bullet.js";
 
 export function shoot(stick) {
@@ -10,11 +10,11 @@ export function shoot(stick) {
     if (player.shoot && !thisBullet) {
         Game.sound.play('shoot', 0.5)
         player.shoot = false
-        this.unit.add(bullet(this.width, player, stick))
+        this.unit.add(bullet(player, stick))
     }
 
     if (thisBullet) {
-        if (thisBullet.relX >= this.width || thisBullet.relX <= 0) {
+        if (thisBullet.relX >= Game.width || thisBullet.relX <= 0) {
             this.unit.del(thisBullet.id)
         }
         this.unit.travel(u => {
