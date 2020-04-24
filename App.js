@@ -114,9 +114,15 @@ export function App(e) {
     ]
 
     const options = {
-        el: 'app',
+        // 设置宽高
         width: 272,
         height: 160,
+        // 设置文件路径
+        path: {
+            image: 'src/assets/imgs/',
+            audio: 'src/assets/audio/'
+        },
+        // 载入场景
         stages: {
             title,
             forest
@@ -125,10 +131,6 @@ export function App(e) {
 
     // 创建游戏实例
     new Game(options, function () {
-        // 设置文件路径
-        Game.imagePath = 'src/assets/imgs/'
-        Game.audioPath = 'src/assets/audio/'
-
         // 载入图片
         images.forEach(item => {
             this.load.image(item.id, item.url)
@@ -149,4 +151,6 @@ export function App(e) {
         // 创建场景
         this.start('title')
     })
+
+
 }

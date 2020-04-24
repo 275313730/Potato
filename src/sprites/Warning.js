@@ -2,12 +2,10 @@ import { Sprite } from "../../modules/Sprite.js";
 
 export function warning() {
     const options = {
-        id: 'warning',
-        count: 0
+        id: 'warning'
     }
 
     function draw(ctx) {
-        this.count++
         ctx.fillStyle = 'red'
         ctx.font = '14px pixel'
         ctx.centerText('No shoot in this map.', this.x, this.y)

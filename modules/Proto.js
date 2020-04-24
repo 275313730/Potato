@@ -1,6 +1,17 @@
-(function Canvas() {
+(function prototypeChange() {
+    Array.prototype.delete = function (key, value, fn) {
+        for (let i = 0; i < this.length; i++) {
+            if (this[i][key] === value) {
+                fn(this[i])
+                this.splice(i, 1)
+                i--
+            }
+        }
+    }
+
     const canvasProto = CanvasRenderingContext2D.prototype,
         methods = Object.create(canvasProto)
+
     canvasProto.wrapText = function (text, x, y, maxWidth, lineHeight) {
         if (typeof text != 'string' || typeof x != 'number' || typeof y != 'number') {
             return;

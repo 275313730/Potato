@@ -6,6 +6,7 @@ export function player(x, stick) {
         id: 'player',
         x,
         direction: x === 10 ? 'right' : 'left',
+        depth: 1,
         stick,
 
         // 自定义属性和事件

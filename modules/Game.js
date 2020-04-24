@@ -1,19 +1,23 @@
 export class Game {
     constructor(options, fn) {
-        // 画面
-        Game.canvas = document.getElementById(options.el);
+        // 初始化画面
+        Game.canvas = document.getElementsByTagName('canvas')[0];
         Game.ctx = Game.canvas.getContext('2d');
         Game.width = options.width
         Game.height = options.height
         Game.canvas.setAttribute('width', Game.width + 'px')
         Game.canvas.setAttribute('height', Game.height + 'px')
 
-        // 全局参数
-        Game.imagePath = ''
-        Game.audioPath = ''
+        // 路径
+        this.audioPath = options.path.audio
+        this.imagePath = options.path.image
+
+        // 初始化参数
         Game.frames = 60
-        Game.flipVertical = true
+        Game.AnimationInterval = 16
+        Game.anchor = 1
         Game.key = null
+        this.promises = []
 
         // 初始化方法
         Game.audio = Game.audio()
@@ -22,7 +26,6 @@ export class Game {
         Game.sound = Game.sound()
         Game.music = Game.music()
         Game.stage = Game.stage(options.stages)
-        this.promises = []
         this.load = this.load()
 
         // 回调
@@ -40,23 +43,26 @@ export class Game {
     }
 
     load() {
+        let pushPromise = img => {
+            this.promises.push(
+                new Promise((resolve, reject) => {
+                    img.onload = () => {
+                        if (img.fileSize > 0 || (img.width > 0 && img.height > 0)) {
+                            resolve('load')
+                        } else {
+                            reject(img.src)
+                        }
+                    }
+                })
+            )
+        }
         return {
             // 载入图片
             image: (id, url) => {
                 let img = new Image()
                 Game.image.add(id, img)
-                this.promises.push(
-                    new Promise((resolve, reject) => {
-                        img.onload = () => {
-                            if (img.fileSize > 0 || (img.width > 0 && img.height > 0)) {
-                                resolve('load')
-                            } else {
-                                reject(img.src)
-                            }
-                        }
-                    })
-                )
-                img.src = Game.imagePath + url
+                pushPromise(img)
+                img.src = this.imagePath + url
             },
             // 载入动画
             animation: (id, name, url, length, type) => {
@@ -65,23 +71,13 @@ export class Game {
                 type = type || 'png'
                 for (let i = 0; i < length; i++) {
                     images[i] = new Image()
-                    this.promises.push(
-                        new Promise((resolve, reject) => {
-                            images[i].onload = () => {
-                                if (images[i].fileSize > 0 || (images[i].width > 0 && images[i].height > 0)) {
-                                    resolve('load')
-                                } else {
-                                    reject(images[i].src)
-                                }
-                            }
-                        })
-                    )
-                    images[i].src = `${Game.imagePath}${url}${i + 1}.${type}`
+                    pushPromise(images[i])
+                    images[i].src = `${this.imagePath}${url}${i + 1}.${type}`
                 }
             },
             // 载入音频
             audio: (id, url) => {
-                Game.audio.add(id, url)
+                Game.audio.add(id, this.audioPath + url)
             }
         }
     }
@@ -91,7 +87,7 @@ export class Game {
         let audio = {}
         return {
             add: (id, url) => {
-                audio[id] = new Audio(Game.audioPath + url)
+                audio[id] = new Audio(url)
             },
             get: id => {
                 return audio[id]

@@ -35,14 +35,12 @@ export class Sprite {
 
     // 初始化数据
     setDefalutProperty() {
-        this.id = ''
         this.x = 0
         this.y = 0
         this.width = 0
         this.height = 0
-        this.stick = null
+        this.depth = 0
         this.direction = 'right'
-        this.animations = null
         this.game = {
             width: Game.width,
             height: Game.height
@@ -69,82 +67,66 @@ export class Sprite {
 
     // 绘制
     draw() {
-        let drawFunction = function () { }
+        let executor = function () { },
+            setSize = img => {
+                this.width = img.width
+                this.height = img.height
+            },
+            drawImage = img => {
+                const ctx = Game.ctx
+                // 锚点位移
+                const translateY = Game.anchor * (Game.height - this.height) - this.y
+                ctx.globalAlpha = this.alpha || 1
+                if (this.direction === undefined || this.direction === 'right') {
+                    ctx.drawImage(img, this.relX, translateY)
+                } else {
+                    // 水平翻转画布
+                    ctx.translate(Game.width, 0);
+                    ctx.scale(-1, 1);
+                    // 绘制图片
+                    ctx.drawImage(img, Game.width - img.width - this.relX, translateY);
+                    // 画布恢复正常
+                    ctx.translate(Game.width, 0);
+                    ctx.scale(-1, 1);
+                }
+            }
         return {
             // 绑定形状(几何图形)
             shape: fn => {
-                drawFunction = () => {
-                    const translateY = Game.flipVertical ? Game.height - this.y - this.height : this.y
-                    fn.call(this, Game.ctx, translateY)
-                }
+                const translateY = Game.anchor * (Game.height - this.height) - this.y
+                executor = () => fn.call(this, Game.ctx, translateY)
             },
             // 绑定图片
             image: name => {
-                let img = Game.image.get(name),
-                    ctx = Game.ctx
-                this.width = img.width
-                this.height = img.height
-                drawFunction = () => {
-                    // 垂直翻转
-                    const translateY = Game.flipVertical ? Game.height - this.y - this.height : this.y
-                    ctx.globalAlpha = this.alpha || 1
-                    if (this.direction === undefined || this.direction === 'right') {
-                        ctx.drawImage(img, this.relX, translateY)
-                    } else {
-                        // 水平翻转画布
-                        ctx.translate(Game.width, 0);
-                        ctx.scale(-1, 1);
-                        // 绘制图片
-                        ctx.drawImage(img, Game.width - img.width - this.relX, translateY);
-                        // 画布恢复正常
-                        ctx.translate(Game.width, 0);
-                        ctx.scale(-1, 1);
-                    }
+                let img = Game.image.get(name)
+                setSize(img)
+                executor = () => {
+                    drawImage(img)
                 }
             },
             // 绑定动画
-            animation: (name, time) => {
+            animation: (name, interval) => {
                 // 动画间隔帧
-                time = time || Game.AnimationInterval || 16
-                let ctx = Game.ctx,
-                    index = 0,
+                interval = interval || Game.AnimationInterval
+                let index = 0,
                     count = 0,
                     images = Game.animation.get(this.id, name)
-                this.width = images[0].width
-                this.height = images[0].height
-                drawFunction = () => {
-                    // 垂直翻转
-                    const translateY = Game.flipVertical ? Game.height - this.y - this.height : this.y
-
-                    ctx.globalAlpha = this.alpha || 1
-
-                    if (this.direction === undefined || this.direction === 'right') {
-                        ctx.drawImage(images[index], this.relX, translateY)
+                setSize(images[0])
+                executor = () => {
+                    drawImage(images[index])
+                    if (count < interval) {
+                        count++
                     } else {
-                        // 水平翻转画布
-                        ctx.translate(Game.width, 0);
-                        ctx.scale(-1, 1);
-                        // 绘制图片
-                        ctx.drawImage(images[index], Game.width - images[index].width - this.relX, translateY);
-                        // 画布恢复正常
-                        ctx.translate(Game.width, 0);
-                        ctx.scale(-1, 1);
-                    }
-                    count++
-                    if (count === time) {
                         count = 0
-                        index++
-                        if (index === images.length) {
-                            index = 0
-                        }
+                        index < images.length - 1 ? index++ : index = 0
                     }
                 }
             },
             unBind: () => {
-                drawFunction = function () { }
+                executor = function () { }
             },
             execute: () => {
-                drawFunction()
+                executor()
             }
         }
     }
@@ -180,8 +162,8 @@ export class Sprite {
         return {
             add: (fn, eventType, isBreak) => {
                 const bindFn = e => {
-                    if (isBreak) {
-                        if (e.key === Game.key) { return }
+                    if (this.disabled) { return }
+                    if (isBreak && e.key !== Game.key) {
                         Game.key = e.key
                     }
                     if (eventType === 'keyup') {
@@ -194,33 +176,15 @@ export class Sprite {
             },
             del: eventType => {
                 if (!eventType) { return }
-                for (let i = 0; i < userEvents.length; i++) {
-                    let event = userEvents[i]
-                    if (event.eventType === eventType) {
-                        window.removeEventListener(eventType, event.bindFn)
-                        userEvents.splice(i, 1)
-                        i--
-                    }
-
-                }
+                userEvents.delete('eventType', eventType, event => {
+                    window.removeEventListener(eventType, event.bindFn)
+                })
             },
             delAll: () => {
                 userEvents.forEach(event => {
                     window.removeEventListener(event.eventType, event.bindFn)
                 });
-            }
-        }
-    }
-
-    // 状态
-    state() {
-        let states = {}
-        return {
-            set: (key, value) => {
-                states[key] = value
-            },
-            get: key => {
-                return states[key]
+                userEvents = []
             }
         }
     }

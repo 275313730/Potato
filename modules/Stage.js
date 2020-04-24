@@ -2,15 +2,11 @@ import { Game } from "./Game.js";
 
 export class Stage {
     constructor(options, fn) {
-        if (options.id == null) {
-            throw new Error(`Stage need an id.`)
-        }
-        if (!Stage.states) {
-            Stage.states = {}
-        }
+        // 检测参数
+        this.check(options)
+
         // 设置数据
         this.id = options.id
-        this.alive = options.alive
 
         // 初始化场景方法
         this.unit = this.unit()
@@ -20,11 +16,17 @@ export class Stage {
 
         // 进入场景循环
         this.timer = setInterval(() => {
-            this.execute.draw()
-            this.execute.events()
+            this.execute.refresh()
         }, 1000 / Game.frames)
 
         return this
+    }
+
+    // 检测参数
+    check(options) {
+        if (options.id == null) {
+            throw new Error(`Stage need an id.`)
+        }
     }
 
     // 场景单位
@@ -35,7 +37,7 @@ export class Stage {
             add: newUnit => {
                 for (const key in units) {
                     if (key === newUnit.id) {
-                        return false
+                        throw new Error(`Unit exists.`)
                     }
                 }
                 newUnit.stage = {
@@ -43,7 +45,7 @@ export class Stage {
                     height: Game.height
                 }
                 units[newUnit.id] = newUnit
-                return true
+                this.unit.sort()
             },
             // 删除单位
             del: id => {
@@ -67,6 +69,18 @@ export class Stage {
                 for (const key in units) {
                     fn(units[key])
                 }
+            },
+            // 排序
+            sort: () => {
+                let newUnits = {}
+                for (let i = 0; i < 10; i++) {
+                    this.unit.travel(unit => {
+                        if (unit.depth === i) {
+                            newUnits[unit.id] = unit
+                        }
+                    })
+                }
+                units = newUnits
             }
         }
     }
@@ -100,37 +114,31 @@ export class Stage {
         }
     }
 
-    // 场景自调用函数
+    // 场景函数
     execute() {
         return {
-            // 事件(包括场景事件和单位事件)
-            events: () => {
-                this.event.travel(event => {
-                    event.call(this)
-                })
-                this.unit.travel(unit => {
-                    unit.event.execute()
-                })
-            },
-            // 单位绘制
-            draw: () => {
-                // 清除画面
+            // 刷新场景
+            refresh: () => {
                 Game.ctx.clearRect(0, 0, Game.width, Game.height)
+                // 单位渲染和事件
                 this.unit.travel(unit => {
                     // 计算单位真实位置
                     unit.relX = unit.stick ? unit.x + unit.stick.x : unit.x
                     // 绘制画面
                     unit.draw.execute()
+                    // 禁用状态下不能执行事件
+                    if (!unit.disabled) {
+                        // 执行单位事件
+                        unit.event.execute()
+                    }
+                })
+                // 执行场景事件
+                this.event.travel(event => {
+                    event.call(this)
                 })
             },
-            // 场景销毁
+            // 销毁场景
             destory: () => {
-                if (this.alive) {
-                    Stage.states[this.id] = {}
-                    this.unit.travel(unit => {
-                        Stage.states[this.id][unit.id] = unit
-                    })
-                }
                 clearInterval(this.timer)
                 this.unit.delAll()
             }
