@@ -31,13 +31,13 @@ export function npc(id, x, textArr) {
 
         // 准备移动
         if (this.moveStatus === 1) {
-            if (this.waitTime < 300) {
+            if (this.waitTime < 200) {
                 this.waitTime++
             } else {
                 this.moveStatus = 2
                 this.waitTime = 0
                 this.direction = this.speed > 0 ? 'right' : 'left'
-                this.draw.animation('walk')
+                this.draw.animation(this.id, 'walk')
             }
         }
 
@@ -65,12 +65,12 @@ export function npc(id, x, textArr) {
     // 停止移动
     function stop() {
         this.moveStatus = 0
-        this.draw.animation('stay')
+        this.draw.animation(this.id, 'stay')
     }
 
     return new Sprite(options, function () {
         this.event.add(move)
-        this.draw.animation('stay')
+        this.draw.animation(this.id, 'stay')
         this.y = this.game.height - this.height
     })
 }

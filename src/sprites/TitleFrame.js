@@ -1,5 +1,6 @@
-import { Sprite } from "../../modules/Sprite.js";
 import { Game } from "../../modules/Game.js";
+import { Sprite } from "../../modules/Sprite.js";
+
 
 export function titleFrame() {
     const options = {
@@ -69,12 +70,11 @@ export function titleFrame() {
     }
 
     function twinkling() {
-        if (this.count < 25) {
-            this.count++
-            return
+        this.count++
+        if (this.count >= 25) {
+            this.arrow = this.arrow === '' ? '→' : ''
+            this.count = 0
         }
-        this.arrow = this.arrow === '' ? '→' : ''
-        this.count = 0
     }
 
     return new Sprite(options, function () {

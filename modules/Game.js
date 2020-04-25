@@ -10,7 +10,7 @@ export class Game {
 
         // 初始化参数
         Game.frames = 60
-        Game.AnimationInterval = 16
+        Game.animationInterval = 16
         Game.key = null
         this.audioPath = options.path.audio || ''
         this.imagePath = options.path.image || ''

@@ -57,7 +57,7 @@ export class Sprite {
         // direction 
         // direction决定图片的左右位置
         this.direction = 'right'
-   
+
         this.game = {
             width: Game.width,
             height: Game.height
@@ -115,12 +115,12 @@ export class Sprite {
                 }
             },
             // 绑定动画
-            animation: (name, interval) => {
+            animation: (id, name, interval) => {
                 // 动画间隔帧书
-                interval = interval || Game.AnimationInterval
+                interval = interval || Game.animationInterval
                 let index = 0,
                     count = 0,
-                    images = Game.animation.get(this.id, name)
+                    images = Game.animation.get(id, name)
                 setSize(images[0])
                 executor = () => {
                     drawImage(images[index])
@@ -183,7 +183,10 @@ export class Sprite {
                     if (this.disabled) { return }
 
                     // 按键间隔检测
-                    if (isBreak && e.key !== Game.key) {
+                    if (isBreak) {
+                        if (e.key === Game.key) {
+                            return
+                        }
                         Game.key = e.key
                     }
 

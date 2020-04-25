@@ -9,12 +9,10 @@ export function player(x) {
         layer: 1,
 
         // 自定义属性和事件
-        isAdd: false,
         shoot: false,
-        gun: true,
         speed: 2,
-        walking: false,
         space: false,
+        walking: false,
         move,
         stop
     }
@@ -30,16 +28,8 @@ export function player(x) {
             case ' ':
                 this.space = true
                 break
-            case 'Escape':
-                this.isAdd = true
-                break
             case 'z':
-                if (this.gun) {
-                    this.shoot = true
-                }
-                break
-            case 'x':
-                this.gun = !this.gun
+                this.shoot = true
                 break
         }
     }
@@ -59,27 +49,24 @@ export function player(x) {
                 break
             case 'z':
                 this.shoot = false
+                break
         }
     }
 
     function move(direction) {
-        if (this.walking === true && this.direction === direction) {
-            return
-        }
-        this.walking = true
         this.direction = direction
-        this.draw.animation('walk')
+        this.draw.animation(this.id, 'walk')
+        this.walking = true
     }
 
     function stop() {
+        this.draw.animation(this.id, 'stay')
         this.walking = false
-        this.draw.animation('stay')
     }
 
     function walk() {
-        if (!this.walking) { return }
+        if (this.walking === false) { return }
         if (this.direction === 'right') {
-            // 玩家移动
             this.x += this.speed
         } else if (this.direction === 'left' && this.x > 0) {
             this.x -= this.speed
@@ -90,7 +77,7 @@ export function player(x) {
         this.userEvent.add(keyDown, 'keydown', true)
         this.userEvent.add(keyUp, 'keyup')
         this.event.add(walk)
-        this.draw.animation('stay')
+        this.draw.animation(this.id, 'stay')
         this.y = this.game.height - this.height
     })
 }
