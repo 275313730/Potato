@@ -34,23 +34,28 @@ export function forest(mapId, playerX, stickX) {
     return new Stage({ id: mapId }, function () {
         // 载入背景
         bgs.forEach(bg => {
-            this.unit.add(backGround(bg))
+            if (bg === 'treeNear') {
+                const treeNear = backGround(bg)
+                this.unit.add(treeNear)
+                this.width = treeNear.width
+            } else {
+                this.unit.add(backGround(bg, true))
+            }
         })
+
+
 
         // 载入地图名
         this.unit.add(mapName(mapId))
 
-        // 校正背景位置
-        const tn = this.unit.find('treeNear')
-        tn.x = stickX || 0
-
         npcs.forEach(n => {
-            this.unit.add(npc(n.id, n.x, n.textArr, tn))
+            this.unit.add(npc(n.id, n.x, n.textArr))
         })
 
         // 添加玩家
-        const newPlayer = player(playerX || 10, tn)
+        const newPlayer = player(playerX || 10)
         this.unit.add(newPlayer)
+        this.camera.follow(newPlayer)
 
         // 添加对话框
         const newDialog = dialog()
@@ -58,7 +63,7 @@ export function forest(mapId, playerX, stickX) {
 
         // 根据地图id添加不同的事件
         if (mapId % 2 === 0) {
-            this.event.add(shoot, tn)
+            this.event.add(shoot)
         } else {
             this.event.add(noShoot, newDialog)
         }

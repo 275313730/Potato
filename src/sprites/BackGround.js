@@ -1,7 +1,12 @@
 import { Sprite } from "../../modules/Sprite.js";
 
-export function backGround(id) {
-    return new Sprite({ id }, function () {
+export function backGround(id, fixed) {
+    const options = {
+        id,
+        fixed
+    }
+
+    return new Sprite(options, function () {
         this.draw.image(id)
     })
 }

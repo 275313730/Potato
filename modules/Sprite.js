@@ -7,14 +7,14 @@ export class Sprite {
         this.setDefalutProperty()
         this.setProperty(options)
 
-        // 初始化Sprite方法
+        // 初始化方法
         this.draw = this.draw()
         this.event = this.event()
         this.userEvent = this.userEvent()
         fn && fn.call(this)
     }
 
-    // 检查options
+    // 检查
     check(options) {
         // 检查id是否填写
         if (!options.id) {
@@ -39,7 +39,10 @@ export class Sprite {
         this.y = 0
         this.width = 0
         this.height = 0
-        this.depth = 0
+        // 图层值(决定图片上下关系)
+        this.layer = 0
+        // 禁用(disabled为true时无法执行单位事件和用户事件)
+        this.disabled = false
         this.direction = 'right'
         this.game = {
             width: Game.width,
@@ -50,48 +53,45 @@ export class Sprite {
     // 设置数据
     setProperty(options) {
         for (const key in options) {
-            switch (key) {
-                case 'create':
-                    continue
-                case 'setProperty':
-                    continue
-            }
             this[key] = options[key]
-        }
-        if (this.stick) {
-            this.relX = this.x + this.stick.x
-        } else {
-            this.relX = this.x
         }
     }
 
     // 绘制
     draw() {
-        let executor = function () { },
+        let executor = null,
+            // 设置尺寸
             setSize = img => {
                 this.width = img.width
                 this.height = img.height
             },
+            // 绘制图片
             drawImage = img => {
                 const ctx = Game.ctx
+
                 // 锚点位移
                 const translateY = Game.anchor * (Game.height - this.height) - this.y
+
+                // 图片透明度
                 ctx.globalAlpha = this.alpha || 1
-                if (this.direction === undefined || this.direction === 'right') {
+
+                // 图片方向
+                if (this.direction === 'right') {
                     ctx.drawImage(img, this.relX, translateY)
                 } else {
+                    const tranlateX = Game.width - img.width - this.relX
                     // 水平翻转画布
                     ctx.translate(Game.width, 0);
                     ctx.scale(-1, 1);
                     // 绘制图片
-                    ctx.drawImage(img, Game.width - img.width - this.relX, translateY);
+                    ctx.drawImage(img, tranlateX, translateY);
                     // 画布恢复正常
                     ctx.translate(Game.width, 0);
                     ctx.scale(-1, 1);
                 }
             }
         return {
-            // 绑定形状(几何图形)
+            // 绑定形状(canvas绘制)
             shape: fn => {
                 const translateY = Game.anchor * (Game.height - this.height) - this.y
                 executor = () => fn.call(this, Game.ctx, translateY)
@@ -106,7 +106,7 @@ export class Sprite {
             },
             // 绑定动画
             animation: (name, interval) => {
-                // 动画间隔帧
+                // 动画间隔帧书
                 interval = interval || Game.AnimationInterval
                 let index = 0,
                     count = 0,
@@ -114,19 +114,21 @@ export class Sprite {
                 setSize(images[0])
                 executor = () => {
                     drawImage(images[index])
-                    if (count < interval) {
-                        count++
-                    } else {
+                    count++
+                    // 计数>=间隔帧数时切换图片并归零计数
+                    if (count >= interval) {
                         count = 0
                         index < images.length - 1 ? index++ : index = 0
                     }
                 }
             },
+            // 取消绑定
             unBind: () => {
-                executor = function () { }
+                executor = null
             },
+            // 执行
             execute: () => {
-                executor()
+                executor && executor()
             }
         }
     }
@@ -135,9 +137,11 @@ export class Sprite {
     event() {
         let events = []
         return {
+            // 添加
             add: fn => {
                 events.push(fn)
             },
+            // 删除
             del: fn => {
                 for (const key in events) {
                     events[key] === fn
@@ -145,9 +149,11 @@ export class Sprite {
                     return
                 }
             },
+            // 删除所有
             delAll: () => {
                 events = []
             },
+            // 执行
             execute: () => {
                 events.forEach(event => {
                     event.call(this)
@@ -160,26 +166,47 @@ export class Sprite {
     userEvent() {
         let userEvents = []
         return {
+            // 添加
             add: (fn, eventType, isBreak) => {
                 const bindFn = e => {
+                    // disabled时禁用用户事件
                     if (this.disabled) { return }
+
+                    // 按键间隔检测
                     if (isBreak && e.key !== Game.key) {
                         Game.key = e.key
                     }
+
+                    // 键盘松开时Game.key为null
                     if (eventType === 'keyup') {
                         Game.key = null
                     }
+
+                    // 执行事件
                     fn.call(this, e)
                 }
+                // 监听事件
                 window.addEventListener(eventType, bindFn)
+
+                // 添加事件到userEvents中
                 userEvents.push({ eventType, bindFn })
             },
+            // 删除
             del: eventType => {
+                // 没有传参视为无效
                 if (!eventType) { return }
-                userEvents.delete('eventType', eventType, event => {
-                    window.removeEventListener(eventType, event.bindFn)
-                })
+
+                // 解除监听
+                for (let i = 0; i < userEvents.length; i++) {
+                    const event = userEvents[i]
+                    if (event.eventType === eventType) {
+                        window.removeEventListener(eventType, event.bindFn)
+                        userEvents.splice(i, 1)
+                        i--
+                    }
+                }
             },
+            // 删除所有
             delAll: () => {
                 userEvents.forEach(event => {
                     window.removeEventListener(event.eventType, event.bindFn)

@@ -20,7 +20,7 @@ export function talk(player, dialog) {
                 dialog.text = unit.textArr[unit.textCount]
                 dialog.show = true
                 unit.textCount++
-                return
+                return false
             }
         } else {
             // 对话中再次按下空格继续对话或对话结束
@@ -37,13 +37,13 @@ export function talk(player, dialog) {
                         talkStop(player, dialog)
                     }
                 }
-                return
+                return false
             }
 
             // 离开一定范围对话直接结束对话
             if (Math.abs(unit.x - player.x) > unit.width / 4 * 3) {
                 talkStop()
-                return
+                return false
             }
         }
 

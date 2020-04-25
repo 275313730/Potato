@@ -1,24 +1,13 @@
 (function prototypeChange() {
-    Array.prototype.delete = function (key, value, fn) {
-        for (let i = 0; i < this.length; i++) {
-            if (this[i][key] === value) {
-                fn(this[i])
-                this.splice(i, 1)
-                i--
-            }
-        }
-    }
+    const canvasProto = CanvasRenderingContext2D.prototype
 
-    const canvasProto = CanvasRenderingContext2D.prototype,
-        methods = Object.create(canvasProto)
-
+    // 文字换行(用于对话框文字等)
     canvasProto.wrapText = function (text, x, y, maxWidth, lineHeight) {
         if (typeof text != 'string' || typeof x != 'number' || typeof y != 'number') {
             return;
         }
 
-        const context = this;
-        const canvas = context.canvas;
+        const canvas = this.canvas;
 
         if (typeof maxWidth == 'undefined') {
             maxWidth = (canvas && canvas.width) || 300;
@@ -33,10 +22,10 @@
 
         for (let n = 0; n < arrText.length; n++) {
             const testLine = line + arrText[n];
-            const metrics = context.measureText(testLine);
+            const metrics = this.measureText(testLine);
             const testWidth = metrics.width;
             if (testWidth > maxWidth && n > 0) {
-                context.fillText(line, x, y);
+                this.fillText(line, x, y);
                 line = arrText[n];
                 y += lineHeight;
             } else {
@@ -44,13 +33,15 @@
             }
         }
 
-        context.fillText(line, x, y);
+        this.fillText(line, x, y);
     }
 
+    // 中心绘制文字(用于标题等)
     canvasProto.centerText = function (text, x, y) {
         this.fillText(text, x - this.measureText(text).width / 2, y)
     }
 
+    // 中心绘制形状(用于对话框等)
     canvasProto.centerRect = function (x, y, width, height) {
         this.fillRect(x - width / 2, y - height / 2, width, height)
     }

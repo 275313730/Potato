@@ -8,15 +8,13 @@ export class Game {
         Game.canvas.setAttribute('width', Game.width + 'px')
         Game.canvas.setAttribute('height', Game.height + 'px')
 
-        // 路径
-        this.audioPath = options.path.audio
-        this.imagePath = options.path.image
-
         // 初始化参数
         Game.frames = 60
         Game.AnimationInterval = 16
         Game.anchor = 1
         Game.key = null
+        this.audioPath = options.path.audio || ''
+        this.imagePath = options.path.image || ''
         this.promises = []
 
         // 初始化方法
@@ -42,6 +40,7 @@ export class Game {
             .catch(err => console.log(err))
     }
 
+    // 载入
     load() {
         let pushPromise = img => {
             this.promises.push(
@@ -86,9 +85,11 @@ export class Game {
     static audio() {
         let audio = {}
         return {
+            // 添加
             add: (id, url) => {
                 audio[id] = new Audio(url)
             },
+            // 获取
             get: id => {
                 return audio[id]
             }
@@ -99,9 +100,11 @@ export class Game {
     static image() {
         let images = {}
         return {
+            // 添加
             add: (id, img) => {
                 images[id] = img
             },
+            // 获取
             get: id => {
                 return images[id]
             }
@@ -112,10 +115,12 @@ export class Game {
     static animation() {
         let animations = {}
         return {
+            // 添加
             add: (id, name, images) => {
                 animations[id] = animations[id] || {}
                 animations[id][name] = images
             },
+            // 获取
             get: (id, name) => {
                 return animations[id][name]
             }
@@ -126,14 +131,14 @@ export class Game {
     static stage(stages) {
         let currStage = null
         return {
-            // 切换场景
+            // 切换
             switch: (newStage, ...args) => {
                 currStage && currStage.execute.destory()
                 Game.key = null
                 this.stage.cutscenes()
                 setTimeout(() => {
                     currStage = stages[newStage](...args)
-                }, 100)
+                }, 200)
             },
             // 转场
             cutscenes: () => {
@@ -162,6 +167,7 @@ export class Game {
             },
             // 停止
             stop: () => {
+                music.pause()
                 music.currentTime = 0
             },
             // 循环

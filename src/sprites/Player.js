@@ -1,13 +1,12 @@
 import { Sprite } from "../../modules/Sprite.js";
 
-export function player(x, stick) {
+export function player(x) {
     const options = {
         // Sprite属性
         id: 'player',
         x,
         direction: x === 10 ? 'right' : 'left',
-        depth: 1,
-        stick,
+        layer: 1,
 
         // 自定义属性和事件
         isAdd: false,
@@ -79,18 +78,11 @@ export function player(x, stick) {
 
     function walk() {
         if (!this.walking) { return }
-        if (this.direction === 'right' && this.x < this.stick.width) {
-            // 玩家实际位置移动
+        if (this.direction === 'right') {
+            // 玩家移动
             this.x += this.speed
-            // 移动背景使得玩家相对位置不变
-            if (this.relX > this.game.width / 2 - 10 && this.x < this.stick.width - this.game.width / 2) {
-                this.stick.x -= this.speed
-            }
         } else if (this.direction === 'left' && this.x > 0) {
             this.x -= this.speed
-            if (this.relX < this.game.width / 2 - 10 && this.stick.x < 0) {
-                this.stick.x += this.speed
-            }
         }
     }
 

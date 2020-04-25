@@ -1,11 +1,10 @@
 import { Sprite } from "../../modules/Sprite.js";
 
-export function bullet(player, stick) {
+export function bullet(player) {
     const options = {
         id: 'bullet',
         x: player.x + player.width / 2,
         y: 20,
-        stick,
         direction: player.direction
     }
 
