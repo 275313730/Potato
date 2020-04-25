@@ -71,7 +71,6 @@ export class Stage {
                     } else {
                         camera.x = camera.follow.x - Game.width / 2
                     }
-                    camera.y = camera.follow.y
                 } else {
                     camera.moving && camera.moving()
                 }
@@ -94,11 +93,7 @@ export class Stage {
                     }
                 }
 
-                // 给单位添加游戏和场景的宽高值，避免重复调用
-                newUnit.game = {
-                    width: Game.width,
-                    height: Game.height
-                }
+                // 给单位添加场景的宽高值
                 newUnit.stage = {
                     width: this.width,
                     height: this.height
@@ -166,18 +161,16 @@ export class Stage {
             // 添加
             add: (fn, ...args) => {
                 if (events[fn.name]) {
-                    return false
+                    throw new Error(`Event '${fn.name}' exists.`)
                 }
                 events[fn.name] = fn.bind(this, ...args)
-                return true
             },
             // 删除
             del: name => {
                 if (!events[name]) {
-                    return false
+                    throw new Error(`Event '${name}' doesn't exist.`)
                 }
                 delete events[name]
-                return true
             },
             // 遍历
             travel: fn => {
@@ -199,15 +192,13 @@ export class Stage {
                 // 单位渲染和事件
                 this.unit.travel(unit => {
                     // 计算单位相对位置
-                    if (unit.fixed) {
-                        unit.relX = unit.x
-                    } else {
-                        unit.relX = unit.x - camera.x
-                    }
+                    unit.relX = unit.x - camera.x * (1 - unit.fixed)
+                    unit.relY = unit.y - camera.y * (1 - unit.fixed)
+
                     // 绘制画面
                     unit.draw.execute()
                     // 禁用状态下不能执行事件
-                    if (!unit.disabled) {
+                    if (unit.disabled === false) {
                         // 执行单位事件
                         unit.event.execute()
                     }

@@ -6,6 +6,13 @@ export function noShoot() {
     player.disabled = true
     player.stop()
 
+    // 禁用npc
+    this.unit.travel(unit => {
+        if (unit.type === 'npc') {
+            unit.disabled = true
+        }
+    })
+
     // 添加warning
     this.unit.add(warning())
 
@@ -17,6 +24,11 @@ export function noShoot() {
             this.camera.follow(player)
             this.unit.del('warning')
             player.disabled = false
+            this.unit.travel(unit => {
+                if (unit.type === 'npc') {
+                    unit.disabled = false
+                }
+            })
         })
     })
 }

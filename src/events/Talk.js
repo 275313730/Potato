@@ -5,9 +5,9 @@ export function talk(player, dialog) {
         // 判断位置来修改npc方向
         if (unit.moveStatus < 2) {
             if (unit.x < player.x) {
-                unit.direction = 6
+                unit.direction = 'right'
             } else {
-                unit.direction = 4
+                unit.direction = 'left'
             }
         }
 

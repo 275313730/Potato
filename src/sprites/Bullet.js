@@ -8,9 +8,9 @@ export function bullet(player) {
         direction: player.direction
     }
 
-    function draw(ctx, translateY) {
+    function draw(ctx) {
         ctx.fillStyle = 'yellow'
-        ctx.fillRect(this.relX, translateY, 6, 2)
+        ctx.fillRect(this.relX, this.game.height - this.y, 6, 2)
     }
 
     function move() {

@@ -91,5 +91,6 @@ export function player(x) {
         this.userEvent.add(keyUp, 'keyup')
         this.event.add(walk)
         this.draw.animation('stay')
+        this.y = this.game.height - this.height
     })
 }

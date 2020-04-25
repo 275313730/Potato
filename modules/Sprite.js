@@ -39,11 +39,25 @@ export class Sprite {
         this.y = 0
         this.width = 0
         this.height = 0
-        // 图层值(决定图片上下关系)
+
+        // layer
+        // layer决定图片上下关系
         this.layer = 0
-        // 禁用(disabled为true时无法执行单位事件和用户事件)
+
+        // diasabled
+        // disabled为true时无法执行单位事件和用户事件
         this.disabled = false
+
+        // fixed
+        // fixed=0时随镜头移动
+        // fixed=1时固定在页面上，不会随镜头移动
+        // fixed在0~1之间会出现分层移动效果
+        this.fixed = 0
+
+        // direction 
+        // direction决定图片的左右位置
         this.direction = 'right'
+   
         this.game = {
             width: Game.width,
             height: Game.height
@@ -69,22 +83,19 @@ export class Sprite {
             drawImage = img => {
                 const ctx = Game.ctx
 
-                // 锚点位移
-                const translateY = Game.anchor * (Game.height - this.height) - this.y
-
                 // 图片透明度
                 ctx.globalAlpha = this.alpha || 1
 
                 // 图片方向
                 if (this.direction === 'right') {
-                    ctx.drawImage(img, this.relX, translateY)
+                    ctx.drawImage(img, this.relX, this.y)
                 } else {
                     const tranlateX = Game.width - img.width - this.relX
                     // 水平翻转画布
                     ctx.translate(Game.width, 0);
                     ctx.scale(-1, 1);
                     // 绘制图片
-                    ctx.drawImage(img, tranlateX, translateY);
+                    ctx.drawImage(img, tranlateX, this.y);
                     // 画布恢复正常
                     ctx.translate(Game.width, 0);
                     ctx.scale(-1, 1);
@@ -93,8 +104,7 @@ export class Sprite {
         return {
             // 绑定形状(canvas绘制)
             shape: fn => {
-                const translateY = Game.anchor * (Game.height - this.height) - this.y
-                executor = () => fn.call(this, Game.ctx, translateY)
+                executor = () => fn.call(this, Game.ctx)
             },
             // 绑定图片
             image: name => {

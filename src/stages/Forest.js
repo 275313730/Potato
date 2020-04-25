@@ -15,7 +15,27 @@ import { noShoot } from "../events/NoShoot.js";
 
 export function forest(mapId, playerX, stickX) {
 
-    const bgs = ['sky', 'mounFar', 'mounNear', 'treeFar', 'treeNear']
+    const bgs = [
+        {
+            id: 'sky',
+            fixed: 1
+        },
+        {
+            id: 'mounFar',
+            fixed: 1
+        },
+        {
+            id: 'mounNear',
+            fixed: 0.7
+        },
+        {
+            id: 'treeFar',
+            fixed: 0.4
+        },
+        {
+            id: 'treeNear',
+            fixed: 0
+        }]
 
     const npcs = [
         {
@@ -34,16 +54,10 @@ export function forest(mapId, playerX, stickX) {
     return new Stage({ id: mapId }, function () {
         // 载入背景
         bgs.forEach(bg => {
-            if (bg === 'treeNear') {
-                const treeNear = backGround(bg)
-                this.unit.add(treeNear)
-                this.width = treeNear.width
-            } else {
-                this.unit.add(backGround(bg, true))
-            }
+            this.unit.add(backGround(bg.id, bg.fixed))
         })
 
-
+        this.width = this.unit.find('treeNear').width
 
         // 载入地图名
         this.unit.add(mapName(mapId))
