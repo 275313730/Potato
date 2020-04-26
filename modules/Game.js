@@ -158,23 +158,19 @@ export class Game {
             // 载入图片
             'image': {
                 value: (id, url) => {
-                    let img = new Image()
-                    Game.image.add(id, img)
-                    pushPromise(img)
-                    img.src = this.imagePath + url
+                    let image = new Image()
+                    Game.image.add(id, image)
+                    pushPromise(image)
+                    image.src = this.imagePath + url
                 }
             },
             // 载入动画
             'animation': {
-                value: (id, name, url, length, type) => {
-                    let images = []
-                    Game.animation.add(id, name, images)
-                    type = type || 'png'
-                    for (let i = 0; i < length; i++) {
-                        images[i] = new Image()
-                        pushPromise(images[i])
-                        images[i].src = `${this.imagePath}${url}${i + 1}.${type}`
-                    }
+                value: (id, name, url) => {
+                    let image = new Image()
+                    Game.animation.add(id, name, image)
+                    pushPromise(image)
+                    image.src = this.imagePath + url
                 }
             },
             // 载入音频
@@ -234,17 +230,28 @@ export class Game {
 
         // 初始化动画方法
         return Object.defineProperties({}, {
-            // 添加
-            'add': {
-                value: (id, name, images) => {
-                    animations[id] = animations[id] || {}
-                    animations[id][name] = images
+            // 添加角色
+            'role': {
+                value: (id, width, flip) => {
+                    animations[id] = {}
+                    animations[id].width = width
+                    animations[id].flip = flip
                 }
             },
-            // 获取
+            // 添加
+            'add': {
+                value: (id, name, image) => {
+                    animations[id][name] = image
+                }
+            },
+            // 获取动画
             'get': {
                 value: (id, name) => {
-                    return animations[id][name]
+                    return {
+                        width: animations[id].width,
+                        flip: animations[id].flip,
+                        image: animations[id][name]
+                    }
                 }
             }
         })

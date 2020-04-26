@@ -38,61 +38,75 @@ export function App(e) {
     const roles = [
         {
             id: 'player',
+            width: 40,
             animations: [
                 {
-                    url: 'bearded-idle/bearded-idle-',
-                    length: 5,
-                    name: 'stay'
+                    url: 'spritesheets/bearded-idle.png',
+                    name: 'idle'
                 },
                 {
-                    url: 'bearded-walk/bearded-walk-',
-                    length: 5,
+                    url: 'spritesheets/bearded-walk.png',
                     name: 'walk'
                 }
             ]
         },
         {
             id: 'woman',
+            width: 37,
             animations: [
                 {
-                    url: 'woman-idle/woman-idle-',
-                    length: 7,
-                    name: 'stay'
+                    url: 'spritesheets/woman-idle.png',
+                    name: 'idle'
                 },
                 {
-                    url: 'woman-walk/woman-walk-',
-                    length: 6,
+                    url: 'spritesheets/woman-walk.png',
                     name: 'walk'
                 }
             ]
         },
         {
             id: 'oldman',
+            width: 34,
             animations: [
                 {
-                    url: 'oldman-idle/oldman-idle-',
-                    length: 8,
-                    name: 'stay'
+                    url: 'spritesheets/oldman-idle.png',
+                    name: 'idle'
                 },
                 {
-                    url: 'oldman-walk/oldman-walk-',
-                    length: 12,
+                    url: 'spritesheets/oldman-walk.png',
                     name: 'walk'
                 }
             ]
         },
         {
             id: 'hatman',
+            width: 39,
             animations: [
                 {
-                    url: 'hat-man-idle/hat-man-idle-',
-                    length: 4,
-                    name: 'stay'
+                    url: 'spritesheets/hat-man-idle.png',
+                    name: 'idle'
                 },
                 {
-                    url: 'hat-man-walk/hat-man-walk-',
-                    length: 6,
+                    url: 'spritesheets/hat-man-walk.png',
                     name: 'walk'
+                }
+            ]
+        },
+        {
+            id: 'hyena',
+            width: 48,
+            animations: [
+                {
+                    url: 'hyena/hyena-idle.png',
+                    name: 'idle'
+                },
+                {
+                    url: 'hyena/hyena-walk.png',
+                    name: 'walk'
+                },
+                {
+                    url: 'hyena/hyena-death.png',
+                    name: 'death'
                 }
             ]
         }
@@ -138,8 +152,13 @@ export function App(e) {
 
         // 载入动画
         roles.forEach(role => {
+            if (role.id === 'hyena') {
+                Game.animation.role(role.id, role.width, true)
+            } else {
+                Game.animation.role(role.id, role.width)
+            }
             role.animations.forEach(animation => {
-                this.load.animation(role.id, animation.name, animation.url, animation.length)
+                this.load.animation(role.id, animation.name, animation.url)
             })
         })
 
@@ -151,6 +170,4 @@ export function App(e) {
         // 创建场景
         this.start('title')
     })
-
-
 }

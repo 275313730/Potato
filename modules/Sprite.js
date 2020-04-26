@@ -97,26 +97,41 @@ export class Sprite {
                 this.height = img.height
             },
             // 绘制图片
-            drawImage = img => {
+            drawImage = (fn, flip) => {
                 const ctx = Game.ctx
 
                 // 图片透明度
                 ctx.globalAlpha = this.alpha || 1
 
                 // 图片方向
-                if (this.direction === 'right') {
-                    ctx.drawImage(img, this.relX, this.y)
+                if (flip) {
+                    if (this.direction === 'left') {
+                        fn()
+                    } else {
+                        // 水平翻转画布
+                        ctx.translate(Game.width, 0);
+                        ctx.scale(-1, 1);
+                        // 绘制图片
+                        fn()
+                        // 画布恢复正常
+                        ctx.translate(Game.width, 0);
+                        ctx.scale(-1, 1);
+                    }
                 } else {
-                    const tranlateX = Game.width - img.width - this.relX
-                    // 水平翻转画布
-                    ctx.translate(Game.width, 0);
-                    ctx.scale(-1, 1);
-                    // 绘制图片
-                    ctx.drawImage(img, tranlateX, this.y);
-                    // 画布恢复正常
-                    ctx.translate(Game.width, 0);
-                    ctx.scale(-1, 1);
+                    if (this.direction === 'right') {
+                        fn()
+                    } else {
+                        // 水平翻转画布
+                        ctx.translate(Game.width, 0);
+                        ctx.scale(-1, 1);
+                        // 绘制图片
+                        fn()
+                        // 画布恢复正常
+                        ctx.translate(Game.width, 0);
+                        ctx.scale(-1, 1);
+                    }
                 }
+
             }
 
         // 初始化绘制方法
@@ -130,10 +145,19 @@ export class Sprite {
             // 绑定图片
             'image': {
                 value: name => {
-                    let img = Game.image.get(name)
-                    setSize(img)
+                    let image = Game.image.get(name)
+                    setSize(image)
                     executor = () => {
-                        drawImage(img)
+                        if (this.direction === 'right') {
+                            drawImage(() => {
+                                Game.ctx.drawImage(image, this.relX, this.y)
+                            })
+                        } else {
+                            drawImage(() => {
+                                const tranlateX = Game.width - this.width - this.relX
+                                Game.ctx.drawImage(image, tranlateX, this.y)
+                            })
+                        }
                     }
                 }
             },
@@ -149,16 +173,21 @@ export class Sprite {
 
                     // 只读数据
                     let playing = true,
-                        count = 0
+                        count = 0,
+                        role = Game.animation.get(id, name)
+
+
+                    this.width = role.width
+                    this.height = role.image.height
 
                     Object.defineProperties(options, {
                         // 动画间隔帧
                         'interval': {
                             value: interval || Game.animationInterval
                         },
-                        // 图片组
-                        'images': {
-                            value: Game.animation.get(id, name)
+                        // 图片
+                        'image': {
+                            value: role.image
                         },
                         // 动画状态
                         'playing': {
@@ -171,6 +200,14 @@ export class Sprite {
                             get() {
                                 return count
                             }
+                        },
+                        // 动画帧宽度
+                        'width': {
+                            value: this.width
+                        },
+                        // 动画帧高度
+                        'height': {
+                            value: this.height
                         },
                         // 播放
                         'play': {
@@ -195,10 +232,31 @@ export class Sprite {
                         }
                     })
 
-                    setSize(options.images[0])
-
                     executor = () => {
-                        drawImage(options.images[options.currFrame])
+                        if (!role.flip) {
+                            if (this.direction === 'right') {
+                                drawImage(() => {
+                                    Game.ctx.drawImage(options.image, options.currFrame * this.width, 0, this.width, this.height, this.relX, this.y, this.width, this.height)
+                                })
+                            } else {
+                                drawImage(() => {
+                                    const tranlateX = Game.width - role.width - this.relX
+                                    Game.ctx.drawImage(options.image, options.currFrame * this.width, 0, this.width, this.height, tranlateX, this.y, this.width, this.height)
+                                })
+                            }
+                        } else {
+                            if (this.direction === 'left') {
+                                drawImage(() => {
+                                    Game.ctx.drawImage(options.image, options.currFrame * this.width, 0, this.width, this.height, this.relX, this.y, this.width, this.height)
+                                }, true)
+                            } else {
+                                drawImage(() => {
+                                    const tranlateX = Game.width - role.width - this.relX
+                                    Game.ctx.drawImage(options.image, options.currFrame * this.width, 0, this.width, this.height, tranlateX, this.y, this.width, this.height)
+                                }, true)
+                            }
+                        }
+
 
                         // 暂停/停止
                         if (!options.playing) { return }
@@ -207,7 +265,7 @@ export class Sprite {
                         // 计数>=间隔帧数时切换图片并归零计数
                         if (count >= options.interval) {
                             count = 0
-                            if (options.currFrame < options.images.length - 1) {
+                            if (options.currFrame < options.image.width / options.width - 1) {
                                 options.currFrame++
                             } else {
                                 options.currFrame = 0

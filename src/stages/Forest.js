@@ -48,6 +48,11 @@ export function forest(mapId, playerX, stickX) {
             x: 280,
             textArr: [`oldman: "Try to press 'Esc', you can create a new sprite."`,
                 `You: "I will try."`]
+        },
+        {
+            id: 'hyena',
+            x: 200,
+            textArr: [`.........`]
         }
     ]
 

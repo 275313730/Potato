@@ -5,7 +5,6 @@ export function npc(id, x, textArr) {
         // sprite属性
         id,
         x,
-        y: 1,
         direction: 'left',
 
         // 自定义属性
@@ -49,7 +48,7 @@ export function npc(id, x, textArr) {
                 this.speed = -this.speed
                 this.direction = this.speed > 0 ? 'right' : 'left'
             }
-            if (this.waitTime > 300) {
+            if (this.waitTime > 150) {
                 this.moveStatus = 0
                 this.waitTime = 0
             }
@@ -65,12 +64,12 @@ export function npc(id, x, textArr) {
     // 停止移动
     function stop() {
         this.moveStatus = 0
-        this.draw.animation(this.id, 'stay')
+        this.draw.animation(this.id, 'idle')
     }
 
     return new Sprite(options, function () {
         this.event.add(move)
-        this.draw.animation(this.id, 'stay')
+        this.draw.animation(this.id, 'idle')
         this.y = this.game.height - this.height
     })
 }

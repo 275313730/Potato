@@ -5,6 +5,7 @@ export function player(x) {
         // Sprite属性
         id: 'player',
         x,
+        width: 40,
         direction: x === 10 ? 'right' : 'left',
         layer: 1,
 
@@ -60,7 +61,7 @@ export function player(x) {
     }
 
     function stop() {
-        this.draw.animation(this.id, 'stay')
+        this.draw.animation(this.id, 'idle')
         this.walking = false
     }
 
@@ -77,7 +78,7 @@ export function player(x) {
         this.userEvent.add(keyDown, 'keydown', true)
         this.userEvent.add(keyUp, 'keyup')
         this.event.add(walk)
-        this.draw.animation(this.id, 'stay')
+        this.draw.animation(this.id, 'idle')
         this.y = this.game.height - this.height
     })
 }
