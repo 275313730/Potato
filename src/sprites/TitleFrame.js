@@ -1,7 +1,6 @@
 import { Game } from "../../modules/Game.js";
 import { Sprite } from "../../modules/Sprite.js";
 
-
 export function titleFrame() {
     const options = {
         id: 'titleFrame',

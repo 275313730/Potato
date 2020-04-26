@@ -1,10 +1,53 @@
 export class Game {
     constructor(options, fn) {
-        // 初始化画面
-        Game.canvas = document.getElementsByTagName('canvas')[0];
-        Game.ctx = Game.canvas.getContext('2d');
-        Game.width = options.width
-        Game.height = options.height
+        // 初始化实例
+        this.init(options)
+
+        // 回调
+        fn.call(this)
+    }
+
+    init(options) {
+        Game.canvas = document.getElementsByTagName('canvas')[0]
+
+        // 初始化canvas
+        Object.defineProperties(Game, {
+            'canvas': {
+                value: Game.canvas
+            },
+            'ctx': {
+                value: Game.canvas.getContext('2d')
+            },
+            'width': {
+                value: options.width
+            },
+            'height': {
+                value: options.height
+            },
+            'audio': {
+                value: Game.audio()
+            },
+            'image': {
+                value: Game.image()
+            },
+            'animation': {
+                value: Game.animation()
+            },
+            'sound': {
+                value: Game.sound()
+            },
+            'music': {
+                value: Game.music()
+            },
+            'stage': {
+                value: Game.stage(options.stages)
+            },
+            'sprite': {
+                value: Game.sprite()
+            },
+        })
+
+        // 设置canvas宽高
         Game.canvas.setAttribute('width', Game.width + 'px')
         Game.canvas.setAttribute('height', Game.height + 'px')
 
@@ -12,21 +55,14 @@ export class Game {
         Game.frames = 60
         Game.animationInterval = 16
         Game.key = null
+
+        // 初始化load方法和参数
+        this.load = this.load()
         this.audioPath = options.path.audio || ''
         this.imagePath = options.path.image || ''
         this.promises = []
 
-        // 初始化方法
-        Game.audio = Game.audio()
-        Game.image = Game.image()
-        Game.animation = Game.animation()
-        Game.sound = Game.sound()
-        Game.music = Game.music()
-        Game.stage = Game.stage(options.stages)
-        this.load = this.load()
-
-        // 回调
-        fn.call(this)
+        delete this.init
     }
 
     // 创建场景
@@ -37,6 +73,68 @@ export class Game {
                 Game.stage.switch(stage, ...args)
             })
             .catch(err => console.log(err))
+    }
+
+    // 场景
+    static stage(stages) {
+        let currStage = null
+
+        // 初始化场景方法
+        return Object.defineProperties({}, {
+            // 切换
+            'switch': {
+                value: (newStage, ...args) => {
+                    currStage && currStage.execute.destory()
+                    this.key = null
+                    this.stage.cutscenes()
+                    setTimeout(() => {
+                        currStage = stages[newStage](...args)
+                        this.sprite.travel(sprite => {
+                            currStage.sprite.add(sprite)
+                        })
+                    }, 300)
+                }
+            },
+            // 转场
+            'cutscenes': {
+                value: () => {
+                    this.ctx.fillStyle = 'black'
+                    this.ctx.fillRect(0, 0, this.width, this.height)
+                }
+            }
+        })
+    }
+
+    // 全局sprite(在场景创建时加入场景单位中)
+    static sprite() {
+        let sprites = {}
+
+        // 初始化sprite方法
+        return Object.defineProperties({}, {
+            // 添加
+            'add': {
+                value: newSprite => {
+                    sprites[newSprite.id] = newSprite
+                }
+            },
+            // 删除
+            'del': {
+                value: id => {
+                    if (sprites[id]) {
+                        sprites[id].userEvent.delAll()
+                        delete sprites[id]
+                    }
+                }
+            },
+            // 遍历
+            travel: {
+                value: () => {
+                    for (const key in sprites) {
+                        fn(sprites[key])
+                    }
+                }
+            }
+        })
     }
 
     // 载入
@@ -54,143 +152,161 @@ export class Game {
                 })
             )
         }
-        return {
+
+        // 初始化载入方法
+        return Object.defineProperties({}, {
             // 载入图片
-            image: (id, url) => {
-                let img = new Image()
-                Game.image.add(id, img)
-                pushPromise(img)
-                img.src = this.imagePath + url
+            'image': {
+                value: (id, url) => {
+                    let img = new Image()
+                    Game.image.add(id, img)
+                    pushPromise(img)
+                    img.src = this.imagePath + url
+                }
             },
             // 载入动画
-            animation: (id, name, url, length, type) => {
-                let images = []
-                Game.animation.add(id, name, images)
-                type = type || 'png'
-                for (let i = 0; i < length; i++) {
-                    images[i] = new Image()
-                    pushPromise(images[i])
-                    images[i].src = `${this.imagePath}${url}${i + 1}.${type}`
+            'animation': {
+                value: (id, name, url, length, type) => {
+                    let images = []
+                    Game.animation.add(id, name, images)
+                    type = type || 'png'
+                    for (let i = 0; i < length; i++) {
+                        images[i] = new Image()
+                        pushPromise(images[i])
+                        images[i].src = `${this.imagePath}${url}${i + 1}.${type}`
+                    }
                 }
             },
             // 载入音频
-            audio: (id, url) => {
-                Game.audio.add(id, this.audioPath + url)
+            'audio': {
+                value: (id, url) => {
+                    Game.audio.add(id, this.audioPath + url)
+                }
             }
-        }
+        })
     }
 
     // 音频
     static audio() {
         let audio = {}
-        return {
+
+        // 初始化音频方法
+        return Object.defineProperties({}, {
             // 添加
-            add: (id, url) => {
-                audio[id] = new Audio(url)
+            'add': {
+                value: (id, url) => {
+                    audio[id] = new Audio(url)
+                }
             },
             // 获取
-            get: id => {
-                return audio[id]
+            'get': {
+                value: id => {
+                    return audio[id]
+                }
             }
-        }
+        })
     }
 
     // 图片
     static image() {
         let images = {}
-        return {
+
+        // 初始化图片方法
+        return Object.defineProperties({}, {
             // 添加
-            add: (id, img) => {
-                images[id] = img
+            'add': {
+                value: (id, img) => {
+                    images[id] = img
+                }
             },
             // 获取
-            get: id => {
-                return images[id]
+            'get': {
+                value: id => {
+                    return images[id]
+                }
             }
-        }
+        })
     }
 
     // 动画
     static animation() {
         let animations = {}
-        return {
+
+        // 初始化动画方法
+        return Object.defineProperties({}, {
             // 添加
-            add: (id, name, images) => {
-                animations[id] = animations[id] || {}
-                animations[id][name] = images
+            'add': {
+                value: (id, name, images) => {
+                    animations[id] = animations[id] || {}
+                    animations[id][name] = images
+                }
             },
             // 获取
-            get: (id, name) => {
-                return animations[id][name]
+            'get': {
+                value: (id, name) => {
+                    return animations[id][name]
+                }
             }
-        }
-    }
-
-    // 场景
-    static stage(stages) {
-        let currStage = null
-        return {
-            // 切换
-            switch: (newStage, ...args) => {
-                currStage && currStage.execute.destory()
-                Game.key = null
-                this.stage.cutscenes()
-                setTimeout(() => {
-                    currStage = stages[newStage](...args)
-                }, 200)
-            },
-            // 转场
-            cutscenes: () => {
-                this.ctx.fillStyle = 'black'
-                this.ctx.fillRect(0, 0, this.width, this.height)
-            },
-        }
+        })
     }
 
     // 音乐
     static music() {
         let music = null
-        return {
+
+        // 初始化音乐方法
+        return Object.defineProperties({}, {
             // 播放
-            play: name => {
-                if (music === this.audio.get(name)) {
-                    music.play()
-                } else {
-                    music = this.audio.get(name)
-                    music.play()
+            'play': {
+                value: name => {
+                    if (music === this.audio.get(name)) {
+                        music.play()
+                    } else {
+                        music = this.audio.get(name)
+                        music.play()
+                    }
                 }
             },
             // 暂停
-            pause: () => {
-                music.pause()
+            'pause': {
+                value: () => {
+                    music.pause()
+                }
             },
             // 停止
-            stop: () => {
-                music.pause()
-                music.currentTime = 0
+            'stop': {
+                value: () => {
+                    music.pause()
+                    music.currentTime = 0
+                }
             },
             // 循环
-            loop: boolean => {
-                music.loop = boolean
+            'loop': {
+                value: boolean => {
+                    music.loop = boolean
+                }
             }
-        }
+        })
     }
 
     // 音效
     static sound() {
-        return {
-            play: (name, vol, single) => {
-                if (single) {
-                    this.audio.get(name).play()
-                } else {
-                    let sound = this.audio.get(name).cloneNode()
-                    sound.volume = vol || 1
-                    sound.play()
-                    sound.addEventListener('ended', () => {
-                        sound = null
-                    })
+        // 初始化音效方法
+        return Object.defineProperties({}, {
+            'play': {
+                value: (name, vol, single) => {
+                    if (single) {
+                        this.audio.get(name).play()
+                    } else {
+                        let sound = this.audio.get(name).cloneNode()
+                        sound.volume = vol || 1
+                        sound.play()
+                        sound.addEventListener('ended', () => {
+                            sound = null
+                        })
+                    }
                 }
             }
-        }
+        })
     }
 }

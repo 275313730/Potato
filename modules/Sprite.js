@@ -2,20 +2,18 @@ import { Game } from "./Game.js";
 
 export class Sprite {
     constructor(options, fn) {
+        // 初始化实例
+        this.init(options)
+
         // 设置参数
-        this.check(options)
-        this.setDefalutProperty()
         this.setProperty(options)
 
-        // 初始化方法
-        this.draw = this.draw()
-        this.event = this.event()
-        this.userEvent = this.userEvent()
+        // 执行回调函数
         fn && fn.call(this)
     }
 
-    // 检查
-    check(options) {
+    // 初始化实例
+    init(options) {
         // 检查id是否填写
         if (!options.id) {
             throw new Error('Sprite needs an id.')
@@ -31,10 +29,27 @@ export class Sprite {
         if (options.direction && options.direction !== 'right' && options.direction !== 'left') {
             throw new Error(`Direction isn't correct.`)
         }
+
+        // 初始化实例方法
+        Object.defineProperties(this, {
+            'draw': {
+                value: this.draw()
+            },
+            'event': {
+                value: this.event()
+            },
+            'userEvent': {
+                value: this.userEvent()
+            }
+        })
+
+        delete this.init
     }
 
-    // 初始化数据
-    setDefalutProperty() {
+    // 设置参数
+    setProperty(options) {
+        // 设置初始参数
+
         this.x = 0
         this.y = 0
         this.width = 0
@@ -58,17 +73,19 @@ export class Sprite {
         // direction决定图片的左右位置
         this.direction = 'right'
 
-        this.game = {
-            width: Game.width,
-            height: Game.height
-        }
-    }
+        // Game的宽高(只读)
+        Object.defineProperty(this, 'game', {
+            value: {
+                width: Game.width,
+                height: Game.height
+            }
+        })
 
-    // 设置数据
-    setProperty(options) {
         for (const key in options) {
             this[key] = options[key]
         }
+
+        delete this.setProperty
     }
 
     // 绘制
@@ -101,131 +118,227 @@ export class Sprite {
                     ctx.scale(-1, 1);
                 }
             }
-        return {
+
+        // 初始化绘制方法
+        return Object.defineProperties({}, {
             // 绑定形状(canvas绘制)
-            shape: fn => {
-                executor = () => fn.call(this, Game.ctx)
-            },
-            // 绑定图片
-            image: name => {
-                let img = Game.image.get(name)
-                setSize(img)
-                executor = () => {
-                    drawImage(img)
+            'shape': {
+                value: fn => {
+                    executor = () => fn.call(this, Game.ctx)
                 }
             },
-            // 绑定动画
-            animation: (id, name, interval) => {
-                // 动画间隔帧书
-                interval = interval || Game.animationInterval
-                let index = 0,
-                    count = 0,
-                    images = Game.animation.get(id, name)
-                setSize(images[0])
-                executor = () => {
-                    drawImage(images[index])
-                    count++
-                    // 计数>=间隔帧数时切换图片并归零计数
-                    if (count >= interval) {
-                        count = 0
-                        index < images.length - 1 ? index++ : index = 0
+            // 绑定图片
+            'image': {
+                value: name => {
+                    let img = Game.image.get(name)
+                    setSize(img)
+                    executor = () => {
+                        drawImage(img)
                     }
                 }
             },
+            // 绑定动画
+            'animation': {
+                value: (id, name, interval) => {
+                    let options = {
+                        // 当前关键帧
+                        currFrame: 0,
+                        // 完成时执行函数
+                        onComplete: null
+                    }
+
+                    // 只读数据
+                    let playing = true,
+                        count = 0
+
+                    Object.defineProperties(options, {
+                        // 动画间隔帧
+                        'interval': {
+                            value: interval || Game.animationInterval
+                        },
+                        // 图片组
+                        'images': {
+                            value: Game.animation.get(id, name)
+                        },
+                        // 动画状态
+                        'playing': {
+                            get() {
+                                return playing
+                            }
+                        },
+                        // 当前间隔帧
+                        'count': {
+                            get() {
+                                return count
+                            }
+                        },
+                        // 播放
+                        'play': {
+                            value: () => {
+                                playing = true
+                            }
+                        },
+                        // 暂停
+                        'pause': {
+                            value: () => {
+                                playing = false
+                                count = 0
+                            }
+                        },
+                        // 停止
+                        'stop': {
+                            value: () => {
+                                playing = false
+                                this.currFrame = 0
+                                count = 0
+                            }
+                        }
+                    })
+
+                    setSize(options.images[0])
+
+                    executor = () => {
+                        drawImage(options.images[options.currFrame])
+
+                        // 暂停/停止
+                        if (!options.playing) { return }
+                        count++
+
+                        // 计数>=间隔帧数时切换图片并归零计数
+                        if (count >= options.interval) {
+                            count = 0
+                            if (options.currFrame < options.images.length - 1) {
+                                options.currFrame++
+                            } else {
+                                options.currFrame = 0
+                                options.onComplete && options.onComplete()
+                            }
+                        }
+                    }
+
+                    return options
+                }
+            },
             // 取消绑定
-            unBind: () => {
-                executor = null
+            'unBind': {
+                value: () => {
+                    executor = null
+                }
             },
             // 执行
-            execute: () => {
-                executor && executor()
+            'execute': {
+                value: () => {
+                    executor && executor()
+                }
             }
-        }
+        })
     }
 
     // 事件
     event() {
         let events = []
-        return {
+
+        // 初始化事件方法
+        return Object.defineProperties({}, {
             // 添加
-            add: fn => {
-                events.push(fn)
+            'add': {
+                value: fn => {
+                    events.push(fn)
+                }
             },
             // 删除
-            del: fn => {
-                for (const key in events) {
-                    events[key] === fn
-                    events.splice(key, 1)
-                    return
+            'del': {
+                value: fn => {
+                    for (const key in events) {
+                        events[key] === fn
+                        events.splice(key, 1)
+                        return
+                    }
                 }
             },
             // 删除所有
-            delAll: () => {
-                events = []
+            'delAll': {
+                value: () => {
+                    events = []
+                },
             },
             // 执行
-            execute: () => {
-                events.forEach(event => {
-                    event.call(this)
-                })
+            'execute': {
+                value: () => {
+                    // disabled时禁用
+                    if (this.disabled) { return }
+                    events.forEach(event => {
+                        event.call(this)
+                    })
+                }
             }
-        }
+        })
     }
 
     // 用户事件
     userEvent() {
         let userEvents = []
-        return {
+
+        // 初始化用户事件方法
+        return Object.defineProperties({}, {
             // 添加
-            add: (fn, eventType, isBreak) => {
-                const bindFn = e => {
-                    // disabled时禁用用户事件
-                    if (this.disabled) { return }
+            'add': {
+                value: (fn, eventType, isBreak) => {
+                    const bindFn = e => {
+                        // 没有加入到场景前禁用
+                        if (!this.stage) { return }
+                        // disabled时禁用
+                        if (this.disabled) { return }
 
-                    // 按键间隔检测
-                    if (isBreak) {
-                        if (e.key === Game.key) {
-                            return
+                        // 按键间隔检测
+                        if (isBreak) {
+                            if (e.key === Game.key) {
+                                return
+                            }
+                            Game.key = e.key
                         }
-                        Game.key = e.key
-                    }
 
-                    // 键盘松开时Game.key为null
-                    if (eventType === 'keyup') {
-                        Game.key = null
-                    }
+                        // 键盘松开时Game.key为null
+                        if (eventType === 'keyup') {
+                            Game.key = null
+                        }
 
-                    // 执行事件
-                    fn.call(this, e)
+                        // 执行事件
+                        fn.call(this, e)
+                    }
+                    // 监听事件
+                    window.addEventListener(eventType, bindFn)
+
+                    // 添加事件到userEvents中
+                    userEvents.push({ eventType, bindFn })
                 }
-                // 监听事件
-                window.addEventListener(eventType, bindFn)
-
-                // 添加事件到userEvents中
-                userEvents.push({ eventType, bindFn })
             },
             // 删除
-            del: eventType => {
-                // 没有传参视为无效
-                if (!eventType) { return }
+            'del': {
+                value: eventType => {
+                    // 没有传参视为无效
+                    if (!eventType) { return }
 
-                // 解除监听
-                for (let i = 0; i < userEvents.length; i++) {
-                    const event = userEvents[i]
-                    if (event.eventType === eventType) {
-                        window.removeEventListener(eventType, event.bindFn)
-                        userEvents.splice(i, 1)
-                        i--
+                    // 解除监听
+                    for (let i = 0; i < userEvents.length; i++) {
+                        const event = userEvents[i]
+                        if (event.eventType === eventType) {
+                            window.removeEventListener(eventType, event.bindFn)
+                            userEvents.splice(i, 1)
+                            i--
+                        }
                     }
                 }
             },
             // 删除所有
-            delAll: () => {
-                userEvents.forEach(event => {
-                    window.removeEventListener(event.eventType, event.bindFn)
-                });
-                userEvents = []
+            'delAll': {
+                value: () => {
+                    userEvents.forEach(event => {
+                        window.removeEventListener(event.eventType, event.bindFn)
+                    });
+                    userEvents = []
+                }
             }
-        }
+        });
     }
 }

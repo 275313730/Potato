@@ -1,25 +1,25 @@
 export function talk(player, dialog) {
-    this.unit.travel(unit => {
-        if (unit.type !== 'npc') { return }
+    this.sprite.travel(sprite => {
+        if (sprite.type !== 'npc') { return }
 
         // 判断位置来修改npc方向
-        if (unit.moveStatus < 2) {
-            if (unit.x < player.x) {
-                unit.direction = 'right'
+        if (sprite.moveStatus < 2) {
+            if (sprite.x < player.x) {
+                sprite.direction = 'right'
             } else {
-                unit.direction = 'left'
+                sprite.direction = 'left'
             }
         }
 
         // 判断是否对话中
-        if (!unit.talking) {
+        if (!sprite.talking) {
             // 在一定范围内按下空格对话开始
-            if (player.space === true && Math.abs(unit.x - player.x) < unit.width / 4 * 3 && dialog.typing === 0) {
+            if (player.space === true && Math.abs(sprite.x - player.x) < sprite.width / 4 * 3 && dialog.typing === 0) {
                 player.space = false
-                unit.talking = true
-                dialog.text = unit.textArr[unit.textCount]
+                sprite.talking = true
+                dialog.text = sprite.textArr[sprite.textCount]
                 dialog.show = true
-                unit.textCount++
+                sprite.textCount++
                 return false
             }
         } else {
@@ -29,10 +29,10 @@ export function talk(player, dialog) {
                     dialog.typing = 1
                 } else {
                     // 分段对话
-                    if (unit.textCount < unit.textArr.length) {
+                    if (sprite.textCount < sprite.textArr.length) {
                         dialog.typing = 0
-                        dialog.text = unit.textArr[unit.textCount]
-                        unit.textCount++
+                        dialog.text = sprite.textArr[sprite.textCount]
+                        sprite.textCount++
                     } else {
                         talkStop(player, dialog)
                     }
@@ -41,7 +41,7 @@ export function talk(player, dialog) {
             }
 
             // 离开一定范围对话直接结束对话
-            if (Math.abs(unit.x - player.x) > unit.width / 4 * 3) {
+            if (Math.abs(sprite.x - player.x) > sprite.width / 4 * 3) {
                 talkStop()
                 return false
             }
@@ -50,8 +50,8 @@ export function talk(player, dialog) {
         // 对话停止
         function talkStop() {
             dialog.show = false
-            unit.textCount = 0
-            unit.talking = false
+            sprite.textCount = 0
+            sprite.talking = false
             player.space = false
         }
     })

@@ -10,10 +10,10 @@ export function title() {
     return new Stage({ id: 'title' }, function () {
         // 载入背景
         bgs.forEach(bg => {
-            this.unit.add(backGround(bg))
+            this.sprite.add(backGround(bg))
         })
 
-        this.unit.add(titleFrame())
+        this.sprite.add(titleFrame())
 
         Game.music.play('forest')
         Game.music.loop(true)

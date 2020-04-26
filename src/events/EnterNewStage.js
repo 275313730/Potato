@@ -1,7 +1,7 @@
 import { Game } from "../../modules/Game.js"
 
 export function enterNewStage(mapId) {
-    const player = this.unit.find('player')
+    const player = this.sprite.find('player')
     // 玩家的x与场景右边缘对齐时
     if (player.x >= this.width - player.width) {
         Game.stage.switch('forest', mapId + 1)

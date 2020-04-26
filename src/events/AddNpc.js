@@ -13,7 +13,7 @@ export function addNpc() {
         let newHatMan = npc(hatman.id, hatman.x, hatman.textArr)
 
         // 添加hatman
-        this.unit.add(newHatMan)
+        this.sprite.add(newHatMan)
 
         // 删除当前事件
         this.event.del('addNpc')
