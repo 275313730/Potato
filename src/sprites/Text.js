@@ -1,14 +1,14 @@
 import { Sprite } from "../../modules/Sprite.js";
 
-export function warning() {
+export function text() {
     const options = {
-        id: 'warning'
+        id: 'text'
     }
 
     function draw(ctx) {
         ctx.fillStyle = 'red'
         ctx.font = '14px pixel'
-        ctx.centerText('No shoot in this map.', this.x, this.y)
+        ctx.centerText(`Press 'z' to shoot.`, this.x, this.y)
     }
 
     return new Sprite(options, function () {

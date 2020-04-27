@@ -15,7 +15,7 @@ export class Sprite {
     // 初始化实例
     init(options) {
         // 检查id是否填写
-        if (!options.id) {
+        if (options.id == null) {
             throw new Error('Sprite needs an id.')
         }
         // 检查width和height

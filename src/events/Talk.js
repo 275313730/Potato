@@ -1,4 +1,5 @@
-export function talk(player, dialog) {
+export function talk(player) {
+    const dialog = this.sprite.find('dialog')
     this.sprite.travel(sprite => {
         if (sprite.type !== 'npc') { return }
 

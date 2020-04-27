@@ -108,6 +108,10 @@ export function App(e) {
                 {
                     url: 'hyena/hyena-death.png',
                     name: 'death'
+                },
+                {
+                    url: 'hyena/hyena-attack.png',
+                    name: 'attack'
                 }
             ]
         }

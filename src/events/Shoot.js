@@ -4,7 +4,7 @@ import { bullet } from "../sprites/Bullet.js";
 export function shoot() {
     const player = this.sprite.find('player'),
         thisBullet = this.sprite.find('bullet')
-
+    if (!player) { return }
     // 添加bullet
     if (player.shoot && !thisBullet) {
         player.shoot = false
@@ -30,7 +30,7 @@ export function shoot() {
                 this.sprite.del(thisBullet.id)
                 if (!sp.disabled) {
                     sp.disabled = true
-                    sp.draw.animation(sp.id, 'death')
+                    sp.draw.animation(sp.name, 'death')
                         .onComplete = () => {
                             this.sprite.del(sp.id)
                         }

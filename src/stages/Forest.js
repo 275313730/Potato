@@ -12,9 +12,9 @@ import { addNpc } from "../events/AddNpc.js";
 import { enterNewStage } from "../events/EnterNewStage.js";
 import { shoot } from "../events/Shoot.js";
 import { talk } from "../events/Talk.js";
-import { noShoot } from "../events/NoShoot.js";
+import { warning } from "../events/Warning.js";
 
-export function forest(mapId, playerX, stickX) {
+export function forest(mapId, playerX) {
 
     const bgs = [
         {
@@ -52,53 +52,47 @@ export function forest(mapId, playerX, stickX) {
         }
     ]
 
-    const enemies = [
-        {
-            id: 'hyena',
-            x: 200
-        }
-    ]
-
     return new Stage({ id: mapId }, function () {
         // 载入背景
         bgs.forEach(bg => {
             this.sprite.add(backGround(bg.id, bg.fixed))
+            if (bg.fixed === 0) {
+                this.width = this.sprite.find(bg.id).width
+            }
         })
-
-        this.width = this.sprite.find('treeNear').width
 
         // 载入地图名
         this.sprite.add(mapName(mapId))
-
-        // 载入npc
-        npcs.forEach(n => {
-            this.sprite.add(npc(n.id, n.x, n.textArr))
-        })
-
-        // 载入敌人
-        enemies.forEach(e => {
-            this.sprite.add(enemy(e.id, e.x))
-        })
 
         // 载入玩家
         const newPlayer = player(playerX || 10)
         this.sprite.add(newPlayer)
         this.camera.follow(newPlayer)
 
+        if (mapId % 2 === 0) {
+            // 载入npc
+            npcs.forEach(n => {
+                this.sprite.add(npc(n.id, n.x, n.textArr))
+            })
+        } else {
+            // 载入敌人
+            for (let i = 0; i < 3; i++) {
+                this.sprite.add(enemy('hyena',  i,  newPlayer))
+            }
+        }
+
         // 载入对话框
-        const newDialog = dialog()
-        this.sprite.add(newDialog)
+        this.sprite.add(dialog())
 
         // 载入事件
         this.event.add(addNpc)
         this.event.add(enterNewStage, mapId)
-        this.event.add(talk, newPlayer, newDialog)
+        this.event.add(talk, newPlayer)
 
         // 根据地图id载入不同的事件
-        if (mapId % 2 === 0) {
+        if (mapId % 2 === 1) {
             this.event.add(shoot)
-        } else {
-            this.event.add(noShoot, newDialog)
+            this.event.once(warning)
         }
     })
 }

@@ -232,6 +232,17 @@ export class Stage {
                     events[fn.name] = fn.bind(this, ...args)
                 }
             },
+            'once': {
+                value: (fn, ...args) => {
+                    if (events[fn.name]) {
+                        throw new Error(`Event '${fn.name}' exists.`)
+                    }
+                    events[fn.name] = () => {
+                        fn.call(this, ...args)
+                        delete events[fn.name]
+                    }
+                }
+            },
             // 删除
             'del': {
                 value: name => {
@@ -264,6 +275,11 @@ export class Stage {
                     // 获取镜头数据
                     let camera = this.camera.cal()
 
+                    // 执行场景事件
+                    this.event.travel(event => {
+                        event.call(this)
+                    })
+
                     // 单位渲染和事件
                     this.sprite.travel(unit => {
                         // 计算单位相对位置
@@ -275,10 +291,6 @@ export class Stage {
 
                         // 执行单位事件
                         unit.event.execute()
-                    })
-                    // 执行场景事件
-                    this.event.travel(event => {
-                        event.call(this)
                     })
                 }
             },

@@ -1,66 +1,56 @@
 import { Sprite } from "../../modules/Sprite.js";
 
-export function enemy(id, x) {
+export function enemy(name, number, player) {
     const options = {
         // sprite属性
-        id,
-        x,
+        id: 'hyena' + number,
+        x: 200 + number * 100,
         direction: 'left',
+        layer: 2,
 
         // 自定义属性
         type: 'enemy',
+        name,
         moveStatus: 0,
-        waitTime: 0,
-        speed: 1,
-        stop
+        speed: 0.5 + Math.random(),
+        attack
     }
 
     function move() {
         // 静止
-        if (this.moveStatus === 0) {
-            this.stop()
-            this.moveStatus = 1
-            if (Math.random() > 0.5) {
-                this.speed = -this.speed
-            }
-        }
-
-        // 准备移动
-        if (this.moveStatus === 1) {
-            if (this.waitTime < 200) {
-                this.waitTime++
+        if (this.moveStatus === 0 && (this.x < player.x || this.x > player.x + player.width)) {
+            if (player.x < this.x) {
+                this.direction = 'left'
             } else {
-                this.moveStatus = 2
-                this.waitTime = 0
-                this.direction = this.speed > 0 ? 'right' : 'left'
-                this.draw.animation(this.id, 'walk')
+                this.direction = 'right'
             }
+            this.moveStatus = 1
+            this.draw.animation(this.name, 'walk')
         }
 
         // 移动
-        if (this.moveStatus === 2) {
-            this.x += this.speed
-            this.waitTime++
-            if (this.x < 0 || this.x > this.stage.width - this.width) {
-                this.speed = -this.speed
-                this.direction = this.speed > 0 ? 'right' : 'left'
+        if (this.moveStatus === 1) {
+            if (this.x <= player.x + player.width - this.width / 2 && this.x >= player.x - this.width / 2) {
+                this.attack()
+                return
             }
-            if (this.waitTime > 150) {
-                this.moveStatus = 0
-                this.waitTime = 0
+            if (this.direction === 'left') {
+                this.x -= this.speed
+            } else {
+                this.x += this.speed
             }
         }
     }
 
-    // 停止移动
-    function stop() {
+    // 攻击
+    function attack() {
         this.moveStatus = 0
-        this.draw.animation(this.id, 'idle')
+        this.draw.animation(this.name, 'attack')
     }
 
     return new Sprite(options, function () {
         this.event.add(move)
-        this.draw.animation(this.id, 'idle')
+        this.draw.animation(this.name, 'idle')
         this.y = this.game.height - this.height
     })
 }
