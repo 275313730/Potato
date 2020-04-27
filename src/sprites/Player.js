@@ -18,6 +18,7 @@ export function player(x) {
         stop
     }
 
+    // 按下
     function keyDown(e) {
         switch (e.key) {
             case 'ArrowRight':
@@ -35,6 +36,7 @@ export function player(x) {
         }
     }
 
+    // 弹起
     function keyUp(e) {
         switch (e.key) {
             case 'ArrowRight':
@@ -54,17 +56,20 @@ export function player(x) {
         }
     }
 
+    // 移动
     function move(direction) {
         this.direction = direction
         this.draw.animation(this.id, 'walk')
         this.walking = true
     }
 
+    // 停止
     function stop() {
         this.draw.animation(this.id, 'idle')
         this.walking = false
     }
 
+    // 移动
     function walk() {
         if (this.walking === false) { return }
         if (this.direction === 'right') {

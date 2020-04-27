@@ -5,6 +5,7 @@ export function text() {
         id: 'text'
     }
 
+    // 绘制
     function draw(ctx) {
         ctx.fillStyle = 'red'
         ctx.font = '14px pixel'

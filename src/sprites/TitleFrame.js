@@ -4,6 +4,7 @@ import { Sprite } from "../../modules/Sprite.js";
 export function titleFrame() {
     const options = {
         id: 'titleFrame',
+        
         title: 'Lost Forest',
         start: 'Start Game',
         egg: `Don't Press!`,
@@ -14,6 +15,7 @@ export function titleFrame() {
         reset
     }
 
+    // 绘制
     function draw(ctx) {
         const width = this.game.width,
             height = this.game.height
@@ -40,6 +42,7 @@ export function titleFrame() {
         ctx.fillText(this.arrow, this.x - 45, this.y + this.arrowY)
     }
 
+    // 选择
     function select(e) {
         switch (e.key) {
             case 'ArrowDown':
@@ -61,6 +64,7 @@ export function titleFrame() {
         }
     }
 
+    // 重置
     function reset() {
         Game.sound.play('select', 0.8)
         this.arrow = '→'
@@ -68,6 +72,7 @@ export function titleFrame() {
         this.arrowY = 10 + this.selection * 18
     }
 
+    // 闪烁
     function twinkling() {
         this.count++
         if (this.count >= 25) {

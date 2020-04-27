@@ -6,6 +6,7 @@ export function mapName( mapId) {
         y: 15
     }
 
+    // 绘制
     function draw(ctx) {
         ctx.fillStyle = 'red'
         ctx.font = '12px pixel'

@@ -52,6 +52,7 @@ export class Stage {
             follow: null,
             moveMent: null
         },
+            // 创建镜头移动
             createMoveMent = (perX, perY, frames, fn) => {
                 if (camera.x < 0) {
                     camera.x = 0
@@ -71,7 +72,7 @@ export class Stage {
                 }
             }
 
-        // 初始化镜头方法
+        // 初始化方法
         return Object.defineProperties({}, {
             // 跟随
             'follow': {
@@ -126,12 +127,12 @@ export class Stage {
         })
     }
 
-    // 场景单位
+    // 场景精灵
     sprite() {
         let sprites = {},
             layers = []
 
-        // 初始化单位方法
+        // 初始化方法
         return Object.defineProperties({}, {
             // 添加
             'add': {
@@ -221,7 +222,7 @@ export class Stage {
     event() {
         let events = {}
 
-        // 初始化事件方法
+        // 初始化方法
         return Object.defineProperties({}, {
             // 添加
             'add': {
@@ -265,7 +266,7 @@ export class Stage {
 
     // 场景函数
     execute() {
-        // 初始化场景函数方法
+        // 初始化方法
         return Object.defineProperties({}, {
             // 刷新
             'refresh': {
@@ -280,17 +281,23 @@ export class Stage {
                         event.call(this)
                     })
 
-                    // 单位渲染和事件
-                    this.sprite.travel(unit => {
-                        // 计算单位相对位置
-                        unit.relX = unit.x - camera.x * (1 - unit.fixed)
-                        unit.relY = unit.y - camera.y * (1 - unit.fixed)
+                    // 场景精灵渲染和事件
+                    this.sprite.travel(sprite => {
+                        // 计算相对位置
+                        sprite.relX = sprite.x - camera.x * (1 - sprite.fixed)
+                        sprite.relY = sprite.y - camera.y * (1 - sprite.fixed)
 
                         // 绘制画面
-                        unit.draw.execute()
+                        sprite.draw.execute()
 
-                        // 执行单位事件
-                        unit.event.execute()
+                        // 执行事件
+                        sprite.event.execute()
+                    })
+
+                    // 全局精灵渲染和事件
+                    Game.sprite.travel(sprite => {
+                        sprite.draw.execute()
+                        sprite.event.execute()
                     })
                 }
             },

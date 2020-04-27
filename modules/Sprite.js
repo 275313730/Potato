@@ -49,28 +49,24 @@ export class Sprite {
     // 设置参数
     setProperty(options) {
         // 设置初始参数
-
         this.x = 0
         this.y = 0
         this.width = 0
         this.height = 0
 
-        // layer
-        // layer决定图片上下关系
+        // layer 决定图片上下关系
         this.layer = 0
 
-        // diasabled
-        // disabled为true时无法执行单位事件和用户事件
+        // diasabled 为true时无法执行单位事件和用户事件
         this.disabled = false
 
         // fixed
-        // fixed=0时随镜头移动
-        // fixed=1时固定在页面上，不会随镜头移动
-        // fixed在0~1之间会出现分层移动效果
+        // 为0时随镜头移动
+        // 为1时固定在页面上，不会随镜头移动
+        // 在0~1之间会出现分层移动效果
         this.fixed = 0
 
-        // direction 
-        // direction决定图片的左右位置
+        // direction 决定图片的左右位置
         this.direction = 'right'
 
         // Game的宽高(只读)
@@ -107,15 +103,12 @@ export class Sprite {
                 if (this.direction === 'right') {
                     ctx.drawImage(image, this.relX, this.y)
                 } else {
-                    // 水平翻转画布
-                    ctx.translate(Game.width, 0);
-                    ctx.scale(-1, 1);
-                    // 绘制图片
                     const tranlateX = Game.width - this.width - this.relX
-                    ctx.drawImage(image, tranlateX, this.y)
-                    // 画布恢复正常
-                    ctx.translate(Game.width, 0);
-                    ctx.scale(-1, 1);
+                    // 水平翻转绘制
+                    ctx.flip(Game.width, () => {
+                        // 绘制图片
+                        ctx.drawImage(image, tranlateX, this.y)
+                    })
                 }
             },
             // 绘制动画
@@ -129,19 +122,16 @@ export class Sprite {
                 if (!options.flip && this.direction === 'right' || options.flip && this.direction === 'left') {
                     ctx.drawImage(options.image, options.currFrame * this.width, 0, this.width, this.height, this.relX, this.y, this.width, this.height)
                 } else {
-                    // 水平翻转画布
-                    ctx.translate(Game.width, 0);
-                    ctx.scale(-1, 1);
-                    // 绘制图片
                     const tranlateX = Game.width - options.width - this.relX
-                    ctx.drawImage(options.image, options.currFrame * this.width, 0, this.width, this.height, tranlateX, this.y, this.width, this.height)
-                    // 画布恢复正常
-                    ctx.translate(Game.width, 0);
-                    ctx.scale(-1, 1);
+                    // 水平翻转绘制
+                    ctx.drawFlip(Game.width, () => {
+                        // 绘制图片
+                        ctx.drawImage(options.image, options.currFrame * this.width, 0, this.width, this.height, tranlateX, this.y, this.width, this.height)
+                    })
                 }
             }
 
-        // 初始化绘制方法
+        // 初始化方法
         return Object.defineProperties({}, {
             // 绑定形状(canvas绘制)
             'shape': {
@@ -156,6 +146,11 @@ export class Sprite {
                     setSize(image)
                     executor = () => {
                         drawImage(image)
+
+                        if (Game.test) {
+                            Game.ctx.strokeStyle = 'red'
+                            Game.ctx.strokeRect(this.relX, this.y, this.width, this.height)
+                        }
                     }
                 }
             },
@@ -237,6 +232,11 @@ export class Sprite {
                     executor = () => {
                         drawAnimation(options)
 
+                        if (Game.test) {
+                            Game.ctx.strokeStyle = 'red'
+                            Game.ctx.strokeRect(this.relX, this.y, this.width, this.height)
+                        }
+
                         // 暂停/停止
                         if (!options.playing) { return }
                         count++
@@ -275,7 +275,7 @@ export class Sprite {
     event() {
         let events = []
 
-        // 初始化事件方法
+        // 初始化方法
         return Object.defineProperties({}, {
             // 添加
             'add': {
@@ -316,7 +316,7 @@ export class Sprite {
     userEvent() {
         let userEvents = []
 
-        // 初始化用户事件方法
+        // 初始化方法
         return Object.defineProperties({}, {
             // 添加
             'add': {

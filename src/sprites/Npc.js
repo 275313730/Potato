@@ -44,6 +44,7 @@ export function npc(id, x, textArr) {
         if (this.moveStatus === 2) {
             this.x += this.speed
             this.waitTime++
+            // 撞墙折返
             if (this.x < 0 || this.x > this.stage.width - this.width) {
                 this.speed = -this.speed
                 this.direction = this.speed > 0 ? 'right' : 'left'

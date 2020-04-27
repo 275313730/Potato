@@ -45,4 +45,13 @@
     canvasProto.centerRect = function (x, y, width, height) {
         this.fillRect(x - width / 2, y - height / 2, width, height)
     }
+
+    // 水平翻转绘制
+    canvasProto.drawFlip = function (width, fn) {
+        this.translate(width, 0);
+        this.scale(-1, 1);
+        fn()
+        this.translate(width, 0);
+        this.scale(-1, 1);
+    }
 })()

@@ -56,6 +56,7 @@ export class Game {
         Game.frames = 60
         Game.animationInterval = 16
         Game.key = null
+        Game.test = false
 
         // 初始化load方法和参数
         this.load = this.load()

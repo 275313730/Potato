@@ -3,6 +3,7 @@ import { Sprite } from "../../modules/Sprite.js";
 export function dialog() {
     const options = {
         id: 'dialog',
+        
         show: false,
         text: '',
         tempArr: [],
@@ -13,6 +14,7 @@ export function dialog() {
         clear
     }
 
+    // 绘制
     function draw(ctx) {
         const gw = this.game.width,
             gh = this.game.height
@@ -68,6 +70,7 @@ export function dialog() {
         }
     }
 
+    // 清除
     function clear() {
         this.index = 0
         this.count = 0
