@@ -5,6 +5,7 @@ import { backGround } from "../sprites/BackGround.js";
 import { mapName } from "../sprites/MapName.js";
 import { player } from "../sprites/Player.js";
 import { npc } from "../sprites/Npc.js";
+import { enemy } from "../sprites/Enemy.js";
 import { dialog } from "../sprites/Dialog.js";
 // events
 import { addNpc } from "../events/AddNpc.js";
@@ -48,11 +49,13 @@ export function forest(mapId, playerX, stickX) {
             x: 280,
             textArr: [`oldman: "Try to press 'Esc', you can create a new sprite."`,
                 `You: "I will try."`]
-        },
+        }
+    ]
+
+    const enemies = [
         {
             id: 'hyena',
-            x: 200,
-            textArr: [`.........`]
+            x: 200
         }
     ]
 
@@ -67,29 +70,35 @@ export function forest(mapId, playerX, stickX) {
         // 载入地图名
         this.sprite.add(mapName(mapId))
 
+        // 载入npc
         npcs.forEach(n => {
             this.sprite.add(npc(n.id, n.x, n.textArr))
         })
 
-        // 添加玩家
+        // 载入敌人
+        enemies.forEach(e => {
+            this.sprite.add(enemy(e.id, e.x))
+        })
+
+        // 载入玩家
         const newPlayer = player(playerX || 10)
         this.sprite.add(newPlayer)
         this.camera.follow(newPlayer)
 
-        // 添加对话框
+        // 载入对话框
         const newDialog = dialog()
         this.sprite.add(newDialog)
 
-        // 根据地图id添加不同的事件
+        // 载入事件
+        this.event.add(addNpc)
+        this.event.add(enterNewStage, mapId)
+        this.event.add(talk, newPlayer, newDialog)
+
+        // 根据地图id载入不同的事件
         if (mapId % 2 === 0) {
             this.event.add(shoot)
         } else {
             this.event.add(noShoot, newDialog)
         }
-
-        // 添加事件
-        this.event.add(addNpc)
-        this.event.add(enterNewStage, mapId)
-        this.event.add(talk, newPlayer, newDialog)
     })
 }

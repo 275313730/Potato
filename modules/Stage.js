@@ -118,9 +118,8 @@ export class Stage {
                             camera.x = camera.follow.x - Game.width / 2
                         }
                     }
-                    if (camera.moveMent) {
-                        camera.moveMent()
-                    }
+                    camera.moveMent && camera.moveMent()
+
                     return camera
                 }
             }

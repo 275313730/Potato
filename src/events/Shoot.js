@@ -5,7 +5,7 @@ export function shoot() {
     const player = this.sprite.find('player'),
         thisBullet = this.sprite.find('bullet')
 
-    // 如果玩家的shoot值为true并且bullet不存在时
+    // 添加bullet
     if (player.shoot && !thisBullet) {
         player.shoot = false
 
@@ -24,19 +24,16 @@ export function shoot() {
             this.sprite.del(thisBullet.id)
         }
 
-        // 检测npc是否与bullet接触
+        // 检测敌人是否与bullet接触
         this.sprite.travel(sp => {
-            if (sp.type === 'npc' && Math.abs(sp.relX + sp.width / 2 - thisBullet.relX) <= 10) {
+            if (sp.type === 'enemy' && Math.abs(sp.relX + sp.width / 2 - thisBullet.relX) <= 10) {
                 this.sprite.del(thisBullet.id)
-                if (sp.id === 'hyena') {
-                    if (sp.disabled) { return }
+                if (!sp.disabled) {
                     sp.disabled = true
                     sp.draw.animation(sp.id, 'death')
                         .onComplete = () => {
                             this.sprite.del(sp.id)
                         }
-                } else {
-                    this.sprite.del(sp.id)
                 }
                 return false
             }

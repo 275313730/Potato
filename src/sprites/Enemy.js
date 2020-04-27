@@ -1,6 +1,6 @@
 import { Sprite } from "../../modules/Sprite.js";
 
-export function npc(id, x, textArr) {
+export function enemy(id, x) {
     const options = {
         // sprite属性
         id,
@@ -8,10 +8,7 @@ export function npc(id, x, textArr) {
         direction: 'left',
 
         // 自定义属性
-        type: 'npc',
-        talking: false,
-        textArr,
-        textCount: 0,
+        type: 'enemy',
         moveStatus: 0,
         waitTime: 0,
         speed: 1,
@@ -20,7 +17,7 @@ export function npc(id, x, textArr) {
 
     function move() {
         // 静止
-        if (this.moveStatus === 0 && !this.talking) {
+        if (this.moveStatus === 0) {
             this.stop()
             this.moveStatus = 1
             if (Math.random() > 0.5) {
@@ -52,12 +49,6 @@ export function npc(id, x, textArr) {
                 this.moveStatus = 0
                 this.waitTime = 0
             }
-        }
-
-        // 谈话打断移动
-        if (this.talking && this.moveStatus > 0) {
-            this.stop()
-            return
         }
     }
 
