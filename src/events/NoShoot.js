@@ -19,8 +19,8 @@ export function noShoot() {
     // 删除当前事件
     this.event.del('noShoot')
 
-    this.camera.move(2, 0, 100, () => {
-        this.camera.move(-2, 0, 100, () => {
+    this.camera.move(200, 0, 2000, () => {
+        this.camera.move(-200, 0, 2000, () => {
             this.camera.follow(player)
             this.sprite.del('warning')
             player.disabled = false

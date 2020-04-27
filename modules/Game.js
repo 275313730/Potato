@@ -3,10 +3,11 @@ export class Game {
         // 初始化实例
         this.init(options)
 
-        // 回调
+        // 执行回调函数
         fn.call(this)
     }
 
+    // 初始化实例
     init(options) {
         Game.canvas = document.getElementsByTagName('canvas')[0]
 
@@ -127,7 +128,7 @@ export class Game {
                 }
             },
             // 遍历
-            travel: {
+            'travel': {
                 value: () => {
                     for (const key in sprites) {
                         fn(sprites[key])
@@ -232,10 +233,9 @@ export class Game {
         return Object.defineProperties({}, {
             // 添加角色
             'role': {
-                value: (id, width, flip) => {
+                value: (id, options) => {
                     animations[id] = {}
-                    animations[id].width = width
-                    animations[id].flip = flip
+                    animations[id].options = options
                 }
             },
             // 添加
@@ -248,8 +248,7 @@ export class Game {
             'get': {
                 value: (id, name) => {
                     return {
-                        width: animations[id].width,
-                        flip: animations[id].flip,
+                        options: animations[id].options,
                         image: animations[id][name]
                     }
                 }

@@ -64,12 +64,12 @@ export function npc(id, x, textArr) {
     // 停止移动
     function stop() {
         this.moveStatus = 0
-        this.draw.animation(this.id, 'idle')
+        this.draw.animation(this.id, 'idle', 16)
     }
 
     return new Sprite(options, function () {
         this.event.add(move)
-        this.draw.animation(this.id, 'idle')
+        this.draw.animation(this.id, 'idle', 16)
         this.y = this.game.height - this.height
     })
 }

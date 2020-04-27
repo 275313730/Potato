@@ -95,6 +95,7 @@ export function App(e) {
         {
             id: 'hyena',
             width: 48,
+            interval: 7,
             animations: [
                 {
                     url: 'hyena/hyena-idle.png',
@@ -153,9 +154,9 @@ export function App(e) {
         // 载入动画
         roles.forEach(role => {
             if (role.id === 'hyena') {
-                Game.animation.role(role.id, role.width, true)
+                Game.animation.role(role.id, { width: role.width, interval: role.interval, flip: true })
             } else {
-                Game.animation.role(role.id, role.width)
+                Game.animation.role(role.id, { width: role.width })
             }
             role.animations.forEach(animation => {
                 this.load.animation(role.id, animation.name, animation.url)

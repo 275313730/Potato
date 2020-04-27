@@ -3,6 +3,9 @@ import { npc } from "../sprites/Npc.js";
 
 export function addNpc() {
     if (Game.key === 'Escape') {
+        // 删除当前事件
+        this.event.del('addNpc')
+
         // hatman数据
         const hatman = {
             id: 'hatman',
@@ -15,7 +18,12 @@ export function addNpc() {
         // 添加hatman
         this.sprite.add(newHatMan)
 
-        // 删除当前事件
-        this.event.del('addNpc')
+        // 移动镜头
+        this.camera.moveTo(newHatMan, 2500, () => {
+            const player = this.sprite.find('player')
+            this.camera.moveTo(player, 2500, () => {
+                this.camera.follow(player)
+            })
+        })
     }
 }

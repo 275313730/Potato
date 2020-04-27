@@ -50,14 +50,32 @@ export class Stage {
             x: 0,
             y: 0,
             follow: null,
-            moving: null
-        }
+            moveMent: null
+        },
+            createMoveMent = (perX, perY, frames, fn) => {
+                if (camera.x < 0) {
+                    camera.x = 0
+                }
+                if (camera.x > this.width - Game.width) {
+                    camera.x = this.width - Game.width
+                }
+                let count = 0
+                camera.moveMent = () => {
+                    count++
+                    camera.x += perX
+                    camera.y += perY
+                    if (count > frames || (camera.x < 0 || camera.x > this.width - Game.width)) {
+                        camera.moveMent = null
+                        fn && fn()
+                    }
+                }
+            }
 
         // 初始化镜头方法
         return Object.defineProperties({}, {
             // 跟随
             'follow': {
-                value: unit => {
+                value: (unit) => {
                     camera.follow = unit
                 }
             },
@@ -69,18 +87,23 @@ export class Stage {
             },
             // 移动
             'move': {
-                value: (x, y, times, fn) => {
+                value: (x, y, time, fn) => {
                     this.camera.unFollow()
-                    let count = 0
-                    camera.moving = () => {
-                        count++
-                        camera.x += x
-                        camera.y += y
-                        if (count > times) {
-                            camera.moving = null
-                            fn()
-                        }
-                    }
+                    let frames = time / 1000 * Game.frames,
+                        perX = x / frames,
+                        perY = y / frames
+                    createMoveMent(perX, perY, frames, fn)
+                }
+            },
+            // 移动到
+            'moveTo': {
+                value: (unit, time, fn) => {
+                    this.camera.unFollow()
+                    camera.moving = true
+                    let frames = time / 1000 * Game.frames,
+                        perX = (unit.x - camera.x) / frames,
+                        perY = (unit.y - camera.y) / frames
+                    createMoveMent(perX, perY, frames, fn)
                 }
             },
             // 计算并返回数据
@@ -94,8 +117,9 @@ export class Stage {
                         } else {
                             camera.x = camera.follow.x - Game.width / 2
                         }
-                    } else {
-                        camera.moving && camera.moving()
+                    }
+                    if (camera.moveMent) {
+                        camera.moveMent()
                     }
                     return camera
                 }

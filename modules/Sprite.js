@@ -97,41 +97,48 @@ export class Sprite {
                 this.height = img.height
             },
             // 绘制图片
-            drawImage = (fn, flip) => {
+            drawImage = image => {
                 const ctx = Game.ctx
 
                 // 图片透明度
                 ctx.globalAlpha = this.alpha || 1
 
                 // 图片方向
-                if (flip) {
-                    if (this.direction === 'left') {
-                        fn()
-                    } else {
-                        // 水平翻转画布
-                        ctx.translate(Game.width, 0);
-                        ctx.scale(-1, 1);
-                        // 绘制图片
-                        fn()
-                        // 画布恢复正常
-                        ctx.translate(Game.width, 0);
-                        ctx.scale(-1, 1);
-                    }
+                if (this.direction === 'right') {
+                    ctx.drawImage(image, this.relX, this.y)
                 } else {
-                    if (this.direction === 'right') {
-                        fn()
-                    } else {
-                        // 水平翻转画布
-                        ctx.translate(Game.width, 0);
-                        ctx.scale(-1, 1);
-                        // 绘制图片
-                        fn()
-                        // 画布恢复正常
-                        ctx.translate(Game.width, 0);
-                        ctx.scale(-1, 1);
-                    }
+                    // 水平翻转画布
+                    ctx.translate(Game.width, 0);
+                    ctx.scale(-1, 1);
+                    // 绘制图片
+                    const tranlateX = Game.width - this.width - this.relX
+                    ctx.drawImage(image, tranlateX, this.y)
+                    // 画布恢复正常
+                    ctx.translate(Game.width, 0);
+                    ctx.scale(-1, 1);
                 }
+            },
+            // 绘制动画
+            drawAnimation = options => {
+                const ctx = Game.ctx
 
+                // 图片透明度
+                ctx.globalAlpha = this.alpha || 1
+
+                // 图片方向
+                if (!options.flip && this.direction === 'right' || options.flip && this.direction === 'left') {
+                    ctx.drawImage(options.image, options.currFrame * this.width, 0, this.width, this.height, this.relX, this.y, this.width, this.height)
+                } else {
+                    // 水平翻转画布
+                    ctx.translate(Game.width, 0);
+                    ctx.scale(-1, 1);
+                    // 绘制图片
+                    const tranlateX = Game.width - options.width - this.relX
+                    ctx.drawImage(options.image, options.currFrame * this.width, 0, this.width, this.height, tranlateX, this.y, this.width, this.height)
+                    // 画布恢复正常
+                    ctx.translate(Game.width, 0);
+                    ctx.scale(-1, 1);
+                }
             }
 
         // 初始化绘制方法
@@ -148,16 +155,7 @@ export class Sprite {
                     let image = Game.image.get(name)
                     setSize(image)
                     executor = () => {
-                        if (this.direction === 'right') {
-                            drawImage(() => {
-                                Game.ctx.drawImage(image, this.relX, this.y)
-                            })
-                        } else {
-                            drawImage(() => {
-                                const tranlateX = Game.width - this.width - this.relX
-                                Game.ctx.drawImage(image, tranlateX, this.y)
-                            })
-                        }
+                        drawImage(image)
                     }
                 }
             },
@@ -177,17 +175,21 @@ export class Sprite {
                         role = Game.animation.get(id, name)
 
 
-                    this.width = role.width
+                    this.width = role.options.width
                     this.height = role.image.height
 
                     Object.defineProperties(options, {
                         // 动画间隔帧
                         'interval': {
-                            value: interval || Game.animationInterval
+                            value: interval || role.options.interval || Game.animationInterval
                         },
                         // 图片
                         'image': {
                             value: role.image
+                        },
+                        // 翻转
+                        'flip': {
+                            value: role.options.flip
                         },
                         // 动画状态
                         'playing': {
@@ -233,30 +235,7 @@ export class Sprite {
                     })
 
                     executor = () => {
-                        if (!role.flip) {
-                            if (this.direction === 'right') {
-                                drawImage(() => {
-                                    Game.ctx.drawImage(options.image, options.currFrame * this.width, 0, this.width, this.height, this.relX, this.y, this.width, this.height)
-                                })
-                            } else {
-                                drawImage(() => {
-                                    const tranlateX = Game.width - role.width - this.relX
-                                    Game.ctx.drawImage(options.image, options.currFrame * this.width, 0, this.width, this.height, tranlateX, this.y, this.width, this.height)
-                                })
-                            }
-                        } else {
-                            if (this.direction === 'left') {
-                                drawImage(() => {
-                                    Game.ctx.drawImage(options.image, options.currFrame * this.width, 0, this.width, this.height, this.relX, this.y, this.width, this.height)
-                                }, true)
-                            } else {
-                                drawImage(() => {
-                                    const tranlateX = Game.width - role.width - this.relX
-                                    Game.ctx.drawImage(options.image, options.currFrame * this.width, 0, this.width, this.height, tranlateX, this.y, this.width, this.height)
-                                }, true)
-                            }
-                        }
-
+                        drawAnimation(options)
 
                         // 暂停/停止
                         if (!options.playing) { return }
