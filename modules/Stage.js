@@ -1,3 +1,4 @@
+"use strict"
 import { Game } from "./Game.js";
 
 export class Stage {
@@ -51,51 +52,87 @@ export class Stage {
             y: 0,
             follow: null,
             movement: null
-        },
-            // 创建镜头移动
-            createMovement = (perX, perY, frames, callback) => {
-                if (camera.x < 0) {
-                    camera.x = 0
-                }
-                if (camera.x > this.width - Game.width) {
-                    camera.x = this.width - Game.width
-                }
-                let count = 0
+        }
+        // 创建镜头移动函数
+        let createMovement = (x, y, time, callback, disable) => {
+            // 取消相机跟随
+            this.camera.unFollow()
+
+            // 时间默认为0
+            time = time || 0
+
+            // 设置数据
+            let frames = time / 1000 * Game.frames
+            let perX = x / frames
+            let perY = y / frames
+
+            // 调整相机位置
+            if (camera.x < 0) {
+                camera.x = 0
+            }
+            if (camera.x > this.width - Game.width) {
+                camera.x = this.width - Game.width
+            }
+
+            // 移动计数
+            let count = 0
+
+            // 禁用单位
+            if (disable !== false) {
                 this.sprite.travel(sprite => {
                     sprite.disabled = true
                 })
-                camera.movement = () => {
-                    count++
-                    camera.x += perX
-                    camera.y += perY
-                    if (count > frames || (camera.x < 0 || camera.x > this.width - Game.width)) {
-                        camera.movement = null
+            }
+
+            camera.movement = () => {
+                // 计数增加
+                count++
+
+                // 相机移动
+                camera.x += perX
+                camera.y += perY
+
+                // 判断移动计数和相机位置
+                if (count > frames || (camera.x < 0 || camera.x > this.width - Game.width)) {
+                    // 清空相机移动函数
+                    camera.movement = null
+
+                    // 启用单位
+                    if (disable !== false) {
                         this.sprite.travel(sprite => {
                             sprite.disabled = false
                         })
-                        callback && callback()
                     }
+
+                    // 回调函数
+                    callback && callback()
                 }
-            },
-            // 计算镜头位置
-            cal = () => {
-                if (camera.follow) {
-                    if (camera.follow.x < Game.width / 2) {
-                        camera.x = 0
-                    } else if (camera.follow.x > this.width - Game.width / 2) {
-                        camera.x = this.width - Game.width
-                    } else {
-                        camera.x = camera.follow.x - Game.width / 2
-                    }
-                }
-                camera.movement && camera.movement()
             }
+        }
+        // 计算镜头位置
+        let cal = () => {
+            // 当相机跟随单位时
+            if (camera.follow) {
+                // 相机处于游戏宽度范围内才会跟随单位x变化，否则固定值
+                if (camera.follow.x < Game.width / 2) {
+                    camera.x = 0
+                } else if (camera.follow.x > this.width - Game.width / 2) {
+                    camera.x = this.width - Game.width
+                } else {
+                    camera.x = camera.follow.x - Game.width / 2
+                }
+            }
+
+            // 执行相机移动函数
+            camera.movement && camera.movement()
+        }
 
         // 初始化方法
         return Object.defineProperties({}, {
             // 跟随
             'follow': {
                 value: sprite => {
+                    if (sprite === camera.follow) { return }
                     camera.follow = sprite
                 }
             },
@@ -108,29 +145,22 @@ export class Stage {
             // 移动
             'move': {
                 value: (x, y, time, callback) => {
-                    this.camera.unFollow()
-                    time = time || 0
-                    let frames = time / 1000 * Game.frames,
-                        perX = x / frames,
-                        perY = y / frames
-                    createMovement(perX, perY, frames, callback)
+                    createMovement(x, y, time, callback)
                 }
             },
             // 移动到
             'moveTo': {
                 value: (sprite, time, callback) => {
-                    this.camera.unFollow()
-                    time = time || 0
-                    let frames = time / 1000 * Game.frames,
-                        perX = (sprite.x - camera.x) / frames,
-                        perY = (sprite.y - camera.y) / frames
-                    createMovement(perX, perY, frames, callback)
+                    createMovement((sprite.x - camera.x), (sprite.y - camera.y), time, callback)
                 }
             },
             // 获取镜头
             'get': {
                 value: () => {
+                    // 计算镜头数据
                     cal()
+
+                    // 返回镜头数据(只读)
                     return Object.assign({}, camera)
                 },
             }
@@ -139,34 +169,35 @@ export class Stage {
 
     // 场景精灵
     sprite() {
-        let sprites = {},
-            layers = [],
-            // 排序
-            sort = () => {
-                let newSprites = {}
-                // 根据图层值排序
-                layers.forEach(layer => {
-                    for (const key in sprites) {
-                        const sprite = sprites[key]
-                        if (sprite.layer === layer) {
-                            newSprites[sprite.id] = sprite
-                            delete sprites[key]
-                        }
+        let sprites = {}
+        // 图层数组
+        let layers = []
+        // 排序
+        let sort = () => {
+            let newSprites = {}
+            // 根据图层值排序
+            layers.forEach(layer => {
+                for (const key in sprites) {
+                    const sprite = sprites[key]
+                    if (sprite.layer === layer) {
+                        newSprites[sprite.id] = sprite
+                        delete sprites[key]
                     }
-                })
-                sprites = newSprites
-
-            }
+                }
+            })
+            sprites = newSprites
+        }
 
         // 初始化方法
         return Object.defineProperties({}, {
             // 添加
             'add': {
                 value: newSprite => {
+
                     // 检测单位id是否存在
                     for (const key in sprites) {
                         if (key === newSprite.id) {
-                            throw new Error(`Unit exists.`)
+                            throw new Error(`Sprite exists.`)
                         }
                     }
 
@@ -197,6 +228,8 @@ export class Stage {
                     if (sprites[id]) {
                         sprites[id].userEvent.delAll()
                         delete sprites[id]
+                    } else {
+                        throw new Error(`Sprite ${id} doesn't exist`)
                     }
                 }
             },
@@ -218,7 +251,8 @@ export class Stage {
             'travel': {
                 value: callback => {
                     for (const key in sprites) {
-                        if (callback(sprites[key]) === false) {
+                        // 回调函数返回'stop'时停止遍历
+                        if (callback(sprites[key]) === 'stop') {
                             return
                         }
                     }
@@ -281,6 +315,7 @@ export class Stage {
             // 刷新
             'refresh': {
                 value: () => {
+                    // 清除canvas
                     Game.context.clearRect(0, 0, Game.width, Game.height)
 
                     // 获取镜头数据
@@ -301,12 +336,6 @@ export class Stage {
                         sprite.draw.execute()
 
                         // 执行事件
-                        sprite.event.execute()
-                    })
-
-                    // 全局精灵渲染和事件
-                    Game.sprite.travel(sprite => {
-                        sprite.draw.execute()
                         sprite.event.execute()
                     })
                 }

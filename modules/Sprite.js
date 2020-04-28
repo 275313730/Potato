@@ -1,3 +1,4 @@
+"use strict"
 import { Game } from "./Game.js";
 
 export class Sprite {
@@ -86,50 +87,51 @@ export class Sprite {
 
     // 绘制
     draw() {
-        let executor = null,
-            // 设置尺寸
-            setSize = img => {
-                this.width = img.width
-                this.height = img.height
-            },
-            // 绘制图片
-            drawImage = image => {
-                const context = Game.context
+        // 执行函数
+        let executor = null
+        // 设置尺寸
+        let setSize = img => {
+            this.width = img.width
+            this.height = img.height
+        }
+        // 绘制图片
+        let drawImage = image => {
+            const context = Game.context
 
-                // 图片透明度
-                context.globalAlpha = this.alpha || 1
+            // 图片透明度
+            context.globalAlpha = this.alpha || 1
 
-                // 图片方向
-                if (this.direction === 'right') {
-                    context.drawImage(image, this.relX, this.y)
-                } else {
-                    const tranlateX = Game.width - this.width - this.relX
-                    // 水平翻转绘制
-                    context.flip(Game.width, () => {
-                        // 绘制图片
-                        context.drawImage(image, tranlateX, this.y)
-                    })
-                }
-            },
-            // 绘制动画
-            drawAnimation = options => {
-                const context = Game.context
-
-                // 图片透明度
-                context.globalAlpha = this.alpha || 1
-
-                // 图片方向
-                if (!options.flip && this.direction === 'right' || options.flip && this.direction === 'left') {
-                    context.drawImage(options.image, options.currFrame * this.width, 0, this.width, this.height, this.relX, this.y, this.width, this.height)
-                } else {
-                    const tranlateX = Game.width - options.width - this.relX
-                    // 水平翻转绘制
-                    context.drawFlip(Game.width, () => {
-                        // 绘制图片
-                        context.drawImage(options.image, options.currFrame * this.width, 0, this.width, this.height, tranlateX, this.y, this.width, this.height)
-                    })
-                }
+            // 图片方向
+            if (this.direction === 'right') {
+                context.drawImage(image, this.relX, this.y)
+            } else {
+                const tranlateX = Game.width - this.width - this.relX
+                // 水平翻转绘制
+                context.flip(Game.width, () => {
+                    // 绘制图片
+                    context.drawImage(image, tranlateX, this.y)
+                })
             }
+        }
+        // 绘制动画
+        let drawAnimation = options => {
+            const context = Game.context
+
+            // 图片透明度
+            context.globalAlpha = this.alpha || 1
+
+            // 图片方向
+            if (!options.flip && this.direction === 'right' || options.flip && this.direction === 'left') {
+                context.drawImage(options.image, options.currFrame * this.width, 0, this.width, this.height, this.relX, this.y, this.width, this.height)
+            } else {
+                const tranlateX = Game.width - options.width - this.relX
+                // 水平翻转绘制
+                context.drawFlip(Game.width, () => {
+                    // 绘制图片
+                    context.drawImage(options.image, options.currFrame * this.width, 0, this.width, this.height, tranlateX, this.y, this.width, this.height)
+                })
+            }
+        }
 
         // 初始化方法
         return Object.defineProperties({}, {
@@ -155,43 +157,40 @@ export class Sprite {
             // 绑定动画
             'animation': {
                 value: (id, name, interval) => {
-                    let options = {
-                        // 当前关键帧
-                        currFrame: 0,
-                        // 完成时执行函数
-                        onComplete: null
-                    },
-                        // 只读数据 
-                        playing = true,
-                        count = 0,
+                    // 外部只读数据 
+                    let playing = true,
+                        currInterval = 0,
+                        currFrame = 0,
                         role = Game.animation.get(id, name)
 
+                    // 设置精灵宽高
                     this.width = role.width
                     this.height = role.image.height
 
-                    Object.defineProperties(options, {
-                        // 动画间隔帧
-                        'interval': {
-                            value: interval || role.interval || Game.animationInterval
-                        },
+                    // 动画数据
+                    let options = Object.defineProperties({}, {
                         // 图片
                         'image': {
                             value: role.image
                         },
-                        // 翻转
-                        'flip': {
-                            value: role.flip
+                        // 总动画帧
+                        'animationFrames': {
+                            value: role.image.width / role.width - 1
                         },
-                        // 动画状态
-                        'playing': {
+                        // 当前动画帧
+                        'currFrame': {
                             get() {
-                                return playing
+                                return currFrame
                             }
                         },
+                        // 动画间隔帧
+                        'animationInterval': {
+                            value: interval || role.interval || Game.animationInterval
+                        },
                         // 当前间隔帧
-                        'count': {
+                        'currInterval': {
                             get() {
-                                return count
+                                return currInterval
                             }
                         },
                         // 动画帧宽度
@@ -201,6 +200,21 @@ export class Sprite {
                         // 动画帧高度
                         'height': {
                             value: this.height
+                        },
+                        // 是否翻转
+                        'flip': {
+                            value: role.flip
+                        },
+                        // 动画状态
+                        'playing': {
+                            get() {
+                                return playing
+                            }
+                        },
+                        // 完成时
+                        'onComplete': {
+                            value: null,
+                            writable: true
                         },
                         // 播放
                         'play': {
@@ -212,7 +226,7 @@ export class Sprite {
                         'pause': {
                             value: () => {
                                 playing = false
-                                count = 0
+                                this.currInterval = 0
                             }
                         },
                         // 停止
@@ -220,33 +234,45 @@ export class Sprite {
                             value: () => {
                                 playing = false
                                 this.currFrame = 0
-                                count = 0
+                                this.currInterval = 0
                             }
                         }
                     })
 
+                    // 绘制函数
                     executor = () => {
+                        // 绘制动画
                         drawAnimation(options)
 
                         // 测试 
                         Game.test && Game.context.test(this.relX, this.y, this.width, this.height)
 
                         // 暂停/停止
-                        if (!options.playing) { return }
-                        count++
+                        if (!playing) { return }
 
-                        // 计数>=间隔帧数时切换图片并归零计数
-                        if (count >= options.interval) {
-                            count = 0
-                            if (options.currFrame < role.image.width / role.width - 1) {
-                                options.currFrame++
-                            } else {
-                                options.currFrame = 0
+                        // 动画间隔帧增加
+                        currInterval++
+
+                        // 判断计数是否小于间隔帧数
+                        if (currInterval >= options.animationInterval) {
+                            // 动画当前间隔帧归零
+                            currInterval = 0
+
+                            // 动画关键帧增加
+                            currFrame++
+
+                            // 判断是否播放完成
+                            if (currFrame >= options.animationFrames) {
+                                // 动画重置
+                                currFrame = 0
+
+                                // 动画完成时执行函数
                                 options.onComplete && options.onComplete()
                             }
                         }
                     }
 
+                    // 返回数据
                     return options
                 }
             },
@@ -273,19 +299,24 @@ export class Sprite {
         return Object.defineProperties({}, {
             // 添加
             'add': {
-                value: callback => {
-                    events.push(callback)
+                value: func => {
+                    // 判断事件是否存在
+                    for (const event of events) {
+                        if (event.name === func.name) {
+                            throw new Error(`Event ${func.name} exists.`)
+                        }
+                    }
+
+                    // 添加事件
+                    events.push(func)
                 }
             },
             // 删除
             'del': {
                 value: name => {
-                    for (const key in events) {
-                        if (events[key].name === name) {
-                            events.splice(key, 1)
-                            return
-                        }
-                    }
+                    events = events.filter(event => {
+                        return event.name !== name
+                    })
                 }
             },
             // 删除所有

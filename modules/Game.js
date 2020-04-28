@@ -1,38 +1,86 @@
+"use strict"
 export class Game {
     // 初始化Game类
     static init(options) {
+        // 禁用键盘原生事件
+       /*  window.addEventListener('keydown', e => e.preventDefault()) */
+
         // 获取canvas
         const canvas = document.getElementById(options.el)
 
         // 初始化canvas
         Object.defineProperties(Game, {
+            // canvas上下文
             'context': {
                 value: canvas.getContext('2d')
             },
+            // Game宽度
             'width': {
                 value: options.width
             },
+            // Game高度
             'height': {
                 value: options.height
             },
+            // 帧数
+            'frames': {
+                value: 60,
+                writable: true
+            },
+            // 动画间隔帧(每隔n帧绘制下一个关键帧)
+            'animationInterval': {
+                value: 16,
+                writable: true
+            },
+            // 当前按键
+            'key': {
+                value: null,
+                writable: true
+            },
+            // 测试(显示精灵外框)
+            'test': {
+                value: false,
+                writable: true
+            },
+            // 音频路径
+            'audioPath': {
+                value: options.path.audio || '',
+                writable: true
+            },
+            // 图片路径
+            'imagePath': {
+                value: options.path.image || '',
+                writable: true
+            },
+            // 载入
+            'load': {
+                value: Game.load()
+            },
+            // 音频
             'audio': {
                 value: Game.audio()
             },
+            // 图片
             'image': {
                 value: Game.image()
             },
+            // 动画
             'animation': {
                 value: Game.animation()
             },
+            // 音效
             'sound': {
                 value: Game.sound()
             },
+            // 音乐
             'music': {
                 value: Game.music()
             },
+            // 场景
             'stage': {
                 value: Game.stage(options.stages)
             },
+            // 精灵(全局精灵)
             'sprite': {
                 value: Game.sprite()
             },
@@ -49,17 +97,6 @@ export class Game {
         canvas.setAttribute('width', Game.width + 'px')
         canvas.setAttribute('height', Game.height + 'px')
 
-        // 初始化参数
-        Game.frames = 60
-        Game.animationInterval = 16
-        Game.key = null
-        Game.test = false
-
-        // 初始化load方法和参数
-        Game.load = Game.load()
-        Game.audioPath = options.path.audio || ''
-        Game.imagePath = options.path.image || ''
-
         delete Game.init
     }
 
@@ -67,19 +104,19 @@ export class Game {
     static stage(stages) {
         let currStage = null
 
-        // 初始化场景方法
+        // 初始化方法
         return Object.defineProperties({}, {
             // 切换
             'switch': {
                 value: (newStage, ...args) => {
+                    // 销毁场景
                     currStage && currStage.execute.destory()
-                    this.key = null
-                    setTimeout(() => {
-                        currStage = stages[newStage](...args)
-                        this.sprite.travel(sprite => {
-                            currStage.sprite.add(sprite)
-                        })
-                    }, 300)
+
+                    // 清空按键
+                    Game.key = null
+
+                    // 创建场景
+                    currStage = stages[newStage](...args)
                 }
             }
         })
@@ -89,7 +126,7 @@ export class Game {
     static sprite() {
         let sprites = {}
 
-        // 初始化sprite方法
+        // 初始化方法
         return Object.defineProperties({}, {
             // 添加
             'add': {
@@ -105,21 +142,13 @@ export class Game {
                         delete sprites[id]
                     }
                 }
-            },
-            // 遍历
-            'travel': {
-                value: callback => {
-                    for (const key in sprites) {
-                        callback(sprites[key])
-                    }
-                }
             }
         })
     }
 
     // 载入
     static load() {
-        // 初始化载入方法
+        // 初始化方法
         return Object.defineProperties({}, {
             // 载入图片
             'image': {
@@ -150,7 +179,7 @@ export class Game {
     static image() {
         let images = {}
 
-        // 初始化图片方法
+        // 初始化方法
         return Object.defineProperties({}, {
             // 添加
             'add': {
@@ -171,7 +200,7 @@ export class Game {
     static animation() {
         let animations = {}
 
-        // 初始化动画方法
+        // 初始化方法
         return Object.defineProperties({}, {
             // 添加角色
             'role': {
@@ -206,7 +235,7 @@ export class Game {
     static audio() {
         let audio = {}
 
-        // 初始化音频方法
+        // 初始化方法
         return Object.defineProperties({}, {
             // 添加
             'add': {
@@ -227,7 +256,7 @@ export class Game {
     static music() {
         let music = null
 
-        // 初始化音乐方法
+        // 初始化方法
         return Object.defineProperties({}, {
             // 播放
             'play': {
@@ -264,7 +293,7 @@ export class Game {
 
     // 音效
     static sound() {
-        // 初始化音效方法
+        // 初始化方法
         return Object.defineProperties({}, {
             'play': {
                 value: (name, volume, alone) => {

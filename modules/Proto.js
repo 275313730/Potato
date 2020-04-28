@@ -1,4 +1,5 @@
-(function prototypeChange() {
+(function () {
+    "use strict"
     const canvasProto = CanvasRenderingContext2D.prototype
 
     // 文字换行(用于对话框文字等)
