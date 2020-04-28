@@ -2,15 +2,12 @@ export class Game {
     // 初始化Game类
     static init(options) {
         // 获取canvas
-        Game.canvas = document.getElementById(options.el)
+        const canvas = document.getElementById(options.el)
 
         // 初始化canvas
         Object.defineProperties(Game, {
-            'canvas': {
-                value: Game.canvas
-            },
-            'ctx': {
-                value: Game.canvas.getContext('2d')
+            'context': {
+                value: canvas.getContext('2d')
             },
             'width': {
                 value: options.width
@@ -49,8 +46,8 @@ export class Game {
         document.body.style.textAlign = 'center'
 
         // 设置canvas宽高
-        Game.canvas.setAttribute('width', Game.width + 'px')
-        Game.canvas.setAttribute('height', Game.height + 'px')
+        canvas.setAttribute('width', Game.width + 'px')
+        canvas.setAttribute('height', Game.height + 'px')
 
         // 初始化参数
         Game.frames = 60
@@ -77,20 +74,12 @@ export class Game {
                 value: (newStage, ...args) => {
                     currStage && currStage.execute.destory()
                     this.key = null
-                    this.stage.cutscenes()
                     setTimeout(() => {
                         currStage = stages[newStage](...args)
                         this.sprite.travel(sprite => {
                             currStage.sprite.add(sprite)
                         })
                     }, 300)
-                }
-            },
-            // 转场
-            'cutscenes': {
-                value: () => {
-                    this.ctx.fillStyle = 'black'
-                    this.ctx.fillRect(0, 0, this.width, this.height)
                 }
             }
         })
@@ -119,9 +108,9 @@ export class Game {
             },
             // 遍历
             'travel': {
-                value: () => {
+                value: callback => {
                     for (const key in sprites) {
-                        fn(sprites[key])
+                        callback(sprites[key])
                     }
                 }
             }
@@ -157,27 +146,6 @@ export class Game {
         })
     }
 
-    // 音频
-    static audio() {
-        let audio = {}
-
-        // 初始化音频方法
-        return Object.defineProperties({}, {
-            // 添加
-            'add': {
-                value: (id, url) => {
-                    audio[id] = new Audio(url)
-                }
-            },
-            // 获取
-            'get': {
-                value: id => {
-                    return audio[id]
-                }
-            }
-        })
-    }
-
     // 图片
     static image() {
         let images = {}
@@ -207,9 +175,11 @@ export class Game {
         return Object.defineProperties({}, {
             // 添加角色
             'role': {
-                value: (id, options) => {
+                value: (id, width, interval, flip) => {
                     animations[id] = {}
-                    animations[id].options = options
+                    animations[id].width = width
+                    animations[id].interval = interval || Game.interval
+                    animations[id].flip = flip || false
                 }
             },
             // 添加
@@ -222,9 +192,32 @@ export class Game {
             'get': {
                 value: (id, name) => {
                     return {
-                        options: animations[id].options,
-                        image: animations[id][name]
+                        image: animations[id][name],
+                        width: animations[id].width,
+                        flip: animations[id].flip,
+                        interval: animations[id].interval
                     }
+                }
+            }
+        })
+    }
+
+    // 音频
+    static audio() {
+        let audio = {}
+
+        // 初始化音频方法
+        return Object.defineProperties({}, {
+            // 添加
+            'add': {
+                value: (name, url) => {
+                    audio[name] = new Audio(url)
+                }
+            },
+            // 获取
+            'get': {
+                value: name => {
+                    return audio[name]
                 }
             }
         })
@@ -274,12 +267,12 @@ export class Game {
         // 初始化音效方法
         return Object.defineProperties({}, {
             'play': {
-                value: (name, vol, single) => {
-                    if (single) {
+                value: (name, volume, alone) => {
+                    if (alone) {
                         this.audio.get(name).play()
                     } else {
                         let sound = this.audio.get(name).cloneNode()
-                        sound.volume = vol || 1
+                        sound.volume = volume || 1
                         sound.play()
                         sound.addEventListener('ended', () => {
                             sound = null

@@ -1,7 +1,7 @@
 import { Game } from "./Game.js";
 
 export class Stage {
-    constructor(options, fn) {
+    constructor(options, callback) {
         // 初始化实例
         this.init(options)
 
@@ -11,7 +11,7 @@ export class Stage {
         this.height = options.height || Game.height
 
         // 执行回调函数
-        fn && fn.call(this)
+        callback && callback.call(this)
 
         // 进入循环
         this.timer = setInterval(() => {
@@ -50,10 +50,10 @@ export class Stage {
             x: 0,
             y: 0,
             follow: null,
-            moveMent: null
+            movement: null
         },
             // 创建镜头移动
-            createMoveMent = (perX, perY, frames, fn) => {
+            createMovement = (perX, perY, frames, callback) => {
                 if (camera.x < 0) {
                     camera.x = 0
                 }
@@ -64,26 +64,39 @@ export class Stage {
                 this.sprite.travel(sprite => {
                     sprite.disabled = true
                 })
-                camera.moveMent = () => {
+                camera.movement = () => {
                     count++
                     camera.x += perX
                     camera.y += perY
                     if (count > frames || (camera.x < 0 || camera.x > this.width - Game.width)) {
-                        camera.moveMent = null
+                        camera.movement = null
                         this.sprite.travel(sprite => {
                             sprite.disabled = false
                         })
-                        fn && fn()
+                        callback && callback()
                     }
                 }
+            },
+            // 计算镜头位置
+            cal = () => {
+                if (camera.follow) {
+                    if (camera.follow.x < Game.width / 2) {
+                        camera.x = 0
+                    } else if (camera.follow.x > this.width - Game.width / 2) {
+                        camera.x = this.width - Game.width
+                    } else {
+                        camera.x = camera.follow.x - Game.width / 2
+                    }
+                }
+                camera.movement && camera.movement()
             }
 
         // 初始化方法
         return Object.defineProperties({}, {
             // 跟随
             'follow': {
-                value: (unit) => {
-                    camera.follow = unit
+                value: sprite => {
+                    camera.follow = sprite
                 }
             },
             // 解除跟随
@@ -94,41 +107,32 @@ export class Stage {
             },
             // 移动
             'move': {
-                value: (x, y, time, fn) => {
+                value: (x, y, time, callback) => {
                     this.camera.unFollow()
+                    time = time || 0
                     let frames = time / 1000 * Game.frames,
                         perX = x / frames,
                         perY = y / frames
-                    createMoveMent(perX, perY, frames, fn)
+                    createMovement(perX, perY, frames, callback)
                 }
             },
             // 移动到
             'moveTo': {
-                value: (unit, time, fn) => {
+                value: (sprite, time, callback) => {
                     this.camera.unFollow()
-                    camera.moving = true
+                    time = time || 0
                     let frames = time / 1000 * Game.frames,
-                        perX = (unit.x - camera.x) / frames,
-                        perY = (unit.y - camera.y) / frames
-                    createMoveMent(perX, perY, frames, fn)
+                        perX = (sprite.x - camera.x) / frames,
+                        perY = (sprite.y - camera.y) / frames
+                    createMovement(perX, perY, frames, callback)
                 }
             },
-            // 计算并返回数据
-            'cal': {
+            // 获取镜头
+            'get': {
                 value: () => {
-                    if (camera.follow) {
-                        if (camera.follow.x < Game.width / 2) {
-                            camera.x = 0
-                        } else if (camera.follow.x > this.width - Game.width / 2) {
-                            camera.x = this.width - Game.width
-                        } else {
-                            camera.x = camera.follow.x - Game.width / 2
-                        }
-                    }
-                    camera.moveMent && camera.moveMent()
-
-                    return camera
-                }
+                    cal()
+                    return Object.assign({}, camera)
+                },
             }
         })
     }
@@ -136,7 +140,23 @@ export class Stage {
     // 场景精灵
     sprite() {
         let sprites = {},
-            layers = []
+            layers = [],
+            // 排序
+            sort = () => {
+                let newSprites = {}
+                // 根据图层值排序
+                layers.forEach(layer => {
+                    for (const key in sprites) {
+                        const sprite = sprites[key]
+                        if (sprite.layer === layer) {
+                            newSprites[sprite.id] = sprite
+                            delete sprites[key]
+                        }
+                    }
+                })
+                sprites = newSprites
+
+            }
 
         // 初始化方法
         return Object.defineProperties({}, {
@@ -168,7 +188,7 @@ export class Stage {
                     }
 
                     // 单位排序
-                    this.sprite.sort()
+                    sort()
                 }
             },
             // 删除
@@ -196,31 +216,14 @@ export class Stage {
             },
             // 遍历
             'travel': {
-                value: fn => {
+                value: callback => {
                     for (const key in sprites) {
-                        if (fn(sprites[key]) === false) {
+                        if (callback(sprites[key]) === false) {
                             return
                         }
                     }
                 }
             },
-            // 排序
-            'sort': {
-                value: () => {
-                    let newSprites = {}
-                    // 根据图层值排序
-                    layers.forEach(layer => {
-                        for (const key in sprites) {
-                            const sprite = sprites[key]
-                            if (sprite.layer === layer) {
-                                newSprites[sprite.id] = sprite
-                                delete sprites[key]
-                            }
-                        }
-                    })
-                    sprites = newSprites
-                }
-            }
         })
     }
 
@@ -232,21 +235,22 @@ export class Stage {
         return Object.defineProperties({}, {
             // 添加
             'add': {
-                value: (fn, ...args) => {
-                    if (events[fn.name]) {
-                        throw new Error(`Event '${fn.name}' exists.`)
+                value: (func, ...args) => {
+                    if (events[func.name]) {
+                        throw new Error(`Event '${func.name}' exists.`)
                     }
-                    events[fn.name] = fn.bind(this, ...args)
+                    events[func.name] = func.bind(this, ...args)
                 }
             },
+            // 单次
             'once': {
-                value: (fn, ...args) => {
-                    if (events[fn.name]) {
-                        throw new Error(`Event '${fn.name}' exists.`)
+                value: (func, ...args) => {
+                    if (events[func.name]) {
+                        throw new Error(`Event '${func.name}' exists.`)
                     }
-                    events[fn.name] = () => {
-                        fn.call(this, ...args)
-                        delete events[fn.name]
+                    events[func.name] = () => {
+                        func.call(this, ...args)
+                        delete events[func.name]
                     }
                 }
             },
@@ -261,9 +265,9 @@ export class Stage {
             },
             // 遍历
             'travel': {
-                value: fn => {
+                value: callback => {
                     for (const key in events) {
-                        fn(events[key])
+                        callback(events[key])
                     }
                 }
             }
@@ -277,10 +281,10 @@ export class Stage {
             // 刷新
             'refresh': {
                 value: () => {
-                    Game.ctx.clearRect(0, 0, Game.width, Game.height)
+                    Game.context.clearRect(0, 0, Game.width, Game.height)
 
                     // 获取镜头数据
-                    let camera = this.camera.cal()
+                    let camera = this.camera.get()
 
                     // 执行场景事件
                     this.event.travel(event => {

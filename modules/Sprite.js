@@ -1,7 +1,7 @@
 import { Game } from "./Game.js";
 
 export class Sprite {
-    constructor(options, fn) {
+    constructor(options, callback) {
         // 初始化实例
         this.init(options)
 
@@ -9,7 +9,7 @@ export class Sprite {
         this.setProperty(options)
 
         // 执行回调函数
-        fn && fn.call(this)
+        callback && callback.call(this)
     }
 
     // 初始化实例
@@ -94,39 +94,39 @@ export class Sprite {
             },
             // 绘制图片
             drawImage = image => {
-                const ctx = Game.ctx
+                const context = Game.context
 
                 // 图片透明度
-                ctx.globalAlpha = this.alpha || 1
+                context.globalAlpha = this.alpha || 1
 
                 // 图片方向
                 if (this.direction === 'right') {
-                    ctx.drawImage(image, this.relX, this.y)
+                    context.drawImage(image, this.relX, this.y)
                 } else {
                     const tranlateX = Game.width - this.width - this.relX
                     // 水平翻转绘制
-                    ctx.flip(Game.width, () => {
+                    context.flip(Game.width, () => {
                         // 绘制图片
-                        ctx.drawImage(image, tranlateX, this.y)
+                        context.drawImage(image, tranlateX, this.y)
                     })
                 }
             },
             // 绘制动画
             drawAnimation = options => {
-                const ctx = Game.ctx
+                const context = Game.context
 
                 // 图片透明度
-                ctx.globalAlpha = this.alpha || 1
+                context.globalAlpha = this.alpha || 1
 
                 // 图片方向
                 if (!options.flip && this.direction === 'right' || options.flip && this.direction === 'left') {
-                    ctx.drawImage(options.image, options.currFrame * this.width, 0, this.width, this.height, this.relX, this.y, this.width, this.height)
+                    context.drawImage(options.image, options.currFrame * this.width, 0, this.width, this.height, this.relX, this.y, this.width, this.height)
                 } else {
                     const tranlateX = Game.width - options.width - this.relX
                     // 水平翻转绘制
-                    ctx.drawFlip(Game.width, () => {
+                    context.drawFlip(Game.width, () => {
                         // 绘制图片
-                        ctx.drawImage(options.image, options.currFrame * this.width, 0, this.width, this.height, tranlateX, this.y, this.width, this.height)
+                        context.drawImage(options.image, options.currFrame * this.width, 0, this.width, this.height, tranlateX, this.y, this.width, this.height)
                     })
                 }
             }
@@ -135,8 +135,8 @@ export class Sprite {
         return Object.defineProperties({}, {
             // 绑定形状(canvas绘制)
             'shape': {
-                value: fn => {
-                    executor = () => fn.call(this, Game.ctx)
+                value: callback => {
+                    executor = () => callback.call(this, Game.context)
                 }
             },
             // 绑定图片
@@ -148,7 +148,7 @@ export class Sprite {
                         drawImage(image)
 
                         // 测试
-                        Game.test && Game.ctx.test(this.relX, this.y, this.width, this.height)
+                        Game.test && Game.context.test(this.relX, this.y, this.width, this.height)
                     }
                 }
             },
@@ -160,21 +160,19 @@ export class Sprite {
                         currFrame: 0,
                         // 完成时执行函数
                         onComplete: null
-                    }
-
-                    // 只读数据
-                    let playing = true,
+                    },
+                        // 只读数据 
+                        playing = true,
                         count = 0,
                         role = Game.animation.get(id, name)
 
-
-                    this.width = role.options.width
+                    this.width = role.width
                     this.height = role.image.height
 
                     Object.defineProperties(options, {
                         // 动画间隔帧
                         'interval': {
-                            value: interval || role.options.interval || Game.animationInterval
+                            value: interval || role.interval || Game.animationInterval
                         },
                         // 图片
                         'image': {
@@ -182,7 +180,7 @@ export class Sprite {
                         },
                         // 翻转
                         'flip': {
-                            value: role.options.flip
+                            value: role.flip
                         },
                         // 动画状态
                         'playing': {
@@ -229,9 +227,9 @@ export class Sprite {
 
                     executor = () => {
                         drawAnimation(options)
-                        
+
                         // 测试 
-                        Game.test && Game.ctx.test(this.relX, this.y, this.width, this.height)
+                        Game.test && Game.context.test(this.relX, this.y, this.width, this.height)
 
                         // 暂停/停止
                         if (!options.playing) { return }
@@ -240,7 +238,7 @@ export class Sprite {
                         // 计数>=间隔帧数时切换图片并归零计数
                         if (count >= options.interval) {
                             count = 0
-                            if (options.currFrame < options.image.width / options.width - 1) {
+                            if (options.currFrame < role.image.width / role.width - 1) {
                                 options.currFrame++
                             } else {
                                 options.currFrame = 0
@@ -275,17 +273,18 @@ export class Sprite {
         return Object.defineProperties({}, {
             // 添加
             'add': {
-                value: fn => {
-                    events.push(fn)
+                value: callback => {
+                    events.push(callback)
                 }
             },
             // 删除
             'del': {
-                value: fn => {
+                value: name => {
                     for (const key in events) {
-                        events[key] === fn
-                        events.splice(key, 1)
-                        return
+                        if (events[key].name === name) {
+                            events.splice(key, 1)
+                            return
+                        }
                     }
                 }
             },
@@ -316,7 +315,7 @@ export class Sprite {
         return Object.defineProperties({}, {
             // 添加
             'add': {
-                value: (fn, eventType, isBreak) => {
+                value: (func, eventType, isBreak) => {
                     const bindFn = e => {
                         // 没有加入到场景前禁用
                         if (!this.stage) { return }
@@ -337,7 +336,7 @@ export class Sprite {
                         }
 
                         // 执行事件
-                        fn.call(this, e)
+                        func.call(this, e)
                     }
                     // 监听事件
                     window.addEventListener(eventType, bindFn)

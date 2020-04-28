@@ -77,7 +77,7 @@ export function forest(mapId, playerX) {
         } else {
             // 载入敌人
             for (let i = 0; i < 3; i++) {
-                this.sprite.add(enemy('hyena',  i,  newPlayer))
+                this.sprite.add(enemy('hyena', i, newPlayer))
             }
         }
 

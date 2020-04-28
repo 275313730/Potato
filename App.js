@@ -158,14 +158,9 @@ export function App(e) {
     // 载入动画
     roles.forEach(role => {
         if (role.id === 'hyena') {
-            Game.animation.role(role.id, {
-                width: role.width,
-                interval: role.interval, flip: true
-            })
+            Game.animation.role(role.id, role.width, role.interval, true)
         } else {
-            Game.animation.role(role.id, {
-                width: role.width
-            })
+            Game.animation.role(role.id, role.width)
         }
         role.animations.forEach(animation => {
             Game.load.animation(role.id, animation.name, animation.url)

@@ -47,10 +47,10 @@
     }
 
     // 水平翻转绘制
-    canvasProto.drawFlip = function (width, fn) {
+    canvasProto.drawFlip = function (width, callback) {
         this.translate(width, 0);
         this.scale(-1, 1);
-        fn()
+        callback()
         this.translate(width, 0);
         this.scale(-1, 1);
     }
