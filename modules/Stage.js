@@ -61,12 +61,18 @@ export class Stage {
                     camera.x = this.width - Game.width
                 }
                 let count = 0
+                this.sprite.travel(sprite => {
+                    sprite.disabled = true
+                })
                 camera.moveMent = () => {
                     count++
                     camera.x += perX
                     camera.y += perY
                     if (count > frames || (camera.x < 0 || camera.x > this.width - Game.width)) {
                         camera.moveMent = null
+                        this.sprite.travel(sprite => {
+                            sprite.disabled = false
+                        })
                         fn && fn()
                     }
                 }

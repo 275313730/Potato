@@ -10,7 +10,7 @@ export function addNpc() {
         const hatman = {
             id: 'hatman',
             x: 420,
-            textArr: [`hatman: "Wow, you created me.You should try to press 'z' to delete sprite."`],
+            textArr: [`hatman: "Wow, you created me.You can walk forward to the next map."`],
         }
 
         let newHatMan = npc(hatman.id, hatman.x, hatman.textArr)

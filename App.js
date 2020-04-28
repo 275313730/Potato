@@ -132,7 +132,9 @@ export function App(e) {
         }
     ]
 
-    const options = {
+    // 初始化Game类
+    Game.init({
+        el: 'app',
         // 设置宽高
         width: 272,
         height: 160,
@@ -146,33 +148,35 @@ export function App(e) {
             title,
             forest
         }
-    }
-
-    // 创建游戏实例
-    new Game(options, function () {
-        // 载入图片
-        images.forEach(item => {
-            this.load.image(item.id, item.url)
-        })
-
-        // 载入动画
-        roles.forEach(role => {
-            if (role.id === 'hyena') {
-                Game.animation.role(role.id, { width: role.width, interval: role.interval, flip: true })
-            } else {
-                Game.animation.role(role.id, { width: role.width })
-            }
-            role.animations.forEach(animation => {
-                this.load.animation(role.id, animation.name, animation.url)
-            })
-        })
-
-        // 载入音频
-        audios.forEach(audio => {
-            this.load.audio(audio.id, audio.url)
-        })
-
-        // 创建场景
-        this.start('title')
     })
+
+    // 载入图片
+    images.forEach(item => {
+        Game.load.image(item.id, item.url)
+    })
+
+    // 载入动画
+    roles.forEach(role => {
+        if (role.id === 'hyena') {
+            Game.animation.role(role.id, {
+                width: role.width,
+                interval: role.interval, flip: true
+            })
+        } else {
+            Game.animation.role(role.id, {
+                width: role.width
+            })
+        }
+        role.animations.forEach(animation => {
+            Game.load.animation(role.id, animation.name, animation.url)
+        })
+    })
+
+    // 载入音频
+    audios.forEach(audio => {
+        Game.load.audio(audio.id, audio.url)
+    })
+
+    // 创建场景
+    Game.stage.switch('title')
 }

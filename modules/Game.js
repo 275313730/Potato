@@ -1,15 +1,8 @@
 export class Game {
-    constructor(options, fn) {
-        // 初始化实例
-        this.init(options)
-
-        // 执行回调函数
-        fn.call(this)
-    }
-
-    // 初始化实例
-    init(options) {
-        Game.canvas = document.getElementsByTagName('canvas')[0]
+    // 初始化Game类
+    static init(options) {
+        // 获取canvas
+        Game.canvas = document.getElementById(options.el)
 
         // 初始化canvas
         Object.defineProperties(Game, {
@@ -48,6 +41,13 @@ export class Game {
             },
         })
 
+        // 设置body属性
+        document.body.style.userSelect = 'none'
+        document.body.style.margin = 0
+        document.body.style.padding = 0
+        document.body.style.overflow = 'hidden'
+        document.body.style.textAlign = 'center'
+
         // 设置canvas宽高
         Game.canvas.setAttribute('width', Game.width + 'px')
         Game.canvas.setAttribute('height', Game.height + 'px')
@@ -59,22 +59,11 @@ export class Game {
         Game.test = false
 
         // 初始化load方法和参数
-        this.load = this.load()
-        this.audioPath = options.path.audio || ''
-        this.imagePath = options.path.image || ''
-        this.promises = []
+        Game.load = Game.load()
+        Game.audioPath = options.path.audio || ''
+        Game.imagePath = options.path.image || ''
 
-        delete this.init
-    }
-
-    // 创建场景
-    start(stage, ...args) {
-        Promise.all(this.promises)
-            .then(() => {
-                this.promises = null
-                Game.stage.switch(stage, ...args)
-            })
-            .catch(err => console.log(err))
+        delete Game.init
     }
 
     // 场景
@@ -140,45 +129,29 @@ export class Game {
     }
 
     // 载入
-    load() {
-        let pushPromise = img => {
-            this.promises.push(
-                new Promise((resolve, reject) => {
-                    img.onload = () => {
-                        if (img.fileSize > 0 || (img.width > 0 && img.height > 0)) {
-                            resolve('load')
-                        } else {
-                            reject(img.src)
-                        }
-                    }
-                })
-            )
-        }
-
+    static load() {
         // 初始化载入方法
         return Object.defineProperties({}, {
             // 载入图片
             'image': {
                 value: (id, url) => {
                     let image = new Image()
+                    image.src = Game.imagePath + url
                     Game.image.add(id, image)
-                    pushPromise(image)
-                    image.src = this.imagePath + url
                 }
             },
             // 载入动画
             'animation': {
                 value: (id, name, url) => {
                     let image = new Image()
+                    image.src = Game.imagePath + url
                     Game.animation.add(id, name, image)
-                    pushPromise(image)
-                    image.src = this.imagePath + url
                 }
             },
             // 载入音频
             'audio': {
                 value: (id, url) => {
-                    Game.audio.add(id, this.audioPath + url)
+                    Game.audio.add(id, Game.audioPath + url)
                 }
             }
         })

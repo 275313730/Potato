@@ -5,6 +5,7 @@ export function shoot() {
     const player = this.sprite.find('player'),
         thisBullet = this.sprite.find('bullet')
     if (!player) { return }
+    
     // 添加bullet
     if (player.shoot && !thisBullet) {
         player.shoot = false
