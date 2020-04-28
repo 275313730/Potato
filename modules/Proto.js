@@ -54,4 +54,9 @@
         this.translate(width, 0);
         this.scale(-1, 1);
     }
+
+    canvasProto.test = function (x, y, width, height) {
+        this.strokeStyle = 'red'
+        this.strokeRect(x, y, width, height)
+    }
 })()

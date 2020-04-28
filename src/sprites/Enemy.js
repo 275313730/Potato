@@ -11,41 +11,46 @@ export function enemy(name, number, player) {
         // 自定义属性
         type: 'enemy',
         name,
-        moveStatus: 0,
-        speed: 0.5 + Math.random(),
-        attack
+        action: 0,
+        speed: 0.5 + Math.random()
     }
 
     function move() {
+        // 根据位置调整方向
+        if (player.x < this.x) {
+            this.direction = 'left'
+        } else {
+            this.direction = 'right'
+        }
+
         // 静止
-        if (this.moveStatus === 0 && (this.x < player.x || this.x > player.x + player.width)) {
-            if (player.x < this.x) {
-                this.direction = 'left'
-            } else {
-                this.direction = 'right'
-            }
-            this.moveStatus = 1
+        if (this.action === 0 && (this.x < player.x || this.x > player.x + this.width / 2)) {
+            this.action = 1
             this.draw.animation(this.name, 'walk')
         }
 
         // 移动
-        if (this.moveStatus === 1) {
-            if (this.x <= player.x + player.width - this.width / 2 && this.x >= player.x - this.width / 2) {
-                this.attack()
+        if (this.action === 1) {
+            // 如果距离小于敌人宽度/2，执行攻击
+            if (Math.abs(this.x - player.x) <= this.width / 2) {
+                // 播放攻击动画
+                this.draw.animation(this.name, 'attack')
+                this.action = 2
                 return
             }
+
+            // 根据方向判断位移
             if (this.direction === 'left') {
                 this.x -= this.speed
             } else {
                 this.x += this.speed
             }
         }
-    }
 
-    // 攻击
-    function attack() {
-        this.moveStatus = 0
-        this.draw.animation(this.name, 'attack')
+        // 如果距离大于敌人宽度/2，停止攻击
+        if (this.action === 2 && Math.abs(this.x - player.x) > this.width / 2) {
+            this.action = 0
+        }
     }
 
     return new Sprite(options, function () {

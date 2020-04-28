@@ -177,6 +177,8 @@ export function App(e) {
         Game.load.audio(audio.id, audio.url)
     })
 
+    Game.test = true
+
     // 创建场景
-    Game.stage.switch('title')
+    Game.stage.switch('forest', 1)
 }

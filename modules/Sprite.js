@@ -147,10 +147,8 @@ export class Sprite {
                     executor = () => {
                         drawImage(image)
 
-                        if (Game.test) {
-                            Game.ctx.strokeStyle = 'red'
-                            Game.ctx.strokeRect(this.relX, this.y, this.width, this.height)
-                        }
+                        // 测试
+                        Game.test && Game.ctx.test(this.relX, this.y, this.width, this.height)
                     }
                 }
             },
@@ -231,11 +229,9 @@ export class Sprite {
 
                     executor = () => {
                         drawAnimation(options)
-
-                        if (Game.test) {
-                            Game.ctx.strokeStyle = 'red'
-                            Game.ctx.strokeRect(this.relX, this.y, this.width, this.height)
-                        }
+                        
+                        // 测试 
+                        Game.test && Game.ctx.test(this.relX, this.y, this.width, this.height)
 
                         // 暂停/停止
                         if (!options.playing) { return }
