@@ -18,6 +18,5 @@ export function title() {
 
         // 播放音频
         Game.music.play('forest')
-        Game.music.loop(true)
     })
 }

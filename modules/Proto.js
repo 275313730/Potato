@@ -56,6 +56,10 @@
         this.scale(-1, 1);
     }
 
+    canvasProto.clipAnimation = function (image, sx, sy, width, height, dx, dy) {
+        this.drawImage(image, sx, sy, width, height, dx, dy, width, height)
+    }
+
     canvasProto.test = function (x, y, width, height) {
         this.strokeStyle = 'red'
         this.strokeRect(x, y, width, height)

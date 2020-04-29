@@ -108,7 +108,7 @@ export class Sprite {
             } else {
                 const tranlateX = Game.width - this.width - this.relX
                 // 水平翻转绘制
-                context.flip(Game.width, () => {
+                context.drawFlip(Game.width, () => {
                     // 绘制图片
                     context.drawImage(image, tranlateX, this.y)
                 })
@@ -123,13 +123,13 @@ export class Sprite {
 
             // 图片方向
             if (!options.flip && this.direction === 'right' || options.flip && this.direction === 'left') {
-                context.drawImage(options.image, options.currFrame * this.width, 0, this.width, this.height, this.relX, this.y, this.width, this.height)
+                context.clipAnimation(options.image, options.currFrame * this.width, 0, this.width, this.height, this.relX, this.y)
             } else {
                 const tranlateX = Game.width - this.width - this.relX
                 // 水平翻转绘制
                 context.drawFlip(Game.width, () => {
                     // 绘制图片
-                    context.drawImage(options.image, options.currFrame * this.width, 0, this.width, this.height, tranlateX, this.y, this.width, this.height)
+                    context.clipAnimation(options.image, options.currFrame * this.width, 0, this.width, this.height, tranlateX, this.y)
                 })
             }
         }
@@ -161,22 +161,24 @@ export class Sprite {
                     // 外部只读数据 
                     let playing = true,
                         currInterval = 0,
-                        currFrame = 0,
-                        role = Game.animation.get(id, name)
+                        currFrame = 0
+                    
+                    // 获取动画数据
+                    const animation = Game.animation.get(id, name)
 
                     // 设置精灵宽高
-                    this.width = role.width
-                    this.height = role.image.height
+                    this.width = animation.width
+                    this.height = animation.image.height
 
                     // 动画数据
                     let options = Object.defineProperties({}, {
                         // 图片
                         'image': {
-                            value: role.image
+                            value: animation.image
                         },
                         // 总动画帧
                         'animationFrames': {
-                            value: role.image.width / role.width - 1
+                            value: animation.image.width / animation.width - 1
                         },
                         // 当前动画帧
                         'currFrame': {
@@ -186,7 +188,7 @@ export class Sprite {
                         },
                         // 动画间隔帧
                         'animationInterval': {
-                            value: interval || role.interval || Game.animationInterval
+                            value: interval || animation.interval || Game.animationInterval
                         },
                         // 当前间隔帧
                         'currInterval': {
@@ -204,7 +206,7 @@ export class Sprite {
                         },
                         // 是否翻转
                         'flip': {
-                            value: role.flip
+                            value: animation.flip
                         },
                         // 动画状态
                         'playing': {
@@ -305,7 +307,6 @@ export class Sprite {
                     if (events[func.name]) {
                         throw new Error(`Event '${func.name}' exists.`)
                     }
-
                     // 添加事件
                     events[func.name] = func
                 }
@@ -317,7 +318,6 @@ export class Sprite {
                     if (!events[name]) {
                         throw new Error(`Event ${func.name} doesn't exist.`)
                     }
-
                     // 删除事件
                     delete events[name]
                 }
@@ -331,7 +331,7 @@ export class Sprite {
             // 执行
             'execute': {
                 value: () => {
-                    // disabled时禁用
+                    // disabled时禁用事件
                     if (this.disabled) { return }
                     for (const key in events) {
                         events[key].call(this)
@@ -344,6 +344,27 @@ export class Sprite {
     // 用户事件
     userEvent() {
         let userEvents = {}
+        function bindFunction(func, isBreak) {
+            return e => {
+                // 没有加入到场景前禁用
+                if (!this.stage) { return }
+
+                // disabled时禁用
+                if (this.disabled) { return }
+
+                // 按键间隔检测
+                if (isBreak && e.type === 'keydown') {
+                    if (Game.key === e.key) {
+                        return
+                    } else {
+                        Game.key = e.key
+                    }
+                }
+
+                // 执行事件
+                func.call(this, e)
+            }
+        }
 
         // 初始化方法
         return Object.defineProperties({}, {
@@ -355,34 +376,18 @@ export class Sprite {
                         throw new Error(`UserEvent '${eventType}' exists.`)
                     }
 
-                    const bindFn = e => {
-                        // 没有加入到场景前禁用
-                        if (!this.stage) { return }
-
-                        // disabled时禁用
-                        if (this.disabled) { return }
-
-                        // 按键间隔检测
-                        if (isBreak) {
-                            if (e.key === Game.key) {
-                                return
-                            }
-                            Game.key = e.key
-                        }
-
-                        // 键盘松开时Game.key为null
-                        if (eventType === 'keyup') {
-                            Game.key = null
-                        }
-
-                        // 执行事件
-                        func.call(this, e)
-                    }
-                    // 监听事件
-                    window.addEventListener(eventType, bindFn)
-
                     // 添加事件到userEvents中
-                    userEvents[eventType] = bindFn
+                    userEvents[eventType] = bindFunction.call(this, func, isBreak)
+
+                    // 监听事件
+                    window.addEventListener(eventType, userEvents[eventType])
+                }
+            },
+            // 一次
+            'once': {
+                value: (func, eventType) => {
+                    // 监听事件
+                    window.addEventListener(eventType, bindFunction.call(this, func), { once: true })
                 }
             },
             // 删除
@@ -405,9 +410,12 @@ export class Sprite {
             // 删除所有
             'delAll': {
                 value: () => {
+                    // 解绑用户事件
                     for (const key in userEvents) {
                         window.removeEventListener(key, userEvents[key])
                     }
+
+                    // 清空用户事件
                     userEvents = {}
                 }
             }

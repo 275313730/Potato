@@ -2,8 +2,16 @@
 export class Game {
     // 初始化Game类
     static init(options) {
-        // 禁用键盘原生事件
-        window.addEventListener('keydown', e => e.preventDefault())
+        // 监听键盘事件
+        window.addEventListener('keydown', e => {
+            e.preventDefault()
+        })
+        window.addEventListener('keyup', e => {
+            e.preventDefault()
+            if (Game.key === e.key) {
+                Game.key = null
+            }
+        })
 
         // 获取canvas
         const canvas = document.getElementById(options.el)
@@ -178,43 +186,40 @@ export class Game {
             // 载入图片
             'image': {
                 value: (name, url) => {
-                    if (!Game.image.get(name)) {
-                        let image = new Image()
-                        image.src = Game.imagePath + url
-                        loadings.push(
-                            new Promise(resolve => {
-                                image.onload = () => {
-                                    Game.image.add(name, image)
-                                    resolve(true)
-                                }
-                            })
-                        )
-                    }
+                    if (Game.image.get(name)) { return }
+                    const image = new Image()
+                    image.src = Game.imagePath + url
+
+                    const newPromise = new Promise(resolve => {
+                        image.onload = () => {
+                            Game.image.add(name, image)
+                            resolve(true)
+                        }
+                    })
+                    loadings.push(newPromise)
                 }
             },
             // 载入动画
             'animation': {
                 value: (id, name, url) => {
-                    if (!Game.animation.get(id, name)) {
-                        let image = new Image()
-                        image.src = Game.imagePath + url
-                        loadings.push(
-                            new Promise(resolve => {
-                                image.onload = () => {
-                                    Game.animation.add(id, name, image)
-                                    resolve(true)
-                                }
-                            })
-                        )
-                    }
+                    if (Game.animation.get(id, name)) { return }
+                    const image = new Image()
+                    image.src = Game.imagePath + url
+
+                    const newPromise = new Promise(resolve => {
+                        image.onload = () => {
+                            Game.animation.add(id, name, image)
+                            resolve(true)
+                        }
+                    })
+                    loadings.push(newPromise)
                 }
             },
             // 载入音频
             'audio': {
                 value: (name, url) => {
-                    if (!Game.audio.get(name)) {
-                        Game.audio.add(name, new Audio(Game.audioPath + url))
-                    }
+                    if (Game.audio.get(name)) { return }
+                    Game.audio.add(name, new Audio(Game.audioPath + url))
                 }
             },
             'allLoaded': {
@@ -240,9 +245,8 @@ export class Game {
             // 添加
             'add': {
                 value: (name, img) => {
-                    if (!images[name]) {
-                        images[name] = img
-                    }
+                    if (images[name]) { return }
+                    images[name] = img
                 }
             },
             // 获取
@@ -263,20 +267,18 @@ export class Game {
             // 添加角色
             'role': {
                 value: (id, width, interval, flip) => {
-                    if (!animations[id]) {
-                        animations[id] = {}
-                        animations[id].width = width
-                        animations[id].interval = interval || Game.interval
-                        animations[id].flip = flip || false
-                    }
+                    if (animations[id]) { return }
+                    animations[id] = {}
+                    animations[id].width = width
+                    animations[id].interval = interval || Game.interval
+                    animations[id].flip = flip || false
                 }
             },
             // 添加
             'add': {
                 value: (id, name, image) => {
-                    if (!animations[id][name]) {
-                        animations[id][name] = image
-                    }
+                    if (animations[id][name]) { return }
+                    animations[id][name] = image
                 }
             },
             // 获取动画
@@ -304,9 +306,8 @@ export class Game {
             // 添加
             'add': {
                 value: (name, audio) => {
-                    if (!audios[name]) {
-                        audios[name] = audio
-                    }
+                    if (audios[name]) { return }
+                    audios[name] = audio
                 }
             },
             // 获取
@@ -327,12 +328,16 @@ export class Game {
             // 播放
             'play': {
                 value: name => {
-                    if (music === this.audio.get(name)) {
-                        music.play()
+                    // 切换音乐
+                    if (music) {
+                        if (music !== this.audio.get(name)) {
+                            music.currentTime = 0
+                        }
                     } else {
                         music = this.audio.get(name)
-                        music.play()
                     }
+                    music.play()
+                    music.loop = true
                 }
             },
             // 暂停

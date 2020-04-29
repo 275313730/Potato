@@ -54,9 +54,8 @@ export class Stage {
             movement: null
         }
         // 创建镜头移动函数
-        let createMovement = (x, y, time, callback, disable) => {
+        let createMovement = (x, y, time = 0, callback, disable) => {
             // 设置数据
-            time = time || 0    // 时间默认为0
             let frames = time / 1000 * Game.frames
             let perX = x / frames
             let perY = y / frames
@@ -102,7 +101,7 @@ export class Stage {
                         })
                     }
 
-                    // 回调函数
+                    // 执行回调函数
                     callback && callback()
                 }
             }
@@ -222,12 +221,12 @@ export class Stage {
             // 删除
             'del': {
                 value: id => {
-                    if (sprites[id]) {
-                        sprites[id].userEvent.delAll()
-                        delete sprites[id]
-                    } else {
+                    if (!sprites[id]) {
                         throw new Error(`Sprite ${id} doesn't exist`)
                     }
+
+                    sprites[id].userEvent.delAll()
+                    delete sprites[id]
                 }
             },
             // 查找
@@ -266,22 +265,22 @@ export class Stage {
         return Object.defineProperties({}, {
             // 添加
             'add': {
-                value: (func, ...args) => {
-                    if (events[func.name]) {
-                        throw new Error(`Event '${func.name}' exists.`)
+                value: (fn, ...args) => {
+                    if (events[fn.name]) {
+                        throw new Error(`Event '${fn.name}' exists.`)
                     }
-                    events[func.name] = func.bind(this, ...args)
+                    events[fn.name] = fn.bind(this, ...args)
                 }
             },
             // 单次
             'once': {
-                value: (func, ...args) => {
-                    if (events[func.name]) {
-                        throw new Error(`Event '${func.name}' exists.`)
+                value: (fn, ...args) => {
+                    if (events[fn.name]) {
+                        throw new Error(`Event '${fn.name}' exists.`)
                     }
-                    events[func.name] = () => {
-                        func.call(this, ...args)
-                        delete events[func.name]
+                    events[fn.name] = () => {
+                        fn.call(this, ...args)
+                        delete events[fn.name]
                     }
                 }
             },
@@ -307,6 +306,18 @@ export class Stage {
 
     // 场景函数
     execute() {
+        function spriteExecute(sprite, camera) {
+            // 计算相对位置
+            sprite.relX = sprite.x - camera.x * (1 - sprite.fixed)
+            sprite.relY = sprite.y - camera.y * (1 - sprite.fixed)
+
+            // 绘制画面
+            sprite.draw.execute()
+
+            // 执行事件
+            sprite.event.execute()
+        }
+
         // 初始化方法
         return Object.defineProperties({}, {
             // 刷新
@@ -325,35 +336,22 @@ export class Stage {
 
                     // 场景精灵渲染和事件
                     this.sprite.travel(sprite => {
-                        // 计算相对位置
-                        sprite.relX = sprite.x - camera.x * (1 - sprite.fixed)
-                        sprite.relY = sprite.y - camera.y * (1 - sprite.fixed)
-
-                        // 绘制画面
-                        sprite.draw.execute()
-
-                        // 执行事件
-                        sprite.event.execute()
+                        spriteExecute(sprite, camera)
                     })
 
                     // 全局精灵渲染和事件
                     Game.sprite.travel(sprite => {
-                        // 计算相对位置
-                        sprite.relX = sprite.x - camera.x * (1 - sprite.fixed)
-                        sprite.relY = sprite.y - camera.y * (1 - sprite.fixed)
-
-                        // 绘制画面
-                        sprite.draw.execute()
-
-                        // 执行事件
-                        sprite.event.execute()
+                        spriteExecute(sprite, camera)
                     })
                 }
             },
             // 销毁
             'destory': {
                 value: () => {
+                    // 退出循环
                     clearInterval(this.timer)
+
+                    // 清空场景精灵
                     this.sprite.delAll()
                 }
             }
