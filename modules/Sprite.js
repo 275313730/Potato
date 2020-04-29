@@ -124,7 +124,7 @@ export class Sprite {
             if (!options.flip && this.direction === 'right' || options.flip && this.direction === 'left') {
                 context.drawImage(options.image, options.currFrame * this.width, 0, this.width, this.height, this.relX, this.y, this.width, this.height)
             } else {
-                const tranlateX = Game.width - options.width - this.relX
+                const tranlateX = Game.width - this.width - this.relX
                 // 水平翻转绘制
                 context.drawFlip(Game.width, () => {
                     // 绘制图片
@@ -293,7 +293,7 @@ export class Sprite {
 
     // 事件
     event() {
-        let events = []
+        let events = {}
 
         // 初始化方法
         return Object.defineProperties({}, {
@@ -301,28 +301,30 @@ export class Sprite {
             'add': {
                 value: func => {
                     // 判断事件是否存在
-                    for (const event of events) {
-                        if (event.name === func.name) {
-                            throw new Error(`Event ${func.name} exists.`)
-                        }
+                    if (events[func.name]) {
+                        throw new Error(`Event '${func.name}' exists.`)
                     }
 
                     // 添加事件
-                    events.push(func)
+                    events[func.name] = func
                 }
             },
             // 删除
             'del': {
                 value: name => {
-                    events = events.filter(event => {
-                        return event.name !== name
-                    })
+                    // 判断事件是否存在
+                    if (!events[name]) {
+                        throw new Error(`Event ${func.name} doesn't exist.`)
+                    }
+
+                    // 删除事件
+                    delete events[name]
                 }
             },
             // 删除所有
             'delAll': {
                 value: () => {
-                    events = []
+                    events = {}
                 },
             },
             // 执行
@@ -330,9 +332,9 @@ export class Sprite {
                 value: () => {
                     // disabled时禁用
                     if (this.disabled) { return }
-                    events.forEach(event => {
-                        event.call(this)
-                    })
+                    for (const key in events) {
+                        events[key].call(this)
+                    }
                 }
             }
         })
@@ -340,13 +342,18 @@ export class Sprite {
 
     // 用户事件
     userEvent() {
-        let userEvents = []
+        let userEvents = {}
 
         // 初始化方法
         return Object.defineProperties({}, {
             // 添加
             'add': {
                 value: (func, eventType, isBreak) => {
+                    // 判断用户事件是否存在
+                    if (userEvents[eventType]) {
+                        throw new Error(`UserEvent '${eventType}' exists.`)
+                    }
+
                     const bindFn = e => {
                         // 没有加入到场景前禁用
                         if (!this.stage) { return }
@@ -373,33 +380,33 @@ export class Sprite {
                     window.addEventListener(eventType, bindFn)
 
                     // 添加事件到userEvents中
-                    userEvents.push({ eventType, bindFn })
+                    userEvents[eventType] = bindFn
                 }
             },
             // 删除
             'del': {
                 value: eventType => {
                     // 没有传参视为无效
-                    if (!eventType) { return }
+                    if (!eventType) {
+                        throw new Error(`This function need an eventType`)
+                    }
+
+                    // 判断用户事件是否存在
+                    if (!userEvents[eventType]) {
+                        throw new Error(`UserEvent ${eventType} doesn't exist.`)
+                    }
 
                     // 解除监听
-                    for (let i = 0; i < userEvents.length; i++) {
-                        const event = userEvents[i]
-                        if (event.eventType === eventType) {
-                            window.removeEventListener(eventType, event.bindFn)
-                            userEvents.splice(i, 1)
-                            i--
-                        }
-                    }
+                    window.removeEventListener(eventType, events[eventType])
                 }
             },
             // 删除所有
             'delAll': {
                 value: () => {
-                    userEvents.forEach(event => {
-                        window.removeEventListener(event.eventType, event.bindFn)
-                    });
-                    userEvents = []
+                    for (const key in userEvents) {
+                        window.removeEventListener(key, userEvents[key])
+                    }
+                    userEvents = {}
                 }
             }
         });

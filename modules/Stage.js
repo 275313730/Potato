@@ -55,16 +55,14 @@ export class Stage {
         }
         // 创建镜头移动函数
         let createMovement = (x, y, time, callback, disable) => {
-            // 取消相机跟随
-            this.camera.unFollow()
-
-            // 时间默认为0
-            time = time || 0
-
             // 设置数据
+            time = time || 0    // 时间默认为0
             let frames = time / 1000 * Game.frames
             let perX = x / frames
             let perY = y / frames
+
+            // 取消相机跟随
+            this.camera.unFollow()
 
             // 调整相机位置
             if (camera.x < 0) {
@@ -85,12 +83,12 @@ export class Stage {
             }
 
             camera.movement = () => {
-                // 计数增加
-                count++
-
                 // 相机移动
                 camera.x += perX
                 camera.y += perY
+
+                // 移动计数增加
+                count++
 
                 // 判断移动计数和相机位置
                 if (count > frames || (camera.x < 0 || camera.x > this.width - Game.width)) {
@@ -121,10 +119,10 @@ export class Stage {
                 } else {
                     camera.x = camera.follow.x - Game.width / 2
                 }
+            } else {
+                // 执行相机移动函数
+                camera.movement && camera.movement()
             }
-
-            // 执行相机移动函数
-            camera.movement && camera.movement()
         }
 
         // 初始化方法
@@ -173,7 +171,7 @@ export class Stage {
         // 图层数组
         let layers = []
         // 排序
-        let sort = () => {
+        function sort() {
             let newSprites = {}
             // 根据图层值排序
             layers.forEach(layer => {
@@ -193,12 +191,9 @@ export class Stage {
             // 添加
             'add': {
                 value: newSprite => {
-
                     // 检测单位id是否存在
-                    for (const key in sprites) {
-                        if (key === newSprite.id) {
-                            throw new Error(`Sprite exists.`)
-                        }
+                    if (sprites[newSprite.id]) {
+                        throw new Error(`Sprite exists.`)
                     }
 
                     // 给单位添加场景的宽高值(只读)
@@ -321,11 +316,6 @@ export class Stage {
                     // 获取镜头数据
                     let camera = this.camera.get()
 
-                    // 执行场景事件
-                    this.event.travel(event => {
-                        event.call(this)
-                    })
-
                     // 场景精灵渲染和事件
                     this.sprite.travel(sprite => {
                         // 计算相对位置
@@ -337,6 +327,11 @@ export class Stage {
 
                         // 执行事件
                         sprite.event.execute()
+                    })
+
+                    // 执行场景事件
+                    this.event.travel(event => {
+                        event.call(this)
                     })
                 }
             },

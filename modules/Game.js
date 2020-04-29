@@ -3,7 +3,7 @@ export class Game {
     // 初始化Game类
     static init(options) {
         // 禁用键盘原生事件
-       /*  window.addEventListener('keydown', e => e.preventDefault()) */
+        /*  window.addEventListener('keydown', e => e.preventDefault()) */
 
         // 获取canvas
         const canvas = document.getElementById(options.el)
@@ -84,6 +84,11 @@ export class Game {
             'sprite': {
                 value: Game.sprite()
             },
+            // 载入
+            'loadings': {
+                value: [],
+                writable: true
+            }
         })
 
         // 设置body属性
@@ -103,20 +108,30 @@ export class Game {
     // 场景
     static stage(stages) {
         let currStage = null
+        function swtichStage(newStage, ...args) {
+            // 销毁场景
+            currStage && currStage.execute.destory()
+
+            // 清空按键
+            Game.key = null
+
+            // 创建场景
+            currStage = stages[newStage](...args)
+        }
 
         // 初始化方法
         return Object.defineProperties({}, {
             // 切换
             'switch': {
                 value: (newStage, ...args) => {
-                    // 销毁场景
-                    currStage && currStage.execute.destory()
-
-                    // 清空按键
-                    Game.key = null
-
-                    // 创建场景
-                    currStage = stages[newStage](...args)
+                    if (Game.loadings.length > 0) {
+                        Promise.all(Game.loadings)
+                            .then(() => {
+                                swtichStage(newStage, ...args)
+                            })
+                    } else {
+                        swtichStage(newStage, ...args)
+                    }
                 }
             }
         })
@@ -131,7 +146,11 @@ export class Game {
             // 添加
             'add': {
                 value: newSprite => {
-                    sprites[newSprite.id] = newSprite
+                    if (sprites[newSprite.id]) {
+                        throw new Error(`Sprite '${newSprite.id}' exists.`)
+                    } else {
+                        sprites[newSprite.id] = newSprite
+                    }
                 }
             },
             // 删除
@@ -140,6 +159,8 @@ export class Game {
                     if (sprites[id]) {
                         sprites[id].userEvent.delAll()
                         delete sprites[id]
+                    } else {
+                        throw new Error(`Sprite '${id}' doesn't exist.`)
                     }
                 }
             }
@@ -152,24 +173,44 @@ export class Game {
         return Object.defineProperties({}, {
             // 载入图片
             'image': {
-                value: (id, url) => {
-                    let image = new Image()
-                    image.src = Game.imagePath + url
-                    Game.image.add(id, image)
+                value: (name, url) => {
+                    if (!Game.image.get(name)) {
+                        let image = new Image()
+                        image.src = Game.imagePath + url
+                        Game.loadings.push(
+                            new Promise(resolve => {
+                                image.onload = () => {
+                                    Game.image.add(name, image)
+                                    resolve(true)
+                                }
+                            })
+                        )
+                    }
                 }
             },
             // 载入动画
             'animation': {
                 value: (id, name, url) => {
-                    let image = new Image()
-                    image.src = Game.imagePath + url
-                    Game.animation.add(id, name, image)
+                    if (!Game.animation.get(id, name)) {
+                        let image = new Image()
+                        image.src = Game.imagePath + url
+                        Game.loadings.push(
+                            new Promise(resolve => {
+                                image.onload = () => {
+                                    Game.animation.add(id, name, image)
+                                    resolve(true)
+                                }
+                            })
+                        )
+                    }
                 }
             },
             // 载入音频
             'audio': {
-                value: (id, url) => {
-                    Game.audio.add(id, Game.audioPath + url)
+                value: (name, url) => {
+                    if (!Game.audio.get(name)) {
+                        Game.audio.add(name, new Audio(Game.audioPath + url))
+                    }
                 }
             }
         })
@@ -183,14 +224,16 @@ export class Game {
         return Object.defineProperties({}, {
             // 添加
             'add': {
-                value: (id, img) => {
-                    images[id] = img
+                value: (name, img) => {
+                    if (!images[name]) {
+                        images[name] = img
+                    }
                 }
             },
             // 获取
             'get': {
-                value: id => {
-                    return images[id]
+                value: name => {
+                    return images[name]
                 }
             }
         })
@@ -205,26 +248,32 @@ export class Game {
             // 添加角色
             'role': {
                 value: (id, width, interval, flip) => {
-                    animations[id] = {}
-                    animations[id].width = width
-                    animations[id].interval = interval || Game.interval
-                    animations[id].flip = flip || false
+                    if (!animations[id]) {
+                        animations[id] = {}
+                        animations[id].width = width
+                        animations[id].interval = interval || Game.interval
+                        animations[id].flip = flip || false
+                    }
                 }
             },
             // 添加
             'add': {
                 value: (id, name, image) => {
-                    animations[id][name] = image
+                    if (!animations[id][name]) {
+                        animations[id][name] = image
+                    }
                 }
             },
             // 获取动画
             'get': {
                 value: (id, name) => {
-                    return {
-                        image: animations[id][name],
-                        width: animations[id].width,
-                        flip: animations[id].flip,
-                        interval: animations[id].interval
+                    if (animations[id][name]) {
+                        return {
+                            image: animations[id][name],
+                            width: animations[id].width,
+                            flip: animations[id].flip,
+                            interval: animations[id].interval
+                        }
                     }
                 }
             }
@@ -233,20 +282,22 @@ export class Game {
 
     // 音频
     static audio() {
-        let audio = {}
+        let audios = {}
 
         // 初始化方法
         return Object.defineProperties({}, {
             // 添加
             'add': {
-                value: (name, url) => {
-                    audio[name] = new Audio(url)
+                value: (name, audio) => {
+                    if (!audios[name]) {
+                        audios[name] = audio
+                    }
                 }
             },
             // 获取
             'get': {
                 value: name => {
-                    return audio[name]
+                    return audios[name]
                 }
             }
         })

@@ -13,8 +13,10 @@ export function title() {
             this.sprite.add(backGround(bg))
         })
 
+        // 添加精灵
         this.sprite.add(titleFrame())
 
+        // 播放音频
         Game.music.play('forest')
         Game.music.loop(true)
     })

@@ -4,7 +4,7 @@ import { Sprite } from "../../modules/Sprite.js";
 export function titleFrame() {
     const options = {
         id: 'titleFrame',
-        
+
         title: 'Lost Forest',
         start: 'Start Game',
         egg: `Don't Press!`,
@@ -55,7 +55,7 @@ export function titleFrame() {
                 break
             case ' ':
                 if (this.selection === 0) {
-                    Game.stage.switch('forest', 0)
+                    Game.stage.switch('loading', 'forest')
                 } else {
                     this.userEvent.delAll()
                     this.egg = 'Suprise!'
