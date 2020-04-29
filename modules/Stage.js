@@ -210,7 +210,7 @@ export class Stage {
                     // 如果图层值不在layers中则新增图层值并排序layers
                     if (layers.indexOf(newSprite.layer) === -1) {
                         layers.push(newSprite.layer)
-                        
+
                         // 图层值排序
                         layers.sort()
                     }
@@ -249,8 +249,8 @@ export class Stage {
                 value: callback => {
                     for (const key in sprites) {
                         // 回调函数返回'stop'时停止遍历
-                        if (callback(sprites[key]) === 'stop') {
-                            return
+                        if (callback(sprites[key]) === false) {
+                            break
                         }
                     }
                 }

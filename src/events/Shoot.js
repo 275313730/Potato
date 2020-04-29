@@ -41,8 +41,8 @@ export  function shoot() {
                         this.sprite.del(sp.id)
                     }
                 
-                // 返回'stop'来停止遍历
-                return 'stop'
+                // 返回false来停止遍历
+                return false
             }
         })
     }
