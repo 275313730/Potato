@@ -83,11 +83,6 @@ export class Game {
             // 精灵(全局精灵)
             'sprite': {
                 value: Game.sprite()
-            },
-            // 载入
-            'loadings': {
-                value: [],
-                writable: true
             }
         })
 
@@ -124,14 +119,7 @@ export class Game {
             // 切换
             'switch': {
                 value: (newStage, ...args) => {
-                    if (Game.loadings.length > 0) {
-                        Promise.all(Game.loadings)
-                            .then(() => {
-                                swtichStage(newStage, ...args)
-                            })
-                    } else {
-                        swtichStage(newStage, ...args)
-                    }
+                    Game.load.allLoaded(() => swtichStage(newStage, ...args))
                 }
             }
         })
@@ -183,6 +171,8 @@ export class Game {
 
     // 载入
     static load() {
+        let loadings = []
+
         // 初始化方法
         return Object.defineProperties({}, {
             // 载入图片
@@ -191,7 +181,7 @@ export class Game {
                     if (!Game.image.get(name)) {
                         let image = new Image()
                         image.src = Game.imagePath + url
-                        Game.loadings.push(
+                        loadings.push(
                             new Promise(resolve => {
                                 image.onload = () => {
                                     Game.image.add(name, image)
@@ -208,7 +198,7 @@ export class Game {
                     if (!Game.animation.get(id, name)) {
                         let image = new Image()
                         image.src = Game.imagePath + url
-                        Game.loadings.push(
+                        loadings.push(
                             new Promise(resolve => {
                                 image.onload = () => {
                                     Game.animation.add(id, name, image)
@@ -225,6 +215,17 @@ export class Game {
                     if (!Game.audio.get(name)) {
                         Game.audio.add(name, new Audio(Game.audioPath + url))
                     }
+                }
+            },
+            'allLoaded': {
+                value: callback => {
+                    if (loadings.length > 0) {
+                        Promise.all(loadings)
+                            .then(() => callback())
+                    } else {
+                        callback()
+                    }
+
                 }
             }
         })

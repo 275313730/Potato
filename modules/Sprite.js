@@ -55,6 +55,9 @@ export class Sprite {
         this.width = 0
         this.height = 0
 
+        // direction 决定图片的左右位置
+        this.direction = 'right'
+
         // layer 决定图片上下关系
         this.layer = 0
 
@@ -66,9 +69,6 @@ export class Sprite {
         // 为1时固定在页面上，不会随镜头移动
         // 在0~1之间会出现分层移动效果
         this.fixed = 0
-
-        // direction 决定图片的左右位置
-        this.direction = 'right'
 
         // Game的宽高(只读)
         Object.defineProperty(this, 'game', {
@@ -358,7 +358,7 @@ export class Sprite {
                     const bindFn = e => {
                         // 没有加入到场景前禁用
                         if (!this.stage) { return }
-                        
+
                         // disabled时禁用
                         if (this.disabled) { return }
 

@@ -19,6 +19,7 @@ export function titleFrame() {
     function draw(ctx) {
         const width = this.game.width,
             height = this.game.height
+        
         // drawTitle
         ctx.fillStyle = '#CD2626'
         ctx.font = '18px pixel'
