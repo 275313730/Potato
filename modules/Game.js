@@ -3,7 +3,7 @@ export class Game {
     // 初始化Game类
     static init(options) {
         // 禁用键盘原生事件
-        /*  window.addEventListener('keydown', e => e.preventDefault()) */
+        window.addEventListener('keydown', e => e.preventDefault())
 
         // 获取canvas
         const canvas = document.getElementById(options.el)
@@ -137,7 +137,7 @@ export class Game {
         })
     }
 
-    // 全局sprite(在场景创建时加入场景单位中)
+    // 全局精灵
     static sprite() {
         let sprites = {}
 
@@ -161,6 +161,20 @@ export class Game {
                         delete sprites[id]
                     } else {
                         throw new Error(`Sprite '${id}' doesn't exist.`)
+                    }
+                }
+            },
+            // 查找
+            'find': {
+                value: id => {
+                    return sprites[id]
+                }
+            },
+            // 遍历
+            'travel': {
+                value: callback => {
+                    for (const key in sprites) {
+                        callback(sprites[key])
                     }
                 }
             }

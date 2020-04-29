@@ -1,7 +1,7 @@
 import { Game } from "../../modules/Game.js"
 import { bullet } from "../sprites/Bullet.js";
 
-export function shoot() {
+export  function shoot() {
     const player = this.sprite.find('player'),
         thisBullet = this.sprite.find('bullet')
     if (!player) { return }

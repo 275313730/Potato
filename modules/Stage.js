@@ -75,7 +75,7 @@ export class Stage {
             // 移动计数
             let count = 0
 
-            // 禁用单位
+            // 禁用精灵
             if (disable !== false) {
                 this.sprite.travel(sprite => {
                     sprite.disabled = true
@@ -95,7 +95,7 @@ export class Stage {
                     // 清空相机移动函数
                     camera.movement = null
 
-                    // 启用单位
+                    // 启用精灵
                     if (disable !== false) {
                         this.sprite.travel(sprite => {
                             sprite.disabled = false
@@ -109,9 +109,9 @@ export class Stage {
         }
         // 计算镜头位置
         let cal = () => {
-            // 当相机跟随单位时
+            // 当相机跟随精灵时
             if (camera.follow) {
-                // 相机处于游戏宽度范围内才会跟随单位x变化，否则固定值
+                // 相机处于游戏宽度范围内才会跟随精灵x变化，否则固定值
                 if (camera.follow.x < Game.width / 2) {
                     camera.x = 0
                 } else if (camera.follow.x > this.width - Game.width / 2) {
@@ -191,12 +191,12 @@ export class Stage {
             // 添加
             'add': {
                 value: newSprite => {
-                    // 检测单位id是否存在
+                    // 检测id是否存在
                     if (sprites[newSprite.id]) {
                         throw new Error(`Sprite exists.`)
                     }
 
-                    // 给单位添加场景的宽高值(只读)
+                    // 添加场景的宽高值(只读)
                     Object.defineProperty(newSprite, 'stage', {
                         value: {
                             width: this.width,
@@ -204,16 +204,18 @@ export class Stage {
                         }
                     })
 
-                    // 加入场景单位
+                    // 加入场景精灵
                     sprites[newSprite.id] = newSprite
 
                     // 如果图层值不在layers中则新增图层值并排序layers
                     if (layers.indexOf(newSprite.layer) === -1) {
                         layers.push(newSprite.layer)
+                        
+                        // 图层值排序
                         layers.sort()
                     }
 
-                    // 单位排序
+                    // 精灵排序
                     sort()
                 }
             },
@@ -316,6 +318,11 @@ export class Stage {
                     // 获取镜头数据
                     let camera = this.camera.get()
 
+                    // 执行场景事件
+                    this.event.travel(event => {
+                        event.call(this)
+                    })
+
                     // 场景精灵渲染和事件
                     this.sprite.travel(sprite => {
                         // 计算相对位置
@@ -329,9 +336,17 @@ export class Stage {
                         sprite.event.execute()
                     })
 
-                    // 执行场景事件
-                    this.event.travel(event => {
-                        event.call(this)
+                    // 全局精灵渲染和事件
+                    Game.sprite.travel(sprite => {
+                        // 计算相对位置
+                        sprite.relX = sprite.x - camera.x * (1 - sprite.fixed)
+                        sprite.relY = sprite.y - camera.y * (1 - sprite.fixed)
+
+                        // 绘制画面
+                        sprite.draw.execute()
+
+                        // 执行事件
+                        sprite.event.execute()
                     })
                 }
             },

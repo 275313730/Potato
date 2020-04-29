@@ -15,7 +15,7 @@ import { talk } from "../events/Talk.js";
 import { warning } from "../events/Warning.js";
 
 export function forest(mapId, playerX) {
-
+    // 背景分层
     const bgs = [
         {
             id: 'sky',
@@ -85,7 +85,6 @@ export function forest(mapId, playerX) {
         this.sprite.add(dialog())
 
         // 载入事件
-        this.event.add(addNpc)
         this.event.add(enterNewStage, mapId)
         this.event.add(talk, newPlayer)
 
@@ -93,6 +92,8 @@ export function forest(mapId, playerX) {
         if (mapId % 2 === 1) {
             this.event.add(shoot)
             this.event.once(warning)
+        } else {
+            this.event.add(addNpc)
         }
     })
 }

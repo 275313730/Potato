@@ -58,7 +58,7 @@ export class Sprite {
         // layer 决定图片上下关系
         this.layer = 0
 
-        // diasabled 为true时无法执行单位事件和用户事件
+        // diasabled 为true时无法执行精灵事件和用户事件
         this.disabled = false
 
         // fixed
@@ -78,6 +78,7 @@ export class Sprite {
             }
         })
 
+        // 设置实例数据
         for (const key in options) {
             this[key] = options[key]
         }
@@ -357,6 +358,7 @@ export class Sprite {
                     const bindFn = e => {
                         // 没有加入到场景前禁用
                         if (!this.stage) { return }
+                        
                         // disabled时禁用
                         if (this.disabled) { return }
 

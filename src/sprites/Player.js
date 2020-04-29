@@ -72,7 +72,7 @@ export function player(x) {
     // 移动
     function walk() {
         if (this.walking === false) { return }
-        if (this.direction === 'right') {
+        if (this.direction === 'right' && this.x < this.stage.width - this.width) {
             this.x += this.speed
         } else if (this.direction === 'left' && this.x > 0) {
             this.x -= this.speed

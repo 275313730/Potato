@@ -1,14 +1,14 @@
-import { text } from "../sprites/Text.js"
+import { Game } from "../../modules/Game.js"
 
 export function warning() {
     // 添加警告文字
-    this.sprite.add(text())
-
+    const text = Game.sprite.find('text')
+    text.txt = `Press 'z' to shoot.`
+    
     // 相机移动
     this.camera.move(200, 0, 2000, () => {
         this.camera.move(-200, 0, 2000, () => {
-            // 删除警告文字
-            this.sprite.del('text')
+            text.txt = null
             this.camera.follow(this.sprite.find('player'))
         })
     })
