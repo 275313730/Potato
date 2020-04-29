@@ -44,12 +44,12 @@ export class Game {
             },
             // 音频路径
             'audioPath': {
-                value: options.path.audio || '',
+                value: options.path ? options.path.audio : '',
                 writable: true
             },
             // 图片路径
             'imagePath': {
-                value: options.path.image || '',
+                value: options.path ? options.path.image : '',
                 writable: true
             },
             // 载入

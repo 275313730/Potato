@@ -9,10 +9,8 @@ import { loading } from "./src/stages/Loading.js";
 window.addEventListener('keydown', App)
 
 export function App(e) {
-    if (e.key !== ' ') {
-        return
-    }
-
+    // 移除事件
+    if (e.key !== ' ') { return }
     window.removeEventListener('keydown', App)
 
     // 背景图片
