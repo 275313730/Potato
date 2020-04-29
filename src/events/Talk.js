@@ -38,13 +38,13 @@ export function talk(player) {
                         talkStop(player, dialog)
                     }
                 }
-                return 'stop'
+                return false
             }
 
             // 离开一定范围对话直接结束对话
             if (Math.abs(sprite.x - player.x) > sprite.width / 4 * 3) {
                 talkStop()
-                return 'stop'
+                return false
             }
         }
 
