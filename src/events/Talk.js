@@ -21,7 +21,7 @@ export function talk(player) {
                 dialog.text = sprite.textArr[sprite.textCount]
                 dialog.show = true
                 sprite.textCount++
-                return 'stop'
+                return false
             }
         } else {
             // 对话中再次按下空格继续对话或对话结束
