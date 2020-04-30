@@ -216,6 +216,8 @@ export class Stage {
 
                     // 精灵排序
                     sort()
+
+                    return Object.keys(sprites)
                 }
             },
             // 删除
@@ -228,6 +230,8 @@ export class Stage {
                     // 解绑精灵用户事件
                     sprites[id].userEvent.delAll()
                     delete sprites[id]
+
+                    return Object.keys(sprites)
                 }
             },
             // 查找
@@ -240,12 +244,20 @@ export class Stage {
             'filter': {
                 value: callback => {
                     let newSprites = {}
+
                     for (const key in sprites) {
                         if (callback(sprites[key]) === true) {
                             newSprites[key] = sprites[key]
                         }
                     }
+
                     return newSprites
+                }
+            },
+            // 拷贝
+            'copy': {
+                value: () => {
+                    return JSON.parse(JSON.stringify(sprites))
                 }
             },
             // 删除所有
@@ -260,7 +272,7 @@ export class Stage {
             'travel': {
                 value: callback => {
                     for (const key in sprites) {
-                        // 回调函数返回'stop'时停止遍历
+                        // 回调函数返回false时停止遍历
                         if (callback(sprites[key]) === false) {
                             break
                         }

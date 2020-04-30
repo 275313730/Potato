@@ -98,13 +98,16 @@ export function loading(nextStage) {
             })
         })
 
+        // 载入粒子图片
+        Game.load.image('twinkling', 'particle/twinkling.png')
+
         // 载入音频
         Game.load.audio('forest', 'music/forest.mp3')
         Game.load.audio('shoot', 'sound/shoot.mp3')
 
         // 载入全局精灵
         Game.sprite.add(text())
-        
+
         // 切换场景
         Game.stage.switch('forest', 0)
     }

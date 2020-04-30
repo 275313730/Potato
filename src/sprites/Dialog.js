@@ -3,13 +3,13 @@ import { Sprite } from "../../modules/Sprite.js";
 export function dialog() {
     const options = {
         id: 'dialog',
-        
+
         show: false,
         text: '',
         tempArr: [],
-        index: 0,
-        typing: 0,// 0=停止,1=进行中,2=等待下一段文字,3=完成本段对话,4=完成所有对话
-        count: 0,
+        index: 0, // 索引
+        status: 0,  // 0=停止,1=进行中,2=等待下一段文字,3=完成本段对话,4=完成所有对话
+        count: 0,   // 字数
         typeText,
         clear
     }
@@ -30,7 +30,7 @@ export function dialog() {
             ctx.font = '8px pixel'
             ctx.wrapText(this.text, this.x - 55, this.y - 12, gw / 2 - 20, 10)
         } else {
-            this.typing = 0
+            this.status = 0
             this.text = ''
             this.clear()
         }
@@ -38,7 +38,7 @@ export function dialog() {
 
     // 打字效果
     function typeText() {
-        switch (this.typing) {
+        switch (this.status) {
             case 0:
                 if (this.tempArr.length === 0) {
                     let tempText = this.text
@@ -51,7 +51,7 @@ export function dialog() {
                     } else {
                         this.tempArr.push(tempText)
                     }
-                    this.typing = 1
+                    this.status = 1
                 }
                 break
             case 1:
@@ -60,9 +60,9 @@ export function dialog() {
                 if (this.count > this.tempArr[this.index].length) {
                     this.index++
                     this.count = 0
-                    this.typing = 2
+                    this.status = 2
                     if (this.index === this.tempArr.length) {
-                        this.typing = 3
+                        this.status = 3
                         this.clear()
                     }
                 }

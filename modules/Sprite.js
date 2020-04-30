@@ -54,6 +54,7 @@ export class Sprite {
         this.y = 0
         this.width = 0
         this.height = 0
+        this.alpha = 1
 
         // direction 决定图片的左右位置
         this.direction = 'right'
@@ -90,17 +91,12 @@ export class Sprite {
     draw() {
         // 执行函数
         let executor = null
-        // 设置尺寸
-        let setSize = img => {
-            this.width = img.width
-            this.height = img.height
-        }
         // 绘制图片
         let drawImage = image => {
             const context = Game.context
 
             // 图片透明度
-            context.globalAlpha = this.alpha || 1
+            context.globalAlpha = this.alpha
 
             // 图片方向
             if (this.direction === 'right') {
@@ -119,7 +115,7 @@ export class Sprite {
             const context = Game.context
 
             // 图片透明度
-            context.globalAlpha = this.alpha || 1
+            context.globalAlpha = this.alpha
 
             // 图片方向
             if (!options.flip && this.direction === 'right' || options.flip && this.direction === 'left') {
@@ -133,20 +129,46 @@ export class Sprite {
                 })
             }
         }
+        // 绘制粒子
+        let drawParticle = (image, width, height) => {
+            const context = Game.context
+
+            // 图片透明度
+            context.globalAlpha = this.alpha
+
+            // 图片方向
+            if (this.direction === 'right') {
+                context.drawImage(image, 0, 0, width, height, this.relX, this.y, this.width, this.height)
+            } else {
+                const tranlateX = Game.width - this.width - this.relX
+                // 水平翻转绘制
+                context.drawFlip(Game.width, () => {
+                    // 绘制图片
+                    context.drawImage(image, 0, 0, width, height, tranlateX, this.y, this.width, this.height)
+                })
+            }
+        }
+
 
         // 初始化方法
         return Object.defineProperties({}, {
-            // 绑定形状(canvas绘制)
+            // 形状(canvas绘制)
             'shape': {
                 value: callback => {
                     executor = () => callback.call(this, Game.context)
                 }
             },
-            // 绑定图片
+            // 图片
             'image': {
                 value: name => {
+                    // 获取图片数据
                     let image = Game.image.get(name)
-                    setSize(image)
+
+                    // 设置精灵尺寸
+                    this.width = image.width
+                    this.height = image.height
+
+                    // 绘制函数
                     executor = () => {
                         drawImage(image)
 
@@ -155,22 +177,22 @@ export class Sprite {
                     }
                 }
             },
-            // 绑定动画
+            // 动画
             'animation': {
                 value: (id, name, interval) => {
-                    // 外部只读数据 
-                    let playing = true,
-                        currInterval = 0,
-                        currFrame = 0
-                    
                     // 获取动画数据
                     const animation = Game.animation.get(id, name)
 
-                    // 设置精灵宽高
+                    // 设置精灵尺寸
                     this.width = animation.width
                     this.height = animation.image.height
 
-                    // 动画数据
+                    // 只读属性
+                    let playing = true,
+                        currInterval = 0,
+                        currFrame = 0
+
+                    // 动画属性
                     let options = Object.defineProperties({}, {
                         // 图片
                         'image': {
@@ -277,6 +299,57 @@ export class Sprite {
 
                     // 返回数据
                     return options
+                }
+            },
+            // 粒子效果
+            'particle': {
+                value: options => {
+                    let image = Game.image.get(options.name)
+
+                    // 设置精灵尺寸
+                    this.width = image.width
+                    this.height = image.height
+
+                    const interval = options.interval || 60
+                    const alphaRange = options.alphaRange
+                    const sizeRange = options.sizeRange
+                    let nextAlpha, currSize, nextSize
+
+                    if (alphaRange != null) {
+                        nextAlpha = (alphaRange[1] - alphaRange[0]) / interval
+                    }
+
+                    if (sizeRange != null) {
+                        nextSize = (sizeRange[1] - sizeRange[0]) / interval
+                        currSize = sizeRange[1]
+                    } else {
+                        this.width = image.width * options.size
+                        this.height = image.height * options.size
+                    }
+
+                    executor = () => {
+                        if (nextAlpha != null) {
+                            if (this.alpha + nextAlpha <= alphaRange[0] || this.alpha + nextAlpha >= alphaRange[1]) {
+                                nextAlpha = -nextAlpha
+                            }
+                            this.alpha += nextAlpha
+                        }
+                        
+                        if (nextSize != null) {
+                            if (currSize + nextSize <= sizeRange[0] || currSize + nextSize >= sizeRange[1]) {
+                                nextSize = - nextSize
+                            }
+                            currSize += nextSize
+                            this.width = image.width * currSize
+                            this.height = image.height * currSize
+                        }
+
+                        drawParticle(image, image.width, image.height)
+
+                        // 测试
+                        Game.test && Game.context.test(this.relX, this.y, this.width, this.height)
+
+                    }
                 }
             },
             // 取消绑定

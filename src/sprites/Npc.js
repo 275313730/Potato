@@ -11,7 +11,7 @@ export function npc(id, x, textArr) {
         type: 'npc',
         talking: false,
         textArr,
-        textCount: 0,
+        textIndex: 0,
         moveStatus: 0,
         waitTime: 0,
         speed: 1,

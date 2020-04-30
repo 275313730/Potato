@@ -19,25 +19,32 @@ export function talk(player) {
         // 判断是否对话中
         if (!npc.talking) {
             // 在一定范围内按下空格对话开始
-            if (player.space === true && Math.abs(npc.x - player.x) < npc.width / 4 * 3 && dialog.typing === 0) {
+            if (player.space === true && Math.abs(npc.x - player.x) < npc.width / 4 * 3 && dialog.status === 0) {
                 player.space = false
+
+                // npc对话开始
                 npc.talking = true
-                dialog.text = npc.textArr[npc.textCount]
+
+                // 传入文本并显示对话框
+                dialog.text = npc.textArr[npc.textIndex]
                 dialog.show = true
-                npc.textCount++
+
+                // 当前文本索引增加
+                npc.textIndex++
+
                 break
             }
         } else {
             // 对话中再次按下空格继续对话或对话结束
             if (player.space === true) {
-                if (dialog.typing < 3) {
-                    dialog.typing = 1
+                if (dialog.status < 3) {
+                    dialog.status = 1
                 } else {
                     // 分段对话
-                    if (npc.textCount < npc.textArr.length) {
-                        dialog.typing = 0
-                        dialog.text = npc.textArr[npc.textCount]
-                        npc.textCount++
+                    if (npc.textIndex < npc.textArr.length) {
+                        dialog.status = 0
+                        dialog.text = npc.textArr[npc.textIndex]
+                        npc.textIndex++
                     } else {
                         talkStop()
                     }
@@ -54,8 +61,9 @@ export function talk(player) {
 
         // 对话停止
         function talkStop() {
+            // 重置属性
             dialog.show = false
-            npc.textCount = 0
+            npc.textIndex = 0
             npc.talking = false
             player.space = false
         }
