@@ -256,8 +256,8 @@ export class Stage {
             },
             // 拷贝
             'copy': {
-                value: () => {
-                    return JSON.parse(JSON.stringify(sprites))
+                value: tragetSprites => {
+                    return JSON.parse(JSON.stringify(tragetSprites || sprites))
                 }
             },
             // 删除所有

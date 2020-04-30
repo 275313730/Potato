@@ -4,15 +4,11 @@ export function particle(id, name, x, y) {
     const options = {
         id,
         x,
-        y
+        y,
+        size: 0.25
     }
 
     return new Sprite(options, function () {
-        this.draw.particle({
-            name,
-            size: 0.25,
-            alphaRange: [0, 1],
-            interval: 60
-        })
+        this.draw.particle(name, 40, [0, 1])
     })
 }
