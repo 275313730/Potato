@@ -37,6 +37,9 @@ export class Stage {
             'event': {
                 value: this.event()
             },
+            'geometry': {
+                value: this.geometry()
+            },
             'execute': {
                 value: this.execute()
             }
@@ -329,6 +332,35 @@ export class Stage {
         })
     }
 
+    // 几何
+    geometry() {
+        // 初始化方法
+        return Object.defineProperties({}, {
+            'intersect': {
+                value: (spriteA, spriteB) => {
+                    if (spriteA.x > spriteB.x + spriteB.width ||
+                        spriteA.x + spriteA.width < spriteB.x ||
+                        spriteA.y > spriteB.y + spriteB.height ||
+                        spriteA.y + spriteA.height < spriteB.y) {
+                        return false
+                    }
+                    return true
+                }
+            },
+            'contain': {
+                value: (spriteA, spriteB) => {
+                    if (spriteA.width < spriteB.width &&
+                        spriteA.height < spriteB.height &&
+                        (spriteA.x <= spriteB.x || spriteA.x + spriteA.width >= spriteB.x + spriteB.width) &&
+                        (spriteA.y <= spriteB.y || spriteA.y + spriteA.height >= spriteB.y + spriteB.height)) {
+                        return false
+                    }
+                    return true
+                }
+            }
+        })
+    }
+
     // 场景函数
     execute() {
         function spriteExecute(sprite, camera) {
@@ -359,12 +391,12 @@ export class Stage {
                         event.call(this)
                     })
 
-                    // 场景精灵渲染和事件
+                    // 执行场景精灵渲染和事件
                     this.sprite.travel(sprite => {
                         spriteExecute(sprite, camera)
                     })
 
-                    // 全局精灵渲染和事件
+                    // 执行全局精灵渲染和事件
                     Game.sprite.travel(sprite => {
                         spriteExecute(sprite, camera)
                     })

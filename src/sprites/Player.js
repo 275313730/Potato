@@ -7,7 +7,7 @@ export function player(x) {
         x,
         width: 40,
         direction: x === 10 ? 'right' : 'left',
-        layer: 1,
+        layer: 2,
 
         // 自定义属性和事件
         shoot: false,
@@ -19,8 +19,8 @@ export function player(x) {
     }
 
     // 按下
-    function keyDown(e) {
-        switch (e.key) {
+    function keyDown(key) {
+        switch (key) {
             case 'ArrowRight':
                 this.move('right')
                 break
@@ -37,8 +37,8 @@ export function player(x) {
     }
 
     // 弹起
-    function keyUp(e) {
-        switch (e.key) {
+    function keyUp(key) {
+        switch (key) {
             case 'ArrowRight':
                 if (this.direction === 'left') { return }
                 this.stop()

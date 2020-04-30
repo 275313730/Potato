@@ -19,7 +19,7 @@ export function talk(player) {
         // 判断是否对话中
         if (!npc.talking) {
             // 在一定范围内按下空格对话开始
-            if (player.space === true && Math.abs(npc.x - player.x) < npc.width / 4 * 3 && dialog.status === 0) {
+            if (player.space === true && this.geometry.intersect(player, npc) && dialog.status === 0) {
                 player.space = false
 
                 // npc对话开始
@@ -53,7 +53,7 @@ export function talk(player) {
             }
 
             // 离开一定范围对话直接结束对话
-            if (Math.abs(npc.x - player.x) > npc.width / 4 * 3) {
+            if (!this.geometry.intersect(player, npc)) {
                 talkStop()
                 break
             }
@@ -67,5 +67,5 @@ export function talk(player) {
             npc.talking = false
             player.space = false
         }
-    }   
+    }
 }

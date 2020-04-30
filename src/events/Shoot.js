@@ -33,7 +33,8 @@ export function shoot() {
         // 检测敌人是否与bullet接触
         for (const key in enemies) {
             const enemy = enemies[key]
-            if (!enemy.disabled && Math.abs(enemy.relX + enemy.width / 2 - thisBullet.relX) <= 10) {
+            if (!enemy.disabled && this.geometry.intersect(thisBullet, enemy)) {
+                console.log(true)
                 // 删除子弹
                 this.sprite.del(thisBullet.id)
 

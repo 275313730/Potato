@@ -4,7 +4,7 @@ export function enterNewStage(mapId) {
     const player = this.sprite.find('player')
 
     // 玩家的右边缘与场景右边缘对齐时
-    if (player.x >= this.width - player.width && mapId === 0) {
+    if (player.x + player.width >= this.width && mapId === 0) {
         Game.stage.switch('forest', mapId + 1)
         return
     }

@@ -3,6 +3,7 @@ import { Sprite } from "../../modules/Sprite.js";
 export function dialog() {
     const options = {
         id: 'dialog',
+        layer: 3,
 
         show: false,
         text: '',

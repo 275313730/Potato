@@ -208,10 +208,11 @@ export class Game {
 
                     const newPromise = new Promise(resolve => {
                         image.onload = () => {
-                            Game.animation.add(id, name, image)
+                            Game.animation.addAnimation(id, name, image)
                             resolve(true)
                         }
                     })
+
                     loadings.push(newPromise)
                 }
             },
@@ -265,7 +266,7 @@ export class Game {
         // 初始化方法
         return Object.defineProperties({}, {
             // 添加角色
-            'role': {
+            'addRole': {
                 value: (id, width, interval, flip) => {
                     if (animations[id]) { return }
                     animations[id] = {}
@@ -275,7 +276,7 @@ export class Game {
                 }
             },
             // 添加
-            'add': {
+            'addAnimation': {
                 value: (id, name, image) => {
                     if (animations[id][name]) { return }
                     animations[id][name] = image

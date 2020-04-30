@@ -5,7 +5,8 @@ export function particle(id, name, x, y) {
         id,
         x,
         y,
-        size: 0.25
+        size: 0.25,
+        fixed: 1,
     }
 
     return new Sprite(options, function () {

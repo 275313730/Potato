@@ -6,6 +6,7 @@ export function npc(id, x, textArr) {
         id,
         x,
         direction: 'left',
+        layer: 1,
 
         // 自定义属性
         type: 'npc',

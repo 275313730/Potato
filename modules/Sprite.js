@@ -96,9 +96,6 @@ export class Sprite {
         let drawImage = (image) => {
             const context = Game.context
 
-            // 图片透明度
-            context.globalAlpha = this.alpha
-
             // 图片方向
             if (this.direction === 'right') {
                 context.drawImage(image, 0, 0, image.width, image.height, this.relX, this.y, image.width * this.size, image.height * this.size)
@@ -114,9 +111,6 @@ export class Sprite {
         // 绘制动画
         let drawAnimation = (image, options) => {
             const context = Game.context
-
-            // 图片透明度
-            context.globalAlpha = this.alpha
 
             // 图片方向
             if (!options.flip && this.direction === 'right' || options.flip && this.direction === 'left') {
@@ -345,7 +339,13 @@ export class Sprite {
             // 执行
             'execute': {
                 value: () => {
-                    executor && executor()
+                    Game.context.globalAlpha = this.alpha
+                    if (executor) {
+                        executor()
+                    } else {
+                        // 测试
+                        executor = () => Game.test && Game.context.test(this.relX, this.y, this.width, this.height)
+                    }
                 }
             }
         })
@@ -419,7 +419,7 @@ export class Sprite {
                 }
 
                 // 执行事件
-                func.call(this, e)
+                func.call(this, e.key)
             }
         }
 

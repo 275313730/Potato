@@ -4,16 +4,18 @@ export function bullet(player) {
     const options = {
         id: 'bullet',
         x: player.x + player.width / 2,
-        y: 20,
-        
+        width: 6,
+        height: 2,
+
         speed: 5,
         direction: player.direction
     }
 
     // 绘制
     function draw(ctx) {
+        ctx.globalAlpha = this.alpha
         ctx.fillStyle = 'yellow'
-        ctx.fillRect(this.relX, this.game.height - this.y, 6, 2)
+        ctx.fillRect(this.relX, this.y, this.width, this.height)
     }
 
     // 移动
@@ -28,6 +30,7 @@ export function bullet(player) {
     }
 
     return new Sprite(options, function () {
+        this.y = this.game.height - 20
         this.draw.shape(draw)
         this.event.add(move)
     })

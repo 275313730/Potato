@@ -1,5 +1,6 @@
 // modules
 import { Stage } from "../../modules/Stage.js";
+
 // sprites
 import { backGround } from "../sprites/BackGround.js";
 import { mapName } from "../sprites/MapName.js";
@@ -8,6 +9,7 @@ import { npc } from "../sprites/Npc.js";
 import { enemy } from "../sprites/Enemy.js";
 import { dialog } from "../sprites/Dialog.js";
 import { particle } from "../sprites/Particle.js";
+
 // events
 import { addNpc } from "../events/AddNpc.js";
 import { enterNewStage } from "../events/EnterNewStage.js";

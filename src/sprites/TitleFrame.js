@@ -12,26 +12,26 @@ export function titleFrame() {
         arrowY: 10,
         selection: 0,
         count: 0,
-        reset
+        reset,
     }
 
     // 绘制
     function draw(ctx) {
-        const width = this.game.width,
-            height = this.game.height
-        
+        const w = this.game.width
+        const h = this.game.height
+
         // drawTitle
         ctx.fillStyle = '#CD2626'
         ctx.font = '18px pixel'
-        ctx.centerText(this.title, width / 2, height / 3)
+        ctx.centerText(this.title, w / 2, h / 3)
 
         // drawSelectFrame
         ctx.fillStyle = 'rgba(150,150,150,0.5)'
-        ctx.centerRect(this.x, this.y + 15, width / 2, height / 2.7)
+        ctx.centerRect(this.x, this.y + 15, w / 2, h / 2.7)
         ctx.fillStyle = 'rgba(255,255,255,0.5)'
-        ctx.centerRect(this.x, this.y + 15, width / 2 - 2, height / 2.7 - 2)
+        ctx.centerRect(this.x, this.y + 15, w / 2 - 2, h / 2.7 - 2)
         ctx.fillStyle = 'rgba(125,100,58,0.5)'
-        ctx.centerRect(this.x, this.y + 15, width / 2 - 4, height / 2.7 - 4)
+        ctx.centerRect(this.x, this.y + 15, w / 2 - 4, h / 2.7 - 4)
 
         // drawSelection
         ctx.fillStyle = 'red'
@@ -44,8 +44,8 @@ export function titleFrame() {
     }
 
     // 选择
-    function select(e) {
-        switch (e.key) {
+    function select(key) {
+        switch (key) {
             case 'ArrowDown':
                 this.selection = 1
                 this.reset()
@@ -62,6 +62,7 @@ export function titleFrame() {
                     this.egg = 'Suprise!'
                 }
                 this.reset()
+                break
         }
     }
 
