@@ -1,7 +1,7 @@
 import { Game } from "../../modules/Game.js"
 import { bullet } from "../sprites/Bullet.js";
 
-export  function shoot() {
+export function shoot() {
     const player = this.sprite.find('player'),
         thisBullet = this.sprite.find('bullet')
     if (!player) { return }
@@ -25,25 +25,31 @@ export  function shoot() {
             this.sprite.del(thisBullet.id)
         }
 
+        // 获取敌人
+        const enemies = this.sprite.filter(sprite => {
+            return sprite.type === 'enemy'
+        })
+
         // 检测敌人是否与bullet接触
-        this.sprite.travel(sp => {
-            if (!sp.disabled && sp.type === 'enemy' && Math.abs(sp.relX + sp.width / 2 - thisBullet.relX) <= 10) {
+        for (const key in enemies) {
+            const enemy = enemies[key]
+            if (!enemy.disabled && Math.abs(enemy.relX + enemy.width / 2 - thisBullet.relX) <= 10) {
                 // 删除子弹
                 this.sprite.del(thisBullet.id)
 
                 // 击中后禁用
-                sp.disabled = true
+                enemy.disabled = true
 
                 // 播放死亡动画
-                sp.draw.animation(sp.name, 'death')
+                enemy.draw.animation(enemy.name, 'death')
                     // 动画完成后销毁精灵
                     .onComplete = () => {
-                        this.sprite.del(sp.id)
+                        this.sprite.del(enemy.id)
                     }
-                
-                // 返回false来停止遍历
-                return false
+
+                // 停止遍历
+                break
             }
-        })
+        }
     }
 }

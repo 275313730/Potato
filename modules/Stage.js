@@ -225,6 +225,7 @@ export class Stage {
                         throw new Error(`Sprite ${id} doesn't exist`)
                     }
 
+                    // 解绑精灵用户事件
                     sprites[id].userEvent.delAll()
                     delete sprites[id]
                 }
@@ -233,6 +234,18 @@ export class Stage {
             'find': {
                 value: id => {
                     return sprites[id]
+                }
+            },
+            // 过滤
+            'filter': {
+                value: callback => {
+                    let newSprites = {}
+                    for (const key in sprites) {
+                        if (callback(sprites[key]) === true) {
+                            newSprites[key] = sprites[key]
+                        }
+                    }
+                    return newSprites
                 }
             },
             // 删除所有
