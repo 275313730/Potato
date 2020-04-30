@@ -111,12 +111,12 @@ export class Stage {
             // 当相机跟随精灵时
             if (camera.follow) {
                 // 相机处于游戏宽度范围内才会跟随精灵x变化，否则固定值
-                if (camera.follow.x < Game.width / 2) {
+                if (camera.follow.x < Game.width / 2 - camera.follow.width / 2) {
                     camera.x = 0
-                } else if (camera.follow.x > this.width - Game.width / 2) {
+                } else if (camera.follow.x > this.width - Game.width / 2 - camera.follow.width / 2) {
                     camera.x = this.width - Game.width
                 } else {
-                    camera.x = camera.follow.x - Game.width / 2
+                    camera.x = camera.follow.x - Game.width / 2 + camera.follow.width / 2
                 }
             } else {
                 // 执行相机移动函数
@@ -148,7 +148,7 @@ export class Stage {
             // 移动到
             'moveTo': {
                 value: (sprite, time, callback) => {
-                    createMovement((sprite.x - camera.x), (sprite.y - camera.y), time, callback)
+                    createMovement((sprite.x - camera.x) - Game.width / 2 + sprite.width / 2, (sprite.y - camera.y), time, callback)
                 }
             },
             // 获取镜头

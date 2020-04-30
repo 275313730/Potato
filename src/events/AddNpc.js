@@ -19,9 +19,9 @@ export function addNpc() {
         this.sprite.add(newHatMan)
 
         // 移动镜头
-        this.camera.moveTo(newHatMan, 2500, () => {
+        this.camera.moveTo(newHatMan, 1500, () => {
             const player = this.sprite.find('player')
-            this.camera.moveTo(player, 2500, () => {
+            this.camera.moveTo(player, 1500, () => {
                 this.camera.follow(player)
             })
         })
