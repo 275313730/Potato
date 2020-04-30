@@ -78,7 +78,8 @@ export function App(e) {
         Game.load.audio(audio.id, audio.url)
     })
 
-    Game.test = true
+    // 调试模式
+    Game.test = false
 
     // 创建场景
     Game.stage.switch('title')

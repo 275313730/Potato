@@ -54,7 +54,11 @@ export class Sprite {
         this.y = 0
         this.width = 0
         this.height = 0
+
+        // alpha 决定绘制透明度
         this.alpha = 1
+
+        // size 决定实际绘制尺寸
         this.size = 1
 
         // direction 决定图片的左右位置
@@ -136,7 +140,7 @@ export class Sprite {
             },
             // 图片
             'image': {
-                value: (name, size = 1) => {
+                value: name => {
                     // 获取图片数据
                     let image = Game.image.get(name)
 
@@ -146,7 +150,7 @@ export class Sprite {
 
                     // 绘制函数
                     executor = () => {
-                        drawImage(image, this.width * size, this.height * size)
+                        drawImage(image)
 
                         // 测试
                         Game.test && Game.context.test(this.relX, this.y, this.width, this.height)
