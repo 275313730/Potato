@@ -8,9 +8,9 @@ export function text() {
 
     // 绘制
     function draw(ctx) {
-        ctx.fillStyle = 'red'
-        ctx.font = '14px pixel'
         if (this.txt !== null) {
+            ctx.fillStyle = 'red'
+            ctx.font = '14px pixel'
             ctx.centerText(this.txt, this.x, this.y)
         }
     }
