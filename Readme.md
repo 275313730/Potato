@@ -1,6 +1,6 @@
-## CanvasGame
+## Just-Game
 
-   * CanvasGame是一个用js和canvas来制作游戏的框架,源码中包含了一个示例游戏
+   * Just-Game是一个用js和canvas来制作游戏的框架,源码中包含了一个示例游戏
 
 ## 框架思想
 
@@ -49,4 +49,4 @@
 
 ## API文档
 
-   [CanvasGameAPI](https://www.yuque.com/books/share/662514e0-513d-44b6-9f95-343b279351b8?#)
+   [Just-Game API](https://www.yuque.com/books/share/662514e0-513d-44b6-9f95-343b279351b8?#)
