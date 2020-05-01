@@ -34,7 +34,6 @@ export function shoot() {
         for (const key in enemies) {
             const enemy = enemies[key]
             if (!enemy.disabled && this.geometry.intersect(thisBullet, enemy)) {
-                console.log(true)
                 // 删除子弹
                 this.sprite.del(thisBullet.id)
 

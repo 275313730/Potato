@@ -11,6 +11,7 @@ window.addEventListener('keydown', App)
 export function App(e) {
     // 移除事件
     if (e.key !== ' ') { return }
+    tip.parentNode.removeChild(tip)
     window.removeEventListener('keydown', App)
 
     // 背景图片

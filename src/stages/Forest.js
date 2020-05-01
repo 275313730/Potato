@@ -90,6 +90,8 @@ export function forest(mapId, playerX) {
         // 载入粒子精灵
         this.sprite.add(particle('test', 'twinkling', 100, 50))
 
+        
+
         // 载入事件
         this.event.add(enterNewStage, mapId)
         this.event.add(talk, newPlayer)
