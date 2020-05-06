@@ -1,18 +1,22 @@
-import { Sprite } from "../../modules/Sprite.js";
-
 export function enemy(name, number, player) {
-    const options = {
-        // sprite属性
-        id: 'hyena' + number,
-        x: 200 + number * 100,
-        direction: 'left',
-        layer: 2,
-
-        // 自定义属性
-        type: 'enemy',
-        name,
-        action: 0,
-        speed: 0.5 + Math.random()
+    return {
+        config: {
+            id: 'hyena' + number,
+            x: 200 + number * 100,
+            direction: 'left',
+            layer: 2,
+        },
+        data: {
+            type: 'enemy',
+            name,
+            action: 0,
+            speed: 0.5 + Math.random()
+        },
+        created() {
+            this.event.add(move)
+            this.draw.animation(this.name, 'idle')
+            this.y = this.game.height - this.height
+        }
     }
 
     function move() {
@@ -52,10 +56,4 @@ export function enemy(name, number, player) {
             this.action = 0
         }
     }
-
-    return new Sprite(options, function () {
-        this.event.add(move)
-        this.draw.animation(this.name, 'idle')
-        this.y = this.game.height - this.height
-    })
 }

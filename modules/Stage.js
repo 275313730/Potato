@@ -1,5 +1,6 @@
 "use strict"
 import { Game } from "./Game.js";
+import { Sprite } from "./Sprite.js";
 
 export class Stage {
     constructor(options, callback) {
@@ -15,9 +16,7 @@ export class Stage {
         callback && callback.call(this)
 
         // 进入循环
-        this.timer = setInterval(() => {
-            this.execute.refresh()
-        }, 1000 / Game.frames)
+        this.execute.refresh()
     }
 
     // 初始化实例
@@ -59,7 +58,7 @@ export class Stage {
         // 创建镜头移动函数
         let createMovement = (x, y, time = 0, callback, disable) => {
             // 设置数据
-            let frames = time / 1000 * Game.frames
+            let frames = time * Game.frames
             let perX = x / frames
             let perY = y / frames
 
@@ -192,7 +191,9 @@ export class Stage {
         return Object.defineProperties({}, {
             // 添加
             'add': {
-                value: newSprite => {
+                value: options => {
+                    const newSprite = new Sprite(options)
+
                     // 检测id是否存在
                     if (sprites[newSprite.id]) {
                         throw new Error(`Sprite exists.`)
@@ -220,7 +221,7 @@ export class Stage {
                     // 精灵排序
                     sort()
 
-                    return Object.keys(sprites)
+                    return newSprite
                 }
             },
             // 删除
@@ -249,8 +250,9 @@ export class Stage {
                     let newSprites = {}
 
                     for (const key in sprites) {
-                        if (callback(sprites[key]) === true) {
-                            newSprites[key] = sprites[key]
+                        const sprite = sprites[key]
+                        if (callback(sprite) === true) {
+                            newSprites[key] = sprite
                         }
                     }
 
@@ -260,6 +262,7 @@ export class Stage {
             // 拷贝
             'copy': {
                 value: tragetSprites => {
+                    // JSON偷鸡深拷贝
                     return JSON.parse(JSON.stringify(tragetSprites || sprites))
                 }
             },
@@ -348,11 +351,20 @@ export class Stage {
                 }
             },
             'contain': {
-                value: (spriteA, spriteB) => {
-                    if (spriteA.width < spriteB.width &&
-                        spriteA.height < spriteB.height &&
-                        (spriteA.x <= spriteB.x || spriteA.x + spriteA.width >= spriteB.x + spriteB.width) &&
-                        (spriteA.y <= spriteB.y || spriteA.y + spriteA.height >= spriteB.y + spriteB.height)) {
+                value: (sprite1, sprite2) => {
+                    const x1 = sprite1.x
+                    const y1 = sprite1.y
+                    const w1 = sprite1.width
+                    const h1 = sprite1.height
+
+                    const x2 = sprite2.x
+                    const y2 = sprite2.y
+                    const w2 = sprite2.width
+                    const h2 = sprite2.height
+
+                    if (w1 < w2 && h1 < h2 &&
+                        (x1 <= x2 || x1 + w1 >= x2 + w2) &&
+                        (y1 <= y2 || y1 + h1 >= y2 + h2)) {
                         return false
                     }
                     return true
@@ -375,11 +387,15 @@ export class Stage {
             sprite.event.execute()
         }
 
+        let stop = false
+
         // 初始化方法
         return Object.defineProperties({}, {
             // 刷新
             'refresh': {
                 value: () => {
+                    if (stop) { return }
+
                     // 清除canvas
                     Game.context.clearRect(0, 0, Game.width, Game.height)
 
@@ -400,13 +416,15 @@ export class Stage {
                     Game.sprite.travel(sprite => {
                         spriteExecute(sprite, camera)
                     })
+
+                    window.requestAnimationFrame(this.execute.refresh)
                 }
             },
             // 销毁
             'destory': {
                 value: () => {
                     // 退出循环
-                    clearInterval(this.timer)
+                    stop = true
 
                     // 清空场景精灵
                     this.sprite.delAll()

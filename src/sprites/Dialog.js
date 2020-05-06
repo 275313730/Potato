@@ -1,18 +1,27 @@
-import { Sprite } from "../../modules/Sprite.js";
-
 export function dialog() {
-    const options = {
-        id: 'dialog',
-        layer: 3,
+    return {
+        config: {
+            id: 'dialog',
+            layer: 3,
 
-        show: false,
-        text: '',
-        tempArr: [],
-        index: 0, // 索引
-        status: 0,  // 0=停止,1=进行中,2=等待下一段文字,3=完成本段对话,4=完成所有对话
-        count: 0,   // 字数
-        typeText,
-        clear
+        },
+        data: {
+            show: false,
+            text: '',
+            tempArr: [],
+            index: 0, // 索引
+            status: 0,  // 0=停止,1=进行中,2=等待下一段文字,3=完成本段对话,4=完成所有对话
+            count: 0,   // 字数
+        },
+        methods: {
+            typeText,
+            clear
+        },
+        created() {
+            this.x = this.game.width / 2
+            this.y = this.game.height / 2
+            this.draw.shape(draw)
+        }
     }
 
     // 绘制
@@ -77,10 +86,4 @@ export function dialog() {
         this.count = 0
         this.tempArr = []
     }
-
-    return new Sprite(options, function () {
-        this.x = this.game.width / 2
-        this.y = this.game.height / 2
-        this.draw.shape(draw)
-    })
 }

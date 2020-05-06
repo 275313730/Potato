@@ -1,22 +1,32 @@
-import { Sprite } from "../../modules/Sprite.js";
-
 export function npc(id, x, textArr) {
-    const options = {
-        // sprite属性
-        id,
-        x,
-        direction: 'left',
-        layer: 1,
-
-        // 自定义属性
-        type: 'npc',
-        talking: false,
-        textArr,
-        textIndex: 0,
-        moveStatus: 0,
-        waitTime: 0,
-        speed: 1,
-        stop
+    return {
+        config: {
+            id,
+            x,
+            direction: 'left',
+            layer: 1,
+        },
+        data: {
+            type: 'npc',
+            talking: false,
+            textArr,
+            textIndex: 0,
+            moveStatus: 0,
+            waitTime: 0,
+            speed: 1,
+        },
+        methods: {
+            // 停止移动
+            stop() {
+                this.moveStatus = 0
+                this.draw.animation(this.id, 'idle')
+            }
+        },
+        created() {
+            this.event.add(move)
+            this.draw.animation(this.id, 'idle')
+            this.y = this.game.height - this.height
+        }
     }
 
     function move() {
@@ -62,16 +72,4 @@ export function npc(id, x, textArr) {
             return
         }
     }
-
-    // 停止移动
-    function stop() {
-        this.moveStatus = 0
-        this.draw.animation(this.id, 'idle')
-    }
-
-    return new Sprite(options, function () {
-        this.event.add(move)
-        this.draw.animation(this.id, 'idle')
-        this.y = this.game.height - this.height
-    })
 }

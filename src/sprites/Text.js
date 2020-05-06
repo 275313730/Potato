@@ -1,9 +1,16 @@
-import { Sprite } from "../../modules/Sprite.js";
-
 export function text() {
-    const options = {
-        id: 'text',
-        txt: null
+    return {
+        config: {
+            id: 'text',
+        },
+        data: {
+            txt: null
+        },
+        created() {
+            this.x = this.game.width / 2
+            this.y = this.game.height / 2
+            this.draw.shape(draw)
+        }
     }
 
     // 绘制
@@ -14,10 +21,4 @@ export function text() {
             ctx.centerText(this.txt, this.x, this.y)
         }
     }
-
-    return new Sprite(options, function () {
-        this.x = this.game.width / 2
-        this.y = this.game.height / 2
-        this.draw.shape(draw)
-    })
 }

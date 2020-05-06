@@ -1,14 +1,20 @@
-import { Sprite } from "../../modules/Sprite.js";
-
 export function bullet(player) {
-    const options = {
-        id: 'bullet',
-        x: player.x + player.width / 2,
-        width: 6,
-        height: 2,
-
-        speed: 5,
-        direction: player.direction
+    return {
+        config: {
+            id: 'bullet',
+            x: player.x + player.width / 2,
+            width: 6,
+            height: 2,
+        },
+        data: {
+            speed: 5,
+            direction: player.direction
+        },
+        created() {
+            this.y = this.game.height - 20
+            this.draw.shape(draw)
+            this.event.add(move)
+        }
     }
 
     // 绘制
@@ -28,10 +34,4 @@ export function bullet(player) {
             }
         }
     }
-
-    return new Sprite(options, function () {
-        this.y = this.game.height - 20
-        this.draw.shape(draw)
-        this.event.add(move)
-    })
 }

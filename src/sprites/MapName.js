@@ -1,9 +1,12 @@
-import { Sprite } from "../../modules/Sprite.js";
-
-export function mapName( mapId) {
-    const options = {
-        id: `Forest ${mapId}`,
-        y: 15
+export function mapName(mapId) {
+    return {
+        config: {
+            id: `Forest ${mapId}`,
+            y: 15
+        },
+        created() {
+            this.draw.shape(draw)
+        }
     }
 
     // 绘制
@@ -12,8 +15,4 @@ export function mapName( mapId) {
         ctx.font = '12px pixel'
         ctx.centerText(this.id, this.game.width / 2, this.y)
     }
-
-    return new Sprite(options, function () {
-        this.draw.shape(draw)
-    })
 }

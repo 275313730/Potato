@@ -13,15 +13,13 @@ export function addNpc() {
             textArr: [`hatman: "Wow, you created me.You can walk forward to the next map."`],
         }
 
-        let newHatMan = npc(hatman.id, hatman.x, hatman.textArr)
-
         // 添加hatman
-        this.sprite.add(newHatMan)
+        let newHatMan = this.sprite.add(npc(hatman.id, hatman.x, hatman.textArr))
 
         // 移动镜头
-        this.camera.moveTo(newHatMan, 1500, () => {
+        this.camera.moveTo(newHatMan, 2, () => {
             const player = this.sprite.find('player')
-            this.camera.moveTo(player, 1500, () => {
+            this.camera.moveTo(player, 2, () => {
                 this.camera.follow(player)
             })
         })

@@ -1,5 +1,6 @@
 // modules
 import { Game } from "./modules/Game.js";
+
 // stages
 import { title } from "./src/stages/Title.js";
 import { forest } from "./src/stages/Forest.js";
@@ -80,7 +81,7 @@ export function App(e) {
     })
 
     // 调试模式
-    Game.test = false
+    Game.test = true
 
     // 创建场景
     Game.stage.switch('title')

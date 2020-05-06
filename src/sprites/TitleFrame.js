@@ -1,24 +1,41 @@
 import { Game } from "../../modules/Game.js";
-import { Sprite } from "../../modules/Sprite.js";
 
 export function titleFrame() {
-    const options = {
-        id: 'titleFrame',
-
-        title: 'Lost Forest',
-        start: 'Start Game',
-        egg: `Don't Press!`,
-        arrow: '→',
-        arrowY: 10,
-        selection: 0,
-        count: 0,
-        reset,
+    return {
+        config: {
+            id: 'titleFrame',
+        },
+        data: {
+            title: 'Lost Forest',
+            start: 'Start Game',
+            egg: `Don't Press!`,
+            arrow: '→',
+            arrowY: 10,
+            selection: 0,
+            count: 0,
+        },
+        methods: {
+            // 重置
+            reset() {
+                Game.sound.play('select', 0.8)
+                this.arrow = '→'
+                this.count = 0
+                this.arrowY = 10 + this.selection * 18
+            }
+        },
+        created() {
+            this.x = this.game.width / 2
+            this.y = this.game.height / 2
+            this.userEvent.add(select, 'keydown', true)
+            this.event.add(twinkling)
+            this.draw.shape(draw)
+        }
     }
 
     // 绘制
     function draw(ctx) {
-        const w = this.game.width
-        const h = this.game.height
+        const w = this.game.width 
+        const h = this.game.height 
 
         // drawTitle
         ctx.fillStyle = '#CD2626'
@@ -66,14 +83,6 @@ export function titleFrame() {
         }
     }
 
-    // 重置
-    function reset() {
-        Game.sound.play('select', 0.8)
-        this.arrow = '→'
-        this.count = 0
-        this.arrowY = 10 + this.selection * 18
-    }
-
     // 闪烁
     function twinkling() {
         this.count++
@@ -82,12 +91,4 @@ export function titleFrame() {
             this.count = 0
         }
     }
-
-    return new Sprite(options, function () {
-        this.x = this.game.width / 2
-        this.y = this.game.height / 2
-        this.userEvent.add(select, 'keydown', true)
-        this.event.add(twinkling)
-        this.draw.shape(draw)
-    })
 }

@@ -1,4 +1,6 @@
 "use strict"
+import { Sprite } from "./Sprite.js"
+
 export class Game {
     // 初始化Game类
     static init(options) {
@@ -12,87 +14,55 @@ export class Game {
                 Game.key = null
             }
         })
+        window.addEventListener('mousedown', e => {
+            e.preventDefault()
+        })
+        window.addEventListener('mouseup', e => {
+            Game.mouseDown = false
+        })
 
         // 获取canvas
         const canvas = document.getElementById(options.el)
 
-        // 初始化canvas
-        Object.defineProperties(Game, {
+        Object.assign(Game, {
             // canvas上下文
-            'context': {
-                value: canvas.getContext('2d')
-            },
+            context: canvas.getContext('2d'),
             // Game宽度
-            'width': {
-                value: options.width
-            },
+            width: options.width,
             // Game高度
-            'height': {
-                value: options.height
-            },
+            height: options.height,
             // 帧数
-            'frames': {
-                value: 60,
-                writable: true
-            },
+            frames: 60,
             // 动画间隔帧(每隔n帧绘制下一个关键帧)
-            'animationInterval': {
-                value: 16,
-                writable: true
-            },
+            animationInterval: 16,
             // 当前按键
-            'key': {
-                value: null,
-                writable: true
-            },
+            key: null,
+            // 鼠标状态
+            mouseDown: false,
             // 测试(显示精灵外框)
-            'test': {
-                value: false,
-                writable: true
-            },
+            test: false,
             // 音频路径
-            'audioPath': {
-                value: options.path ? options.path.audio : '',
-                writable: true
-            },
+            audioPath: options.path ? options.path.audio : '',
             // 图片路径
-            'imagePath': {
-                value: options.path ? options.path.image : '',
-                writable: true
-            },
+            imagePath: options.path ? options.path.image : '',
             // 载入
-            'load': {
-                value: Game.load()
-            },
+            load: Game.load(),
             // 音频
-            'audio': {
-                value: Game.audio()
-            },
+            audio: Game.audio(),
             // 图片
-            'image': {
-                value: Game.image()
-            },
+            image: Game.image(),
             // 动画
-            'animation': {
-                value: Game.animation()
-            },
+            animation: Game.animation(),
             // 音效
-            'sound': {
-                value: Game.sound()
-            },
+            sound: Game.sound(),
             // 音乐
-            'music': {
-                value: Game.music()
-            },
+            music: Game.music(),
             // 场景
-            'stage': {
-                value: Game.stage(options.stages)
-            },
+            stage: Game.stage(options.stages),
             // 精灵(全局精灵)
-            'sprite': {
-                value: Game.sprite()
-            }
+            sprite: Game.sprite()
         })
+
 
         // 设置body属性
         document.body.style.userSelect = 'none'
@@ -141,12 +111,14 @@ export class Game {
         return Object.defineProperties({}, {
             // 添加
             'add': {
-                value: newSprite => {
+                value: options => {
+                    const newSprite = new Sprite(options)
                     if (sprites[newSprite.id]) {
                         throw new Error(`Sprite '${newSprite.id}' exists.`)
                     } else {
                         sprites[newSprite.id] = newSprite
                     }
+                    return newSprite
                 }
             },
             // 删除

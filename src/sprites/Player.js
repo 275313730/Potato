@@ -1,24 +1,45 @@
-import { Sprite } from "../../modules/Sprite.js";
-
 export function player(x) {
-    const options = {
-        // Sprite属性
-        id: 'player',
-        x,
-        width: 40,
-        direction: x === 10 ? 'right' : 'left',
-        layer: 2,
-
-        // 自定义属性和事件
-        shoot: false,
-        speed: 2,
-        space: false,
-        walking: false,
-        move,
-        stop
+    return {
+        config: {
+            id: 'player',
+            x,
+            width: 40,
+            direction: x === 10 ? 'right' : 'left',
+            layer: 2,
+        },
+        data: {
+            shoot: false,
+            speed: 2,
+            space: false,
+            walking: false,
+            mousedown: false
+        },
+        methods: {
+            // 移动
+            move(direction) {
+                this.direction = direction
+                this.draw.animation(this.id, 'walk')
+                this.walking = true
+            },
+            // 停止
+            stop() {
+                this.draw.animation(this.id, 'idle')
+                this.walking = false
+            }
+        },
+        created() {
+            this.draw.animation(this.id, 'idle')
+            this.userEvent.add(keyDown, 'keydown', true)
+            this.userEvent.add(keyUp, 'keyup')
+            this.userEvent.add(mouseDown, 'mousedown', true)
+            this.userEvent.add(mouseUp, 'mouseup')
+            this.userEvent.add(mouseMove, 'mousemove')
+            this.event.add(walk)
+            this.y = this.game.height - this.height
+        }
     }
 
-    // 按下
+    // 键盘按下
     function keyDown(key) {
         switch (key) {
             case 'ArrowRight':
@@ -36,7 +57,7 @@ export function player(x) {
         }
     }
 
-    // 弹起
+    // 键盘松开
     function keyUp(key) {
         switch (key) {
             case 'ArrowRight':
@@ -56,17 +77,30 @@ export function player(x) {
         }
     }
 
-    // 移动
-    function move(direction) {
-        this.direction = direction
-        this.draw.animation(this.id, 'walk')
-        this.walking = true
+    // 鼠标按下移动
+    function mouseDown(mouse) {
+        this.mousedown = true
+        if (mouse.x <= this.relX) {
+            this.move('left')
+        } else if (mouse.x >= this.relX + this.width) {
+            this.move('right')
+        }
     }
 
-    // 停止
-    function stop() {
-        this.draw.animation(this.id, 'idle')
-        this.walking = false
+    // 鼠标松开停止
+    function mouseUp() {
+        this.mousedown = false
+        this.stop()
+    }
+
+    // 鼠标决定移动方向
+    function mouseMove(mouse) {
+        if (!this.mousedown) { return }
+        if (mouse.x <= this.relX) {
+            this.direction = 'left'
+        } else if (mouse.x >= this.relX + this.width) {
+            this.direction = 'right'
+        }
     }
 
     // 移动
@@ -78,12 +112,4 @@ export function player(x) {
             this.x -= this.speed
         }
     }
-
-    return new Sprite(options, function () {
-        this.userEvent.add(keyDown, 'keydown', true)
-        this.userEvent.add(keyUp, 'keyup')
-        this.event.add(walk)
-        this.draw.animation(this.id, 'idle')
-        this.y = this.game.height - this.height
-    })
 }

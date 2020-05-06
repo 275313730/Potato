@@ -6,8 +6,8 @@ export function warning() {
     text.txt = `Press 'z' to shoot.`
     
     // 相机移动
-    this.camera.move(200, 0, 2000, () => {
-        this.camera.move(-200, 0, 2000, () => {
+    this.camera.move(200, 0, 2, () => {
+        this.camera.move(-200, 0, 2, () => {
             text.txt = null
             this.camera.follow(this.sprite.find('player'))
         })
