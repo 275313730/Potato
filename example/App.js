@@ -1,5 +1,5 @@
 // modules
-import { Game } from "./modules/Game.js";
+import { Game } from "../modules/Game.js";
 
 // stages
 import { title } from "./src/stages/Title.js";

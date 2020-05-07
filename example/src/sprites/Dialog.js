@@ -3,7 +3,6 @@ export function dialog() {
         config: {
             id: 'dialog',
             layer: 3,
-
         },
         data: {
             show: false,

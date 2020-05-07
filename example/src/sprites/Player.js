@@ -3,7 +3,6 @@ export function player(x) {
         config: {
             id: 'player',
             x,
-            width: 40,
             direction: x === 10 ? 'right' : 'left',
             layer: 2,
         },
@@ -12,7 +11,6 @@ export function player(x) {
             speed: 2,
             space: false,
             walking: false,
-            mousedown: false
         },
         methods: {
             // 移动
@@ -33,7 +31,6 @@ export function player(x) {
             this.userEvent.add(keyUp, 'keyup')
             this.userEvent.add(mouseDown, 'mousedown', true)
             this.userEvent.add(mouseUp, 'mouseup')
-            this.userEvent.add(mouseMove, 'mousemove')
             this.event.add(walk)
             this.y = this.game.height - this.height
         }
@@ -42,17 +39,14 @@ export function player(x) {
     // 键盘按下
     function keyDown(key) {
         switch (key) {
-            case 'ArrowRight':
+            case 'd':
                 this.move('right')
                 break
-            case 'ArrowLeft':
+            case 'a':
                 this.move('left')
                 break
             case ' ':
                 this.space = true
-                break
-            case 'z':
-                this.shoot = true
                 break
         }
     }
@@ -60,47 +54,28 @@ export function player(x) {
     // 键盘松开
     function keyUp(key) {
         switch (key) {
-            case 'ArrowRight':
+            case 'd':
                 if (this.direction === 'left') { return }
                 this.stop()
                 break
-            case 'ArrowLeft':
+            case 'a':
                 if (this.direction === 'right') { return }
                 this.stop()
                 break
             case ' ':
                 this.space = false
                 break
-            case 'z':
-                this.shoot = false
-                break
         }
     }
 
-    // 鼠标按下移动
+    // 鼠标按下射击
     function mouseDown(mouse) {
-        this.mousedown = true
-        if (mouse.x <= this.relX) {
-            this.move('left')
-        } else if (mouse.x >= this.relX + this.width) {
-            this.move('right')
-        }
+        this.shoot = true
     }
 
     // 鼠标松开停止
     function mouseUp() {
-        this.mousedown = false
-        this.stop()
-    }
-
-    // 鼠标决定移动方向
-    function mouseMove(mouse) {
-        if (!this.mousedown) { return }
-        if (mouse.x <= this.relX) {
-            this.direction = 'left'
-        } else if (mouse.x >= this.relX + this.width) {
-            this.direction = 'right'
-        }
+        this.shoot = false
     }
 
     // 移动
