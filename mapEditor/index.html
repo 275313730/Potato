@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            user-select: none;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        #main {
+            border: 1px solid black;
+            overflow: scroll;
+            width: 70%;
+            height: 100vh;
+            text-align: center;
+        }
+
+        #app {
+            margin-top: 20px;
+            border: 1px solid black;
+        }
+
+        #work {
+            overflow: scroll;
+            border: 1px solid black;
+            display: block;
+            position: absolute;
+            height: 100%;
+            width: 30%;
+            right: 0;
+            top: 0;
+            text-align: center;
+        }
+
+        #show {
+            margin-top: 10px;
+            background-color: black;
+            width: 23vw;
+        }
+
+        .inner {
+            margin-bottom: 3vh;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="main">
+        <canvas id="app"></canvas>
+    </div>
+
+    <div id="work">
+        <div class="inner">
+            <p>地图属性</p>
+            <input id="pixel" type="text" placeholder="像素">
+            <br>
+            <input id="mapRow" type="text" placeholder="行数">
+            <br>
+            <input id="mapColumn" type="text" placeholder="列数">
+            <br>
+            <button onclick="Editor.changeMap()">改变</button>
+        </div>
+
+        <div class="inner">
+            <p>图片上传</p>
+            <input id="file" type="file" accept="image/*" onchange="Editor.changepic(this)">
+            <br>
+            <img id="show">
+        </div>
+
+        <div class="inner">
+            <p>地图绘制</p>
+            <input id="drawRow" type="text" placeholder="地图绘制行数">
+            <br>
+            <input id="drawColumn" type="text" placeholder="地图绘制列数">
+            <br>
+            <input id="imageRow" type="text" placeholder="行数">
+            <br>
+            <input id="imageColumn" type="text" placeholder="列数">
+            <br>
+            <button onclick="Editor.draw()">绘制</button>
+        </div>
+
+        <div class="inner">
+            <input id="fileName" type="text" placeholder="输入要保存的文件名">
+            <br>
+            <button id="save" onclick="Editor.save()">save</button>
+        </div>
+    </div>
+
+
+    <script src="Editor.js"></script>
+    <script>
+        Editor.init(640, 480)
+    </script>
+</body>
+
+</html>
