@@ -32,7 +32,7 @@ export class Game {
         // 帧数
         Game.frames = 60
         // 动画间隔帧(每隔n帧绘制下一个关键帧)
-        Game.animationInterval = 16
+        Game.animationInterval = 4
         // 键盘状态
         Game.key = null
         // 鼠标状态

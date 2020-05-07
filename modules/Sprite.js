@@ -104,7 +104,7 @@ export class Sprite {
             if (this.direction === 'right') {
                 context.drawImage(image, 0, 0, width, height, relX, y, width * scale, height * scale)
             } else {
-                const tranlateX = Game.width - width - relX
+                const tranlateX = Game.width - this.width - relX
                 context.drawFlip(Game.width, () => {
                     // 绘制图片的数据要用图片属性
                     // 因为粒子精灵是无宽度和高度的，绘制出来的图片它与自身宽高和精灵的scale有关
@@ -118,8 +118,8 @@ export class Sprite {
             const context = Game.context
             const relX = this.relX
             const y = this.y
-            const width = this.width
-            const height = this.height
+            const width = options.width
+            const height = options.height
             const scale = this.scale
             const direction = this.direction
             const currFrame = options.currFrame
@@ -128,7 +128,7 @@ export class Sprite {
             if (!options.flip && direction === 'right' || options.flip && direction === 'left') {
                 context.drawImage(image, currFrame * width, 0, width, height, relX, y, width * scale, height * scale)
             } else {
-                const tranlateX = Game.width - width * scale - relX
+                const tranlateX = Game.width - this.width * scale - relX
                 // 水平翻转绘制
                 context.drawFlip(Game.width, () => {
                     // 动画绘制的数据要用精灵属性
@@ -148,10 +148,6 @@ export class Sprite {
             image: name => {
                 // 获取图片数据
                 let image = Game.image.get(name)
-
-                // 设置精灵尺寸
-                this.width = image.width
-                this.height = image.height
 
                 // 绘制函数
                 executor = () => {
@@ -221,10 +217,6 @@ export class Sprite {
                 // 获取动画数据
                 const animation = Game.animation.get(id, name)
 
-                // 设置精灵尺寸
-                this.width = animation.width
-                this.height = animation.image.height
-
                 // 只读属性
                 let playing = true,
                     currInterval = 0,
@@ -254,11 +246,11 @@ export class Sprite {
                     },
                     // 动画帧宽度
                     'width': {
-                        value: this.width
+                        value: animation.width
                     },
                     // 动画帧高度
                     'height': {
-                        value: this.height
+                        value: animation.image.height
                     },
                     // 是否翻转
                     'flip': {
