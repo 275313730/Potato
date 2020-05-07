@@ -4,6 +4,7 @@ class Editor {
         this.canvas.setAttribute('width', width)
         this.canvas.setAttribute('height', height)
         this.context = this.canvas.getContext('2d')
+        this.pick()
     }
 
     // 改变地图属性
@@ -14,10 +15,16 @@ class Editor {
     }
 
     // 上传图片
-    static changepic(obj) {
-        //console.log(obj.files[0]);//这里可以获取上传文件的name
-        var newsrc = getObjectURL(obj.files[0]);
-        document.getElementById('show').src = newsrc;
+    static uploadPic(obj) {
+        const img = new Image()
+        img.onload = () => {
+            this.assetCanvas = document.querySelector('#asset')
+            this.assetContext = canvas.getContext('2d')
+            this.assetCanvas.setAttribute('width', img.width)
+            this.assetCanvas.setAttribute('height', img.height)
+            this.assetContext.drawImage(img, 0, 0)
+        }
+        img.src = getObjectURL(obj.files[0])
 
         //建立一個可存取到該file的url
         function getObjectURL(file) {
@@ -34,10 +41,25 @@ class Editor {
         }
     }
 
+    // 选取
+    static pick() {
+        this.canvas.addEventListener('click', mouse => {
+            const mouseX = mouse.clientX + this.canvas.offsetLeft
+            console.log(mouseX)
+        })
+    }
+
     // 绘制
     static draw() {
+        if (imageColumn < 1 || imageRow.value < 1 || drawColumn < 1 || drawRow < 1) { return }
         const pixel = this.pixel
         this.context.drawImage(show, (imageColumn.value - 1) * pixel, (imageRow.value - 1) * pixel, pixel, pixel, (drawColumn.value - 1) * pixel, (drawRow.value - 1) * pixel, pixel, pixel)
+    }
+
+    static clear() {
+        if (drawColumn < 1 || drawRow < 1) { return }
+        const pixel = this.pixel
+        this.context.clearRect((drawColumn.value - 1) * pixel, (drawRow.value - 1) * pixel, pixel, pixel)
     }
 
     // 保存画布
