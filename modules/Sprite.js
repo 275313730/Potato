@@ -41,6 +41,8 @@ export class Sprite {
         this.y = config.y || 0
         this.width = config.width || 0
         this.height = config.height || 0
+        this.offsetLeft = config.offsetLeft || 0
+        this.offsetTop = config.offsetTop || 0
 
         // alpha 决定绘制透明度
         this.alpha = config.alpha || 1
@@ -96,19 +98,21 @@ export class Sprite {
             const context = Game.context
             const relX = this.relX
             const y = this.y
+            const offsetLeft = this.offsetLeft
+            const offsetTop = this.offsetTop
             const width = image.width
             const height = image.height
             const scale = this.scale
 
             // 图片方向
             if (this.direction === 'right') {
-                context.drawImage(image, 0, 0, width, height, relX, y, width * scale, height * scale)
+                context.drawImage(image, 0, 0, width, height, relX + offsetLeft, y + offsetTop, width * scale, height * scale)
             } else {
                 const tranlateX = Game.width - this.width - relX
                 context.drawFlip(Game.width, () => {
                     // 绘制图片的数据要用图片属性
                     // 因为粒子精灵是无宽度和高度的，绘制出来的图片它与自身宽高和精灵的scale有关
-                    context.drawImage(image, 0, 0, width, height, tranlateX, y, width * scale, height * scale)
+                    context.drawImage(image, 0, 0, width, height, tranlateX + offsetLeft, y + offsetTop, width * scale, height * scale)
                 })
             }
         }
@@ -118,6 +122,8 @@ export class Sprite {
             const context = Game.context
             const relX = this.relX
             const y = this.y
+            const offsetLeft = this.offsetLeft
+            const offsetTop = this.offsetTop
             const width = options.width
             const height = options.height
             const scale = this.scale
@@ -126,14 +132,14 @@ export class Sprite {
 
             // 图片方向
             if (!options.flip && direction === 'right' || options.flip && direction === 'left') {
-                context.drawImage(image, currFrame * width, 0, width, height, relX, y, width * scale, height * scale)
+                context.drawImage(image, currFrame * width, 0, width, height, relX + offsetLeft, y + offsetTop, width * scale, height * scale)
             } else {
                 const tranlateX = Game.width - this.width * scale - relX
                 // 水平翻转绘制
                 context.drawFlip(Game.width, () => {
                     // 动画绘制的数据要用精灵属性
                     // 因为动画是由图片裁剪出来的，只与精灵自身宽高有关，跟图片无关
-                    context.drawImage(image, currFrame * width, 0, width, height, tranlateX, y, width * scale, height * scale)
+                    context.drawImage(image, currFrame * width, 0, width, height, tranlateX + offsetLeft, y + offsetTop, width * scale, height * scale)
                 })
             }
         }
