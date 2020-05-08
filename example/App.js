@@ -1,5 +1,5 @@
 // modules
-import { Game } from "../modules/Game.js";
+import { Game } from "./modules/Game.js";
 
 // stages
 import { title } from "./src/stages/Title.js";
@@ -59,8 +59,8 @@ export function App(e) {
         height: 160,
         // 设置文件路径
         path: {
-            image: 'src/assets/imgs/',
-            audio: 'src/assets/audio/'
+            image: './src/assets/imgs/',
+            audio: './src/assets/audio/'
         },
         // 载入场景
         stages: {

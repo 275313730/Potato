@@ -4,7 +4,7 @@ import { Sprite } from "./Sprite.js"
 export class Game {
     // 初始化Game类
     static init(options) {
-        // 监听键盘事件
+        // 禁用原生事件
         window.addEventListener('keydown', e => {
             e.preventDefault()
         })
@@ -25,9 +25,9 @@ export class Game {
         Game.canvas = document.getElementById(options.el)
         // canvas上下文
         Game.context = Game.canvas.getContext('2d')
-        // Game宽度
+        // 宽度
         Game.width = options.width
-        // Game高度
+        // 高度
         Game.height = options.height
         // 帧数
         Game.frames = 60
@@ -54,7 +54,6 @@ export class Game {
         Game.stage = Game.stage(options.stages)
         Game.sprite = Game.sprite()
 
-
         // 设置body属性
         document.body.style.userSelect = 'none'
         document.body.style.margin = 0
@@ -65,8 +64,6 @@ export class Game {
         // 设置canvas宽高
         Game.canvas.setAttribute('width', Game.width + 'px')
         Game.canvas.setAttribute('height', Game.height + 'px')
-
-        delete Game.init
     }
 
     // 场景
@@ -95,7 +92,6 @@ export class Game {
     static sprite() {
         let sprites = {}
 
-        // 初始化方法
         return {
             // 添加
             add: options => {
@@ -133,7 +129,6 @@ export class Game {
     static load() {
         let loadings = []
 
-        // 初始化方法
         return {
             // 载入图片
             image: (name, url) => {
@@ -184,7 +179,6 @@ export class Game {
     static image() {
         let images = {}
 
-        // 初始化方法
         return {
             // 添加
             add: (name, img) => {
@@ -202,7 +196,6 @@ export class Game {
     static animation() {
         let animations = {}
 
-        // 初始化方法
         return {
             // 添加角色
             addRole: (id, width, interval, flip) => {
@@ -235,7 +228,6 @@ export class Game {
     static audio() {
         let audios = {}
 
-        // 初始化方法
         return {
             // 添加
             add: (name, audio) => {
@@ -253,7 +245,6 @@ export class Game {
     static music() {
         let music = null
 
-        // 初始化方法
         return {
             // 播放
             play: name => {
@@ -286,7 +277,6 @@ export class Game {
 
     // 音效
     static sound() {
-        // 初始化方法
         return {
             play: (name, volume, alone) => {
                 if (alone) {
