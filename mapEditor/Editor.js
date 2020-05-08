@@ -2,14 +2,10 @@ class Editor {
     // 创建新地图
     static createMap(node) {
         this.pixel = pixel.value
-
         this.setCanvas(mapColumn.value * pixel.value, mapRow.value * pixel.value)
-
         this.context.strokeRect(0, 0, this.pixel, this.pixel)
-
         this.drawPick()
-
-        node.parentNode.parentNode.removeChild(node.parentNode)
+        map.remove()
     }
 
     // 上传地图
@@ -17,17 +13,12 @@ class Editor {
         const img = new Image()
         img.onload = () => {
             this.pixel = pixel.value
-
             this.setCanvas(img.width, img.height)
-
             this.relContext.drawImage(img, 0, 0)
-
             this.context.drawImage(img, 0, 0)
             this.context.strokeRect(0, 0, this.pixel, this.pixel)
-
             this.drawPick()
-
-            obj.parentNode.parentNode.removeChild(obj.parentNode)
+            map.remove()
         }
         img.src = this.getObjectURL(obj.files[0])
     }
@@ -36,13 +27,10 @@ class Editor {
     static setCanvas(width, height) {
         this.canvas = document.querySelector('#app')
         this.context = this.canvas.getContext('2d')
-
         this.canvas.setAttribute('width', width)
         this.canvas.setAttribute('height', height)
-
         this.relCanvas = this.canvas.cloneNode()
         this.relContext = this.relCanvas.getContext('2d')
-
         window.addEventListener('keypress', e => {
             if (e.key === 'd') {
                 this.draw()
@@ -61,11 +49,8 @@ class Editor {
             const column = this.drawColumn = Math.floor((mouse.layerX - canvas.offsetLeft) / (pixel / scale))
             const row = this.drawRow = Math.floor((mouse.layerY - canvas.offsetTop) / (pixel / scale))
             const ctx = this.context
-
             const imgData = this.relContext.getImageData(0, 0, canvas.getAttribute('width'), canvas.getAttribute('height'))
-
             ctx.putImageData(imgData, 0, 0)
-
             ctx.strokeRect(column * pixel, row * pixel, pixel, pixel)
         })
     }
@@ -78,17 +63,12 @@ class Editor {
             this.assetCanvas = document.querySelector('#asset')
             this.assetCanvas.setAttribute('width', img.width)
             this.assetCanvas.setAttribute('height', img.height)
-
             const ctx = this.assetContext = this.assetCanvas.getContext('2d')
-
             ctx.drawImage(img, 0, 0)
-
             ctx.strokeStyle = 'white'
             ctx.strokeRect(0, 0, this.pixel, this.pixel)
-
             this.assetPick()
-
-            obj.parentNode.parentNode.removeChild(obj.parentNode)
+            obj.parentNode.remove()
         }
         img.src = this.getObjectURL(obj.files[0])
 
@@ -117,10 +97,8 @@ class Editor {
             const column = this.assetColumn = Math.floor((mouse.layerX - canvas.offsetLeft) / (pixel / scale))
             const row = this.assetRow = Math.floor((mouse.layerY - canvas.offsetTop) / (pixel / scale))
             const ctx = this.assetContext
-
             ctx.clearRect(0, 0, canvas.getAttribute('width'), canvas.getAttribute('height'))
             ctx.drawImage(this.asset, 0, 0)
-
             ctx.strokeRect(column * pixel, row * pixel, pixel, pixel)
         })
     }
@@ -142,32 +120,18 @@ class Editor {
     // 拷贝画布
     static copy() {
         const pixel = this.pixel
-
         const imgData = this.relContext.getImageData(0, 0, this.canvas.getAttribute('width'), this.canvas.getAttribute('height'))
-
         this.context.putImageData(imgData, 0, 0)
-
         this.context.strokeRect(this.drawColumn * pixel, this.drawRow * pixel, pixel, pixel)
     }
 
-    // 保存画布
+    // 保存画布为png格式的图片并下载
     static save() {
-
-        downLoad(saveAsPNG(this.relCanvas), fileName.value);
-
-        // 保存成png格式的图片
-        function saveAsPNG(canvas) {
-            return canvas.toDataURL("image/png");
-        }
-
-        // 下载
-        function downLoad(url, name) {
-            var oA = document.createElement("a");
-            oA.download = name + '.png';// 设置下载的文件名，默认是'下载'
-            oA.href = url;
-            document.body.appendChild(oA);
-            oA.click();
-            oA.remove(); // 下载之后把创建的元素删除
-        }
+        const oA = document.createElement("a");
+        oA.download = fileName.value + '.png';// 设置下载的文件名
+        oA.href = this.relCanvas.toDataURL("image/png");
+        document.body.appendChild(oA);
+        oA.click();
+        oA.remove(); // 下载之后把创建的元素删除
     }
 }

@@ -62,15 +62,14 @@
     </div>
 
     <div id="work">
-        <div class="inner">
+        <div id="map" class="inner">
             <p>地图</p>
             <span>地图像素：</span><input id="pixel" type="text">
             <br>
             <span>地图行数：</span><input id="mapRow" type="text">
             <br>
             <span>地图列数：</span><input id="mapColumn" type="text">
-            <br>
-            <br>
+            <br><br>
             <button onclick="Editor.createMap(this)">创建新地图</button>
             <button onclick="uploadMap.click()">上传地图</button>
             <input id="uploadMap" class="none" type="file" accept="image\*" onchange="Editor.uploadMap(this)">
@@ -96,8 +95,7 @@
         <div class="inner">
             <p>地图保存</p>
             <input id="fileName" type="text" placeholder="输入要保存的文件名">
-            <br>
-            <br>
+            <br><br>
             <button id="save" onclick="Editor.save()">save</button>
         </div>
     </div>
