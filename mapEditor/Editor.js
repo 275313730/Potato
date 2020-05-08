@@ -1,6 +1,6 @@
 class Editor {
     // 创建新地图
-    static createMap(node) {
+    static createMap() {
         this.pixel = pixel.value
         this.setCanvas(mapColumn.value * pixel.value, mapRow.value * pixel.value)
         this.context.strokeRect(0, 0, this.pixel, this.pixel)
@@ -31,11 +31,14 @@ class Editor {
         this.canvas.setAttribute('height', height)
         this.relCanvas = this.canvas.cloneNode()
         this.relContext = this.relCanvas.getContext('2d')
+        this.drawColumn = 0
+        this.drawRow = 0
+
         window.addEventListener('keypress', e => {
-            if (e.key === 'd') {
-                this.draw()
-            } else if (e.key === 'c') {
-                this.clear()
+            if (e.key === 'w') {
+                this.zoomIn()
+            } else if (e.key === 's') {
+                this.zoomOut()
             }
         })
     }
@@ -68,6 +71,16 @@ class Editor {
             ctx.strokeStyle = 'white'
             ctx.strokeRect(0, 0, this.pixel, this.pixel)
             this.assetPick()
+            this.assetColumn = 0
+            this.assetRow = 0
+
+            window.addEventListener('keypress', e => {
+                if (e.key === 'd') {
+                    this.draw()
+                } else if (e.key === 'a') {
+                    this.clear()
+                }
+            })
             obj.parentNode.remove()
         }
         img.src = this.getObjectURL(obj.files[0])
@@ -115,6 +128,31 @@ class Editor {
         const pixel = this.pixel
         this.relContext.clearRect(this.drawColumn * pixel, this.drawRow * pixel, pixel, pixel)
         this.copy()
+    }
+
+    // 放大
+    static zoomIn() {
+        this.zoom(5)
+    }
+
+    // 缩小
+    static zoomOut() {
+        this.zoom(-5)
+    }
+
+    static zoom(vary) {
+        if (!this.style) {
+            this.style = document.createElement('style');
+            this.width = 45 + vary
+            this.style.type = 'text/css';
+            this.style.innerHTML = `#app{ width:${this.width}vw; }`;
+            document.getElementsByTagName('HEAD').item(0).appendChild(this.style);
+        } else {
+            if (this.width <= 20 && vary < 0) { return }
+            if (this.width >= 80 && vary > 0) { return }
+            this.width += vary
+            this.style.innerHTML = `#app{width:${this.width}vw;}`
+        }
     }
 
     // 拷贝画布

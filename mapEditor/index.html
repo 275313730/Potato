@@ -24,7 +24,7 @@
 
         #app {
             margin: 20px;
-            width: 52vw;
+            width: 45vw;
             border: 1px solid black;
         }
 
@@ -81,7 +81,6 @@
                 <button onclick="uploadAsset.click()">上传素材</button>
                 <input id="uploadAsset" class="none" type="file" accept="image\*" onchange="Editor.uploadAsset(this)">
             </div>
-
             <br>
             <canvas id="asset"></canvas>
         </div>
@@ -89,7 +88,9 @@
         <div class="inner">
             <p>地图绘制</p>
             <button onclick="Editor.draw()">绘制(d)</button>
-            <button onclick="Editor.clear()">擦除(c)</button>
+            <button onclick="Editor.clear()">擦除(a)</button>
+            <button onclick="Editor.zoomIn()">放大(w)</button>
+            <button onclick="Editor.zoomOut()">缩小(s)</button>
         </div>
 
         <div class="inner">

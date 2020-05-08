@@ -107,44 +107,32 @@ export class Stage {
             }
         }
 
-        // 初始化方法
-        return Object.defineProperties({}, {
+        return {
             // 跟随
-            'follow': {
-                value: sprite => {
-                    if (sprite === camera.follow) { return }
-                    camera.follow = sprite
-                }
+            follow: sprite => {
+                if (sprite === camera.follow) { return }
+                camera.follow = sprite
             },
             // 解除跟随
-            'unFollow': {
-                value: () => {
-                    camera.follow = null
-                }
+            unFollow: () => {
+                camera.follow = null
             },
             // 移动
-            'move': {
-                value: (x, y, time, callback) => {
-                    createMovement(x, y, time, callback)
-                }
+            move: (x, y, time, callback) => {
+                createMovement(x, y, time, callback)
             },
             // 移动到
-            'moveTo': {
-                value: (sprite, time, callback) => {
-                    createMovement((sprite.x - camera.x) - Game.width / 2 + sprite.width / 2, (sprite.y - camera.y), time, callback)
-                }
+            moveTo: (sprite, time, callback) => {
+                createMovement((sprite.x - camera.x) - Game.width / 2 + sprite.width / 2, (sprite.y - camera.y), time, callback)
             },
             // 获取镜头
-            'get': {
-                value: () => {
-                    // 计算镜头数据
-                    cal()
-
-                    // 返回镜头数据(只读)
-                    return Object.assign({}, camera)
-                },
+            get: () => {
+                // 计算镜头数据
+                cal()
+                // 返回镜头数据(只读)
+                return Object.assign({}, camera)
             }
-        })
+        }
     }
 
     // 场景精灵
@@ -168,157 +156,132 @@ export class Stage {
             sprites = newSprites
         }
 
-        // 初始化方法
-        return Object.defineProperties({}, {
+        return {
             // 添加
-            'add': {
-                value: options => {
-                    const newSprite = new Sprite(options)
+            add: options => {
+                const newSprite = new Sprite(options)
 
-                    // 检测id是否存在
-                    if (sprites[newSprite.id]) {
-                        throw new Error(`Sprite exists.`)
-                    }
-
-                    // 添加场景的宽高值(只读)
-                    Object.defineProperty(newSprite, 'stage', {
-                        value: {
-                            width: this.width,
-                            height: this.height
-                        }
-                    })
-
-                    // 加入场景精灵
-                    sprites[newSprite.id] = newSprite
-
-                    // 如果图层值不在layers中则新增图层值并排序layers
-                    if (layers.indexOf(newSprite.layer) === -1) {
-                        layers.push(newSprite.layer)
-
-                        // 图层值排序
-                        layers.sort()
-                    }
-
-                    // 精灵排序
-                    sort()
-
-                    return newSprite
+                // 检测id是否存在
+                if (sprites[newSprite.id]) {
+                    throw new Error(`Sprite exists.`)
                 }
+
+                // 添加场景的宽高值(只读)
+                Object.defineProperty(newSprite, 'stage', {
+                    value: {
+                        width: this.width,
+                        height: this.height
+                    }
+                })
+
+                // 加入场景精灵
+                sprites[newSprite.id] = newSprite
+
+                // 如果图层值不在layers中则新增图层值并排序layers
+                if (layers.indexOf(newSprite.layer) === -1) {
+                    layers.push(newSprite.layer)
+
+                    // 图层值排序
+                    layers.sort()
+                }
+
+                // 精灵排序
+                sort()
+
+                return newSprite
             },
             // 删除
-            'del': {
-                value: id => {
-                    if (!sprites[id]) {
-                        throw new Error(`Sprite ${id} doesn't exist`)
-                    }
-
-                    // 解绑精灵用户事件
-                    sprites[id].userEvent.delAll()
-                    delete sprites[id]
-
-                    return Object.keys(sprites)
+            del: id => {
+                if (!sprites[id]) {
+                    throw new Error(`Sprite ${id} doesn't exist`)
                 }
+
+                // 解绑精灵用户事件
+                sprites[id].userEvent.delAll()
+                delete sprites[id]
+
+                return Object.keys(sprites)
             },
             // 查找
-            'find': {
-                value: id => {
-                    return sprites[id]
-                }
+            find: id => {
+                return sprites[id]
             },
             // 过滤
-            'filter': {
-                value: callback => {
-                    let newSprites = {}
+            filter: callback => {
+                let newSprites = {}
 
-                    for (const key in sprites) {
-                        const sprite = sprites[key]
-                        if (callback(sprite) === true) {
-                            newSprites[key] = sprite
-                        }
+                for (const key in sprites) {
+                    const sprite = sprites[key]
+                    if (callback(sprite) === true) {
+                        newSprites[key] = sprite
                     }
-
-                    return newSprites
                 }
+
+                return newSprites
             },
             // 拷贝
-            'copy': {
-                value: tragetSprites => {
-                    // JSON偷鸡深拷贝
-                    return JSON.parse(JSON.stringify(tragetSprites || sprites))
-                }
+            copy: tragetSprites => {
+                // JSON偷鸡深拷贝
+                return JSON.parse(JSON.stringify(tragetSprites || sprites))
             },
             // 删除所有
-            'delAll': {
-                value: () => {
-                    for (const key in sprites) {
-                        this.sprite.del(key)
-                    }
+            delAll: () => {
+                for (const key in sprites) {
+                    this.sprite.del(key)
                 }
             },
             // 遍历
-            'travel': {
-                value: callback => {
-                    for (const key in sprites) {
-                        // 回调函数返回false时停止遍历
-                        if (callback(sprites[key]) === false) {
-                            break
-                        }
+            travel: callback => {
+                for (const key in sprites) {
+                    // 回调函数返回false时停止遍历
+                    if (callback(sprites[key]) === false) {
+                        break
                     }
                 }
             },
-        })
+        }
     }
 
     // 场景事件
     event() {
         let events = {}
 
-        // 初始化方法
-        return Object.defineProperties({}, {
+        return {
             // 添加
-            'add': {
-                value: (fn, ...args) => {
-                    if (events[fn.name]) {
-                        throw new Error(`Event '${fn.name}' exists.`)
-                    }
-                    events[fn.name] = fn.bind(this, ...args)
+            add: (fn, ...args) => {
+                if (events[fn.name]) {
+                    throw new Error(`Event '${fn.name}' exists.`)
                 }
+                events[fn.name] = fn.bind(this, ...args)
             },
             // 单次
-            'once': {
-                value: (fn, ...args) => {
-                    if (events[fn.name]) {
-                        throw new Error(`Event '${fn.name}' exists.`)
-                    }
-                    events[fn.name] = () => {
-                        fn.call(this, ...args)
-                        delete events[fn.name]
-                    }
+            once: (fn, ...args) => {
+                if (events[fn.name]) {
+                    throw new Error(`Event '${fn.name}' exists.`)
+                }
+                events[fn.name] = () => {
+                    fn.call(this, ...args)
+                    delete events[fn.name]
                 }
             },
             // 删除
-            'del': {
-                value: name => {
-                    if (!events[name]) {
-                        throw new Error(`Event '${name}' doesn't exist.`)
-                    }
-                    delete events[name]
+            del: name => {
+                if (!events[name]) {
+                    throw new Error(`Event '${name}' doesn't exist.`)
                 }
+                delete events[name]
             },
             // 遍历
-            'travel': {
-                value: callback => {
-                    for (const key in events) {
-                        callback(events[key])
-                    }
+            travel: callback => {
+                for (const key in events) {
+                    callback(events[key])
                 }
             }
-        })
+        }
     }
 
     // 几何
     geometry() {
-        // 初始化方法
         return {
             intersect: (spriteA, spriteB) => {
                 const x1 = spriteA.x
@@ -339,6 +302,7 @@ export class Stage {
                 }
                 return true
             },
+            // 包含
             contain: (spriteA, spriteB) => {
                 const x1 = spriteA.x
                 const y1 = spriteA.y
@@ -357,6 +321,7 @@ export class Stage {
                 }
                 return true
             },
+            // 在上面
             above: (sprite1, sprite2) => {
                 if (sprite1.y - sprite1.height <= sprite2 && sprite1.x >= sprite2.x && sprite1.x <= sprite2.x + sprite2.width) {
                     return true
@@ -382,47 +347,42 @@ export class Stage {
 
         let stop = false
 
-        // 初始化方法
-        return Object.defineProperties({}, {
+        return {
             // 刷新
-            'refresh': {
-                value: () => {
-                    if (stop) { return }
+            refresh: () => {
+                if (stop) { return }
 
-                    // 清除canvas
-                    Game.context.clearRect(0, 0, Game.width, Game.height)
+                // 清除canvas
+                Game.context.clearRect(0, 0, Game.width, Game.height)
 
-                    // 获取镜头数据
-                    let camera = this.camera.get()
+                // 获取镜头数据
+                let camera = this.camera.get()
 
-                    // 执行场景事件
-                    this.event.travel(event => {
-                        event.call(this)
-                    })
+                // 执行场景事件
+                this.event.travel(event => {
+                    event.call(this)
+                })
 
-                    // 执行场景精灵渲染和事件
-                    this.sprite.travel(sprite => {
-                        spriteExecute(sprite, camera)
-                    })
+                // 执行场景精灵渲染和事件
+                this.sprite.travel(sprite => {
+                    spriteExecute(sprite, camera)
+                })
 
-                    // 执行全局精灵渲染和事件
-                    Game.sprite.travel(sprite => {
-                        spriteExecute(sprite, camera)
-                    })
+                // 执行全局精灵渲染和事件
+                Game.sprite.travel(sprite => {
+                    spriteExecute(sprite, camera)
+                })
 
-                    window.requestAnimationFrame(this.execute.refresh)
-                }
+                window.requestAnimationFrame(this.execute.refresh)
             },
             // 销毁
-            'destory': {
-                value: () => {
-                    // 退出循环
-                    stop = true
+            destory: () => {
+                // 退出循环
+                stop = true
 
-                    // 清空场景精灵
-                    this.sprite.delAll()
-                }
+                // 清空场景精灵
+                this.sprite.delAll()
             }
-        })
+        }
     }
 }

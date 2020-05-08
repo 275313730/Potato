@@ -81,12 +81,10 @@ export class Sprite {
             this[key] = data[key]
         }
 
-        // 设置实例方法
+        // 设置实例事件
         for (const key in methods) {
             this[key] = methods[key]
         }
-
-        delete this.setProperty
     }
 
     // 绘制
