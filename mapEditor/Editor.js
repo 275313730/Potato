@@ -1,28 +1,13 @@
 class Editor {
-    static init() {
-        this.canvas = document.querySelector('#app')
-        this.context = this.canvas.getContext('2d')
-        this.drawPick()
-    }
-
     // 创建新地图
     static createMap(node) {
         this.pixel = pixel.value
-        this.canvas.setAttribute('width', mapColumn.value * pixel.value)
-        this.canvas.setAttribute('height', mapRow.value * pixel.value)
 
-        this.relCanvas = this.canvas.cloneNode()
-        this.relContext = this.relCanvas.getContext('2d')
+        this.setCanvas(mapColumn.value * pixel.value, mapRow.value * pixel.value)
+
+        this.context.strokeRect(0, 0, this.pixel, this.pixel)
 
         this.drawPick()
-
-        window.addEventListener('keypress', e => {
-            if (e.key === 'd') {
-                this.draw()
-            } else if (e.key === 'c') {
-                this.clear()
-            }
-        })
 
         node.parentNode.parentNode.removeChild(node.parentNode)
     }
@@ -32,46 +17,39 @@ class Editor {
         const img = new Image()
         img.onload = () => {
             this.pixel = pixel.value
-            this.canvas.setAttribute('width', img.width)
-            this.canvas.setAttribute('height', img.height)
 
-            this.relCanvas = this.canvas.cloneNode()
-            this.relContext = this.relCanvas.getContext('2d')
+            this.setCanvas(img.width, img.height)
 
             this.relContext.drawImage(img, 0, 0)
 
-            const ctx = this.context
-            ctx.drawImage(img, 0, 0)
-
-            ctx.strokeRect(0, 0, this.pixel, this.pixel)
+            this.context.drawImage(img, 0, 0)
+            this.context.strokeRect(0, 0, this.pixel, this.pixel)
 
             this.drawPick()
 
-            window.addEventListener('keypress', e => {
-                if (e.key === 'd') {
-                    this.draw()
-                } else if (e.key === 'c') {
-                    this.clear()
-                }
-            })
-
             obj.parentNode.parentNode.removeChild(obj.parentNode)
         }
-        img.src = getObjectURL(obj.files[0])
+        img.src = this.getObjectURL(obj.files[0])
+    }
 
-        //建立一個可存取到該file的url
-        function getObjectURL(file) {
-            var url = null;
-            // 下面函数执行的效果是一样的，只是需要针对不同的浏览器执行不同的 js 函数而已
-            if (window.createObjectURL != undefined) { // basic
-                url = window.createObjectURL(file);
-            } else if (window.URL != undefined) { // mozilla(firefox)
-                url = window.URL.createObjectURL(file);
-            } else if (window.webkitURL != undefined) { // webkit or chrome
-                url = window.webkitURL.createObjectURL(file);
+    // 设置画布属性
+    static setCanvas(width, height) {
+        this.canvas = document.querySelector('#app')
+        this.context = this.canvas.getContext('2d')
+
+        this.canvas.setAttribute('width', width)
+        this.canvas.setAttribute('height', height)
+
+        this.relCanvas = this.canvas.cloneNode()
+        this.relContext = this.relCanvas.getContext('2d')
+
+        window.addEventListener('keypress', e => {
+            if (e.key === 'd') {
+                this.draw()
+            } else if (e.key === 'c') {
+                this.clear()
             }
-            return url;
-        }
+        })
     }
 
     // 绘制区域选取
@@ -112,21 +90,22 @@ class Editor {
 
             obj.parentNode.parentNode.removeChild(obj.parentNode)
         }
-        img.src = getObjectURL(obj.files[0])
+        img.src = this.getObjectURL(obj.files[0])
 
-        //建立一個可存取到該file的url
-        function getObjectURL(file) {
-            var url = null;
-            // 下面函数执行的效果是一样的，只是需要针对不同的浏览器执行不同的 js 函数而已
-            if (window.createObjectURL != undefined) { // basic
-                url = window.createObjectURL(file);
-            } else if (window.URL != undefined) { // mozilla(firefox)
-                url = window.URL.createObjectURL(file);
-            } else if (window.webkitURL != undefined) { // webkit or chrome
-                url = window.webkitURL.createObjectURL(file);
-            }
-            return url;
+    }
+
+    // 获取file的url
+    static getObjectURL(file) {
+        var url = null;
+        // 下面函数执行的效果是一样的，只是需要针对不同的浏览器执行不同的 js 函数而已
+        if (window.createObjectURL != undefined) { // basic
+            url = window.createObjectURL(file);
+        } else if (window.URL != undefined) { // mozilla(firefox)
+            url = window.URL.createObjectURL(file);
+        } else if (window.webkitURL != undefined) { // webkit or chrome
+            url = window.webkitURL.createObjectURL(file);
         }
+        return url;
     }
 
     // 素材区域选取
@@ -150,18 +129,19 @@ class Editor {
     static draw() {
         const pixel = this.pixel
         this.relContext.drawImage(this.asset, this.assetColumn * pixel, this.assetRow * pixel, pixel, pixel, this.drawColumn * pixel, this.drawRow * pixel, pixel, pixel)
-
-        const imgData = this.relContext.getImageData(0, 0, this.canvas.getAttribute('width'), this.canvas.getAttribute('height'))
-
-        this.context.putImageData(imgData, 0, 0)
-
-        this.context.strokeRect(this.drawColumn * pixel, this.drawRow * pixel, pixel, pixel)
+        this.copy()
     }
 
     // 擦除
     static clear() {
         const pixel = this.pixel
         this.relContext.clearRect(this.drawColumn * pixel, this.drawRow * pixel, pixel, pixel)
+        this.copy()
+    }
+
+    // 拷贝画布
+    static copy() {
+        const pixel = this.pixel
 
         const imgData = this.relContext.getImageData(0, 0, this.canvas.getAttribute('width'), this.canvas.getAttribute('height'))
 
@@ -191,8 +171,3 @@ class Editor {
         }
     }
 }
-
-Editor.init()
-
-
-
