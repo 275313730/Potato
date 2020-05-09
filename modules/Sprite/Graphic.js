@@ -3,6 +3,16 @@ import { Game } from "../Game/Game.js"
 export function graphic(unit) {
     // 执行函数
     let executor = null
+    // 设置尺寸
+    let setSize = (width, height, sameSize) => {
+        unit.drawWidth = width
+        unit.drawHeight = height
+
+        if (sameSize) {
+            unit.width = width
+            unit.height = height
+        }
+    }
     // 绘制图片
     let drawImage = image => {
         const context = Game.context
@@ -61,12 +71,11 @@ export function graphic(unit) {
             executor = () => callback.call(unit, Game.context)
         },
         // 图片
-        image(name) {
+        image(name, sameSize = true) {
             // 获取图片数据
             let image = Game.image.get(name)
 
-            unit.width = image.width
-            unit.height = image.height
+            setSize(image.width, image.height, sameSize)
 
             // 绘制函数
             executor = () => {
@@ -133,13 +142,8 @@ export function graphic(unit) {
             // 获取动画数据
             const animation = Game.animation.get(id, name)
 
-            unit.drawWidth = animation.width
-            unit.drawHeight = animation.image.height
+            setSize(animation.width, animation.image.height, sameSize)
 
-            if (sameSize) {
-                unit.width = unit.drawWidth
-                unit.height = unit.drawHeight
-            }
 
             // 只读属性
             let playing = true,
