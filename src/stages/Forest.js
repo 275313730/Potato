@@ -1,4 +1,5 @@
 // modules
+import { Game } from "../../modules/Game/Game.js";
 import { Sprite } from "../../modules/Sprite/Sprite.js";
 
 // sprites
@@ -98,7 +99,7 @@ export function forest(mapId, playerX) {
             // 根据地图id载入不同的事件
             if (mapId % 2 === 1) {
                 this.event.add(shoot, newPlayer)
-                this.event.once(warning, newPlayer)
+                this.event.once(warning, newPlayer, Game.unit.find('text'))
             } else {
                 this.event.add(addNpc, newPlayer)
             }

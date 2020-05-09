@@ -1,5 +1,4 @@
 import { Game } from "../Game/Game.js"
-import { Sprite } from "../Sprite/Sprite.js"
 
 export function camera(stage) {
     let camera = {
@@ -31,7 +30,7 @@ export function camera(stage) {
 
         // 禁用精灵
         if (disable !== false) {
-            Sprite.unit.travel(unit => {
+            Game.unit.travel(unit => {
                 unit.disabled = true
             })
         }
@@ -51,7 +50,7 @@ export function camera(stage) {
 
                 // 启用精灵
                 if (disable !== false) {
-                    Sprite.unit.travel(unit => {
+                    Game.unit.travel(unit => {
                         unit.disabled = false
                     })
                 }

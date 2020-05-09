@@ -1,8 +1,5 @@
-import { Game } from "../../modules/Game/Game.js"
-
-export function warning(player) {
+export function warning(player, text) {
     // 添加警告文字
-    const text = Game.unit.find('text')
     text.txt = `Click to shoot.`
 
     // 相机移动
