@@ -3,6 +3,10 @@ export function player(x) {
         config: {
             id: 'player',
             x,
+            width: 30,
+            height: 30,
+            offsetLeft: -18,
+            offsetTop: -16,
             direction: x === 10 ? 'right' : 'left',
             layer: 2,
         },
@@ -16,17 +20,17 @@ export function player(x) {
             // 移动
             move(direction) {
                 this.direction = direction
-                this.graphic.animation(this.id, 'walk')
+                this.graphic.animation(this.id, 'walk', false)
                 this.walking = true
             },
             // 停止
             stop() {
-                this.graphic.animation(this.id, 'idle')
+                this.graphic.animation(this.id, 'idle', false)
                 this.walking = false
             }
         },
         created() {
-            this.graphic.animation(this.id, 'idle')
+            this.stop()
             this.userEvent.add(keyDown, 'keydown', true)
             this.userEvent.add(keyUp, 'keyup')
             this.userEvent.add(mouseDown, 'mousedown', true)

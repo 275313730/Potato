@@ -11,14 +11,15 @@ export function loading(nextStage) {
                 const roles = [
                     {
                         id: 'player',
-                        width: 40,
+                        width: 78,
+                        interval: 8,
                         animations: [
                             {
-                                url: 'spritesheets/bearded-idle.png',
+                                url: 'spritesheets/kingHuman-idle.png',
                                 name: 'idle'
                             },
                             {
-                                url: 'spritesheets/bearded-walk.png',
+                                url: 'spritesheets/kingHuman-walk.png',
                                 name: 'walk'
                             }
                         ]
@@ -95,7 +96,7 @@ export function loading(nextStage) {
                     if (role.id === 'hyena') {
                         Game.animation.addRole(role.id, role.width, role.interval, true)
                     } else {
-                        Game.animation.addRole(role.id, role.width)
+                        Game.animation.addRole(role.id, role.width, role.interval)
                     }
                     role.animations.forEach(animation => {
                         Game.load.animation(role.id, animation.name, animation.url)

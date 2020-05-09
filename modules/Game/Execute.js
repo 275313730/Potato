@@ -18,6 +18,5 @@ export function execute() {
                 currentStage = new Stage(newStage) 
             })
         }
-
     }
 }

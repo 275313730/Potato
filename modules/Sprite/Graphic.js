@@ -129,12 +129,17 @@ export function graphic(unit) {
             }
         },
         // 动画
-        animation(id, name, interval) {
+        animation(id, name, sameSize = true) {
             // 获取动画数据
             const animation = Game.animation.get(id, name)
 
-            unit.width = animation.width
-            unit.height = animation.image.height
+            unit.drawWidth = animation.width
+            unit.drawHeight = animation.image.height
+
+            if (sameSize) {
+                unit.width = unit.drawWidth
+                unit.height = unit.drawHeight
+            }
 
             // 只读属性
             let playing = true,
@@ -155,7 +160,7 @@ export function graphic(unit) {
                 },
                 // 动画间隔帧
                 'animationInterval': {
-                    value: interval || animation.interval || Game.animationInterval
+                    value: animation.interval || Game.animationInterval
                 },
                 // 当前间隔帧
                 'currInterval': {

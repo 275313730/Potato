@@ -24,7 +24,7 @@ export function npc(id, x, textArr) {
         },
         created() {
             this.event.add(move)
-            this.graphic.animation(this.id, 'idle')
+            this.stop()
             this.y = this.game.height - this.height
         }
     }
