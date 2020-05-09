@@ -16,23 +16,23 @@ export function App(e) {
     // 背景图片
     const images = [
         {
-            id: 'sky',
+            name: 'sky',
             url: 'background/sky.png',
         },
         {
-            id: 'mounFar',
+            name: 'mounFar',
             url: 'background/moun-far.png',
         },
         {
-            id: 'mounNear',
+            name: 'mounNear',
             url: 'background/moun-near.png',
         },
         {
-            id: 'treeFar',
+            name: 'treeFar',
             url: 'background/tree-far.png',
         },
         {
-            id: 'treeNear',
+            name: 'treeNear',
             url: 'background/tree-near.png',
         }
     ]
@@ -40,11 +40,11 @@ export function App(e) {
     // 音频
     const audios = [
         {
-            id: 'forest',
+            name: 'forest',
             url: 'music/forest.mp3'
         },
         {
-            id: 'select',
+            name: 'select',
             url: 'sound/select.mp3'
         }
     ]
@@ -64,17 +64,17 @@ export function App(e) {
 
     // 载入图片
     images.forEach(item => {
-        Game.load.image(item.id, item.url)
+        Game.load.image('bg', item.name, item.url)
     })
 
     // 载入音频
     audios.forEach(audio => {
-        Game.load.audio(audio.id, audio.url)
+        Game.load.audio('audio', audio.name, audio.url)
     })
 
     // 调试模式
     Game.test = true
 
     // 创建场景
-    Game.execute.switchStage(title()) 
+    Game.execute.switchStage(title())
 }

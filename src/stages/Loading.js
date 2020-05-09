@@ -70,6 +70,7 @@ export function loading(nextStage) {
                         id: 'hyena',
                         width: 48,
                         interval: 10,
+                        flip: true,
                         animations: [
                             {
                                 url: 'spritesheets/hyena-idle.png',
@@ -93,22 +94,17 @@ export function loading(nextStage) {
 
                 // 载入动画
                 roles.forEach(role => {
-                    if (role.id === 'hyena') {
-                        Game.animation.addRole(role.id, role.width, role.interval, true)
-                    } else {
-                        Game.animation.addRole(role.id, role.width, role.interval)
-                    }
                     role.animations.forEach(animation => {
-                        Game.load.animation(role.id, animation.name, animation.url)
+                        Game.load.animation(role.id, animation.name, animation.url, role.width, role.interval, role.flip)
                     })
                 })
 
                 // 载入粒子图片
-                Game.load.image('twinkling', 'particle/twinkling.png')
+                Game.load.image('bg', 'twinkling', 'particle/twinkling.png')
 
                 // 载入音频
-                Game.load.audio('forest', 'music/forest.mp3')
-                Game.load.audio('shoot', 'sound/shoot.mp3')
+                Game.load.audio('audio', 'forest', 'music/forest.mp3')
+                Game.load.audio('audio', 'shoot', 'sound/shoot.mp3')
 
                 // 载入提示文本
                 new Sprite(text())

@@ -19,7 +19,7 @@ export function titleFrame() {
         methods: {
             // 重置
             reset() {
-                Game.sound.play('select', 0.8)
+                Game.sound.play('audio', 'select', 0.8)
                 this.arrow = '→'
                 this.count = 0
                 this.arrowY = 10 + this.selection * 18

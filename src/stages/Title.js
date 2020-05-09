@@ -18,7 +18,7 @@ export function title() {
             new Sprite(titleFrame())
 
             // 播放音频
-            Game.music.play('forest')
+            Game.music.play('audio', 'forest')
         }
     }
 }

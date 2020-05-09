@@ -5,8 +5,14 @@ export function graphic(unit) {
     let executor = null
     // 设置尺寸
     let setSize = (width, height, sameSize) => {
-        unit.drawWidth = width
-        unit.drawHeight = height
+        Object.defineProperties(unit, {
+            'drawWidth': {
+                value: width
+            },
+            'drawHeight': {
+                value: height
+            }
+        })
 
         if (sameSize) {
             unit.width = width
@@ -24,11 +30,14 @@ export function graphic(unit) {
             width: unit.drawWidth,
             height: unit.drawHeight,
             scale: unit.scale,
+            alpha: unit.alpha
         }
     }
     // 绘制图片
-    let drawImage = image => {
-        const { context, relX, y, offsetLeft, offsetTop, width, height, scale } = getData()
+    let drawImage = (image) => {
+        const { context, relX, y, offsetLeft, offsetTop, width, height, scale, alpha } = getData()
+
+        context.globalAlpha = alpha
 
         // 图片方向
         if (unit.direction === 'right') {
@@ -39,7 +48,6 @@ export function graphic(unit) {
             const tranlateX = Game.width - unit.width - relX + offsetLeft
             const tranlateY = Math.floor(y + offsetTop)
             context.drawFlip(Game.width, () => {
-                // 绘制图片的数据要用图片属性
                 // 因为粒子精灵是无宽度和高度的，绘制出来的图片它与自身宽高和精灵的scale有关
                 context.drawImage(image, 0, 0, width, height, tranlateX, tranlateY, width * scale, height * scale)
             })
@@ -47,7 +55,9 @@ export function graphic(unit) {
     }
     // 绘制动画
     let drawAnimation = (image, options) => {
-        const { context, relX, y, offsetLeft, offsetTop, width, height, scale } = getData()
+        const { context, relX, y, offsetLeft, offsetTop, width, height, scale, alpha } = getData()
+
+        context.globalAlpha = alpha
 
         // 图片方向
         if (!options.flip && unit.direction === 'right' || options.flip && unit.direction === 'left') {
@@ -71,9 +81,9 @@ export function graphic(unit) {
             executor = () => callback.call(unit, Game.context)
         },
         // 图片
-        image(name, sameSize = true) {
+        image(id, name, sameSize = true) {
             // 获取图片数据
-            let image = Game.image.get(name)
+            const image = Game.group.get(id, name)
 
             setSize(image.width, image.height, sameSize)
 
@@ -84,11 +94,10 @@ export function graphic(unit) {
                 // 测试
                 Game.test && Game.context.test(unit.relX, unit.y, unit.width, unit.height)
             }
-
         },
         // 粒子
-        particle(name, interval = 60, alphaRange, scaleRange) {
-            let image = Game.image.get(name)
+        particle(id, name, interval = 60, alphaRange, scaleRange) {
+            const image = Game.group.get(id, name)
 
             // 设置精灵尺寸(粒子精灵没有宽度和高度)
             Object.defineProperties(unit, {
@@ -97,6 +106,12 @@ export function graphic(unit) {
                 },
                 'height': {
                     value: 0
+                },
+                'drawWidth': {
+                    value: image.width
+                },
+                'drawHeight': {
+                    value: image.height
                 }
             })
 
@@ -140,7 +155,7 @@ export function graphic(unit) {
         // 动画
         animation(id, name, sameSize = true) {
             // 获取动画数据
-            const animation = Game.animation.get(id, name)
+            const animation = Game.group.get(id, name)
 
             setSize(animation.width, animation.image.height, sameSize)
 

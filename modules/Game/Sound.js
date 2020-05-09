@@ -1,10 +1,10 @@
-export function sound(audio) {
+export function sound(group) {
     return {
-        play(name, volume, alone) {
+        play(id, name, volume, alone) {
             if (alone) {
-                audio.get(name).play()
+                group.get(id, name).play()
             } else {
-                let newSound = audio.get(name).cloneNode()
+                let newSound = group.get(id, name).cloneNode()
                 newSound.volume = volume || 1
                 newSound.play()
                 newSound.addEventListener('ended', () => {

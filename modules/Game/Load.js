@@ -3,28 +3,28 @@ export function load(Game) {
 
     return {
         // 载入图片
-        image(name, url) {
-            if (Game.image.get(name)) { return }
+        image(id, name, url) {
+            if (Game.group.get(id, name)) { return }
             const image = new Image()
             image.src = Game.imagePath + url
 
             const newPromise = new Promise(resolve => {
                 image.onload = () => {
-                    Game.image.add(name, image)
+                    Game.group.add(id, name, image)
                     resolve(true)
                 }
             })
             loadings.push(newPromise)
         },
         // 载入动画
-        animation(id, name, url) {
-            if (Game.animation.get(id, name)) { return }
+        animation(id, name, url, width, height, interval, flip) {
+            if (Game.group.get(id, name)) { return }
             const image = new Image()
             image.src = Game.imagePath + url
 
             const newPromise = new Promise(resolve => {
                 image.onload = () => {
-                    Game.animation.addAnimation(id, name, image)
+                    Game.group.add(id, name, { image, width, height, interval, flip })
                     resolve(true)
                 }
             })
@@ -32,9 +32,9 @@ export function load(Game) {
             loadings.push(newPromise)
         },
         // 载入音频
-        audio(name, url) {
-            if (Game.audio.get(name)) { return }
-            Game.audio.add(name, new Audio(Game.audioPath + url))
+        audio(id, name, url) {
+            if (Game.group.get(id, name)) { return }
+            Game.group.add(id, name, new Audio(Game.audioPath + url))
         },
         allLoaded(callback) {
             if (loadings.length > 0) {

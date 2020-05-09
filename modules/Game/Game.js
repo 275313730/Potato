@@ -1,11 +1,9 @@
 "use strict"
 import { load } from "./Load.js"
-import { image } from "./Image.js";
-import { animation } from "./Animation.js";
-import { audio } from "./Audio.js"
 import { music } from "./Music.js";
 import { sound } from "./Sound.js";
 import { execute } from "./Execute.js";
+import { group } from "./Group.js";
 
 export class Game {
     // 初始化Game类
@@ -57,11 +55,9 @@ export class Game {
 
         // 初始化实例方法
         this.load = load(this)
-        this.image = image()
-        this.animation = animation(this.animationInterval)
-        this.audio = audio()
-        this.music = music(this.audio)
-        this.sound = sound(this.audio)
+        this.group = group()
+        this.music = music(this.group)
+        this.sound = sound(this.group)
         this.execute = execute()
 
         // 设置body属性
