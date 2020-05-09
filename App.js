@@ -1,10 +1,8 @@
-// modules
+// Modules
 import { Game } from "./modules/Game/Game.js";
 
-// stages
+// Title
 import { title } from "./src/stages/Title.js";
-import { forest } from "./src/stages/Forest.js";
-import { loading } from "./src/stages/Loading.js";
 
 // 交互使音频可自动播放
 window.addEventListener('keydown', App)
@@ -61,12 +59,6 @@ export function App(e) {
         path: {
             image: './src/assets/imgs/',
             audio: './src/assets/audio/'
-        },
-        // 载入场景
-        stages: {
-            title,
-            loading,
-            forest
         }
     })
 
@@ -84,5 +76,5 @@ export function App(e) {
     Game.test = true
 
     // 创建场景
-    Game.stage.switch('title')
+    Game.execute.switchStage(title()) 
 }

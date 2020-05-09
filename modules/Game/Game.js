@@ -1,11 +1,11 @@
 "use strict"
-import { stage } from "./Stage.js";
 import { load } from "./Load.js"
 import { image } from "./Image.js";
 import { animation } from "./Animation.js";
 import { audio } from "./Audio.js"
 import { music } from "./Music.js";
 import { sound } from "./Sound.js";
+import { execute } from "./Execute.js";
 
 export class Game {
     // 初始化Game类
@@ -62,7 +62,7 @@ export class Game {
         this.audio = audio()
         this.music = music(this.audio)
         this.sound = sound(this.audio)
-        this.stage = stage(this, options.stages)
+        this.execute = execute()
 
         // 设置body属性
         document.body.style.userSelect = 'none'

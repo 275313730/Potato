@@ -6,16 +6,11 @@ import { geometry } from "./Geometry.js";
 import { execute } from "./Execute.js";
 
 export class Stage {
-    constructor(options, callback) {
-        // 判断是否传入id
-        if (options.id == null) {
-            throw new Error(`Stage need an id.`)
-        }
-
+    constructor(options) {
         // 初始化场景数据
-        this.id = options.id
-        Stage.width = options.width || Game.width
-        Stage.height = options.height || Game.height
+        const config = options.config
+        Stage.width = (config && config.width) || Game.width
+        Stage.height = (config && config.height) || Game.height
         Object.defineProperties(this, {
             'width': {
                 get() {
@@ -36,9 +31,13 @@ export class Stage {
         this.execute = execute(this)
 
         // 执行回调函数
-        callback && callback.call(this)
+        options.created && options.created.call(this)
 
         // 进入循环
         this.execute.start()
     }
 }
+
+
+
+

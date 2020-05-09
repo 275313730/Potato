@@ -1,5 +1,4 @@
 // modules
-import { Stage } from "../../modules/Stage/Stage.js";
 import { Sprite } from "../../modules/Sprite/Sprite.js";
 
 // sprites
@@ -56,51 +55,53 @@ export function forest(mapId, playerX) {
         }
     ]
 
-    return new Stage({ id: mapId }, function () {
-        // 载入背景
-        bgs.forEach(bg => {
-            new Sprite(backGround(bg.id, bg.fixed))
-            if (bg.fixed === 0) {
-                this.width = Sprite.unit.find(bg.id).width
-            }
-        })
-
-        // 载入地图名
-        new Sprite(mapName(mapId))
-
-        // 载入玩家
-        const newPlayer = new Sprite(player(playerX || 10))
-        this.camera.follow(newPlayer)
-
-        // 载入对话框
-        const newDialog = new Sprite(dialog())
-
-        let npcGroup = []
-        if (mapId % 2 === 0) {
-            // 载入npc
-            npcs.forEach(n => {
-                npcGroup.push(new Sprite(npc(n.id, n.x, n.textArr)))
+    return {
+        created() {
+            // 载入背景
+            bgs.forEach(bg => {
+                new Sprite(backGround(bg.id, bg.fixed))
+                if (bg.fixed === 0) {
+                    this.width = Sprite.unit.find(bg.id).width
+                }
             })
-            this.event.add(talk, newPlayer, newDialog, npcGroup)
-        } else {
-            // 载入敌人
-            for (let i = 0; i < 3; i++) {
-                new Sprite(enemy('hyena', i, newPlayer))
+
+            // 载入地图名
+            new Sprite(mapName(mapId))
+
+            // 载入玩家
+            const newPlayer = new Sprite(player(playerX || 10))
+            this.camera.follow(newPlayer)
+
+            // 载入对话框
+            const newDialog = new Sprite(dialog())
+
+            let npcGroup = []
+            if (mapId % 2 === 0) {
+                // 载入npc
+                npcs.forEach(n => {
+                    npcGroup.push(new Sprite(npc(n.id, n.x, n.textArr)))
+                })
+                this.event.add(talk, newPlayer, newDialog, npcGroup)
+            } else {
+                // 载入敌人
+                for (let i = 0; i < 3; i++) {
+                    new Sprite(enemy('hyena', i, newPlayer))
+                }
+            }
+
+            // 载入粒子精灵
+            new Sprite(particle('test', 'twinkling', 100, 50))
+
+            // 载入事件
+            this.event.add(enterNewStage, mapId)
+
+            // 根据地图id载入不同的事件
+            if (mapId % 2 === 1) {
+                this.event.add(shoot)
+                this.event.once(warning)
+            } else {
+                this.event.add(addNpc)
             }
         }
-
-        // 载入粒子精灵
-        new Sprite(particle('test', 'twinkling', 100, 50))
-
-        // 载入事件
-        this.event.add(enterNewStage, mapId)
-
-        // 根据地图id载入不同的事件
-        if (mapId % 2 === 1) {
-            this.event.add(shoot)
-            this.event.once(warning)
-        } else {
-            this.event.add(addNpc)
-        }
-    })
+    }
 }

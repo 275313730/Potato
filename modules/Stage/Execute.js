@@ -40,7 +40,7 @@ export function execute(stage) {
     return {
         // 刷新
         start() {
-           refresh()
+            refresh()
         },
         // 销毁
         destory() {

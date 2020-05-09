@@ -1,4 +1,6 @@
 import { Game } from "../../modules/Game/Game.js";
+import { Stage } from "../../modules/Stage/Stage.js";
+import { loading } from "../stages/Loading.js";
 
 export function titleFrame() {
     return {
@@ -34,8 +36,8 @@ export function titleFrame() {
 
     // 绘制
     function draw(ctx) {
-        const w = this.game.width 
-        const h = this.game.height 
+        const w = this.game.width
+        const h = this.game.height
 
         // drawTitle
         ctx.fillStyle = '#CD2626'
@@ -73,7 +75,7 @@ export function titleFrame() {
                 break
             case ' ':
                 if (this.selection === 0) {
-                    Game.stage.switch('loading', 'forest')
+                    Game.execute.switchStage(loading('forest'))
                 } else {
                     this.userEvent.delAll()
                     this.egg = 'Suprise!'

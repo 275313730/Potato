@@ -95,7 +95,6 @@ export class Sprite {
         this.graphic = graphic(this)
         this.event = event(this)
         this.userEvent = userEvent(this)
-
         Sprite.unit.add(this)
 
         // 创建实例
