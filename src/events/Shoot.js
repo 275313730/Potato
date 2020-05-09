@@ -2,9 +2,8 @@ import { Game } from "../../modules/Game/Game.js"
 import { bullet } from "../sprites/Bullet.js";
 import { Sprite } from "../../modules/Sprite/Sprite.js";
 
-export function shoot() {
-    const player = Sprite.unit.find('player'),
-        thisBullet = Sprite.unit.find('bullet')
+export function shoot(player) {
+    const thisBullet = Game.unit.find('bullet')
     if (!player) { return }
 
     // 添加子弹
@@ -23,11 +22,11 @@ export function shoot() {
         // 子弹的相对横坐标大于游戏宽度或小于等于0时
         if (thisBullet.relX >= Game.width || thisBullet.relX <= 0) {
             // 删除子弹
-            Sprite.unit.del(thisBullet.id)
+            Game.unit.del(thisBullet.id)
         }
 
         // 获取敌人
-        const enemies = Sprite.unit.filter(unit => {
+        const enemies = Game.unit.filter(unit => {
             return unit.type === 'enemy'
         })
 
@@ -36,7 +35,7 @@ export function shoot() {
             const enemy = enemies[key]
             if (!enemy.disabled && this.geometry.intersect(thisBullet, enemy)) {
                 // 删除子弹
-                Sprite.unit.del(thisBullet.id)
+                Game.unit.del(thisBullet.id)
 
                 // 击中后禁用
                 enemy.disabled = true
@@ -45,7 +44,7 @@ export function shoot() {
                 enemy.graphic.animation(enemy.name, 'death')
                     // 动画完成后销毁精灵
                     .onComplete = () => {
-                        Sprite.unit.del(enemy.id)
+                        Game.unit.del(enemy.id)
                     }
 
                 // 停止遍历

@@ -3,6 +3,7 @@ import { asset } from "./Asset.js";
 import { music } from "./Music.js";
 import { sound } from "./Sound.js";
 import { execute } from "./Execute.js";
+import { unit } from "./Unit.js";
 
 export class Game {
     // 初始化Game类
@@ -56,6 +57,7 @@ export class Game {
         this.asset = asset(this.imagePath, this.audioPath)
         this.music = music(this.asset)
         this.sound = sound(this.asset)
+        this.unit = unit()
         this.execute = execute()
 
         // 设置body属性

@@ -1,10 +1,4 @@
-import { Sprite } from "../../modules/Sprite/Sprite.js"
-
-export function talk(player,dialog) {
-    const npcs = Sprite.unit.filter(sprite => {
-        return sprite.type === 'npc'
-    })
-
+export function talk(player, dialog, npcs) {
     for (const key in npcs) {
         const npc = npcs[key]
 

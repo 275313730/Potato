@@ -59,9 +59,9 @@ export function forest(mapId, playerX) {
         created() {
             // 载入背景
             bgs.forEach(bg => {
-                new Sprite(backGround(bg.id, bg.fixed))
+                const newbg = new Sprite(backGround(bg.id, bg.fixed))
                 if (bg.fixed === 0) {
-                    this.width = Sprite.unit.find(bg.id).width
+                    this.width = newbg.width
                 }
             })
 
@@ -93,14 +93,14 @@ export function forest(mapId, playerX) {
             new Sprite(particle('test', 'twinkling', 100, 50))
 
             // 载入事件
-            this.event.add(enterNewStage, mapId)
+            this.event.add(enterNewStage, mapId, newPlayer)
 
             // 根据地图id载入不同的事件
             if (mapId % 2 === 1) {
-                this.event.add(shoot)
-                this.event.once(warning)
+                this.event.add(shoot, newPlayer)
+                this.event.once(warning, newPlayer)
             } else {
-                this.event.add(addNpc)
+                this.event.add(addNpc, newPlayer)
             }
         }
     }

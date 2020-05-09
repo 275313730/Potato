@@ -1,5 +1,4 @@
 import { Game } from "../Game/Game.js"
-import { Sprite } from "../Sprite/Sprite.js"
 
 export function execute(stage) {
     function unitExecute(unit, camera) {
@@ -27,8 +26,8 @@ export function execute(stage) {
             event.call(stage)
         })
 
-        // 执行场景精灵渲染和事件
-        Sprite.unit.travel(unit => {
+        // 执行精灵渲染和事件
+        Game.unit.travel(unit => {
             unitExecute(unit, camera)
         })
 
@@ -48,7 +47,7 @@ export function execute(stage) {
             stop = true
 
             // 清空场景精灵
-            Sprite.unit.delAll()
+            Game.unit.delAll()
         }
     }
 }

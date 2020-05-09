@@ -1,5 +1,4 @@
 import { Game } from "../../modules/Game/Game.js";
-import { Stage } from "../../modules/Stage/Stage.js";
 import { loading } from "../stages/Loading.js";
 
 export function titleFrame() {
@@ -19,7 +18,7 @@ export function titleFrame() {
         methods: {
             // 重置
             reset() {
-                Game.sound.play('music', 'select', 0.8)
+                Game.sound.play('default', 'select', 0.8)
                 this.arrow = '→'
                 this.count = 0
                 this.arrowY = 10 + this.selection * 18

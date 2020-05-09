@@ -6,7 +6,7 @@ export function asset(imagePath, audioPath) {
         // 载入图片
         load(options) {
             const type = options.type
-            const group = options.group
+            const group = options.group || 'default'
             const name = options.name
             const url = options.url
 

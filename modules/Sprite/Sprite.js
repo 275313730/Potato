@@ -5,7 +5,6 @@ import { Stage } from "../Stage/Stage.js";
 import { graphic } from "./Graphic.js";
 import { event } from "./Event.js";
 import { userEvent } from "./UserEvent.js";
-import { unit } from "./Unit.js";
 
 export class Sprite {
     constructor(options) {
@@ -91,11 +90,10 @@ export class Sprite {
         }
 
         // 初始化实例方法
-        Sprite.unit = Sprite.unit || unit()
         this.graphic = graphic(this)
         this.event = event(this)
         this.userEvent = userEvent(this)
-        Sprite.unit.add(this)
+        Game.unit.add(this)
 
         // 创建实例
         options.created.call(this)
