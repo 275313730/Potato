@@ -10,7 +10,7 @@ export function loading(nextStage) {
             if (nextStage === 'forest') {
                 const roles = [
                     {
-                        id: 'player',
+                        group: 'player',
                         width: 78,
                         interval: 8,
                         animations: [
@@ -25,7 +25,7 @@ export function loading(nextStage) {
                         ]
                     },
                     {
-                        id: 'woman',
+                        group: 'woman',
                         width: 37,
                         animations: [
                             {
@@ -39,7 +39,7 @@ export function loading(nextStage) {
                         ]
                     },
                     {
-                        id: 'oldman',
+                        group: 'oldman',
                         width: 34,
                         animations: [
                             {
@@ -53,7 +53,7 @@ export function loading(nextStage) {
                         ]
                     },
                     {
-                        id: 'hatman',
+                        group: 'hatman',
                         width: 39,
                         animations: [
                             {
@@ -67,7 +67,7 @@ export function loading(nextStage) {
                         ]
                     },
                     {
-                        id: 'hyena',
+                        group: 'hyena',
                         width: 48,
                         interval: 10,
                         flip: true,
@@ -95,16 +95,37 @@ export function loading(nextStage) {
                 // 载入动画
                 roles.forEach(role => {
                     role.animations.forEach(animation => {
-                        Game.load.animation(role.id, animation.name, animation.url, role.width, role.interval, role.flip)
+                        Game.asset.load({
+                            type: 'animation',
+                            group: role.group,
+                            name: animation.name,
+                            url: animation.url,
+                            width: role.width,
+                            interval: role.interval,
+                            flip: role.flip
+                        })
                     })
                 })
 
                 // 载入粒子图片
-                Game.load.image('bg', 'twinkling', 'particle/twinkling.png')
+                Game.asset.load({
+                    type: 'image',
+                    group: 'bg',
+                    name: 'twinkling',
+                    url: 'particle/twinkling.png'
+                })
 
                 // 载入音频
-                Game.load.audio('audio', 'forest', 'music/forest.mp3')
-                Game.load.audio('audio', 'shoot', 'sound/shoot.mp3')
+                Game.asset.load({
+                    type: 'audio',
+                    name: 'forest',
+                    url: 'music/forest.mp3'
+                })
+                Game.asset.load({
+                    type: 'audio',
+                    name: 'shoot',
+                    url: 'sound/shoot.mp3'
+                })
 
                 // 载入提示文本
                 new Sprite(text())

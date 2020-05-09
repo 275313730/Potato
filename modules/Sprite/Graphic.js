@@ -83,7 +83,7 @@ export function graphic(unit) {
         // 图片
         image(id, name, sameSize = true) {
             // 获取图片数据
-            const image = Game.group.get(id, name)
+            const image = Game.asset.get(id, name)
 
             setSize(image.width, image.height, sameSize)
 
@@ -97,7 +97,7 @@ export function graphic(unit) {
         },
         // 粒子
         particle(id, name, interval = 60, alphaRange, scaleRange) {
-            const image = Game.group.get(id, name)
+            const image = Game.asset.get(id, name)
 
             // 设置精灵尺寸(粒子精灵没有宽度和高度)
             Object.defineProperties(unit, {
@@ -155,7 +155,7 @@ export function graphic(unit) {
         // 动画
         animation(id, name, sameSize = true) {
             // 获取动画数据
-            const animation = Game.group.get(id, name)
+            const animation = Game.asset.get(id, name)
 
             setSize(animation.width, animation.image.height, sameSize)
 

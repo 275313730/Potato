@@ -64,12 +64,22 @@ export function App(e) {
 
     // 载入图片
     images.forEach(item => {
-        Game.load.image('bg', item.name, item.url)
+        Game.asset.load({
+            type: 'image',
+            group: 'bg',
+            name: item.name,
+            url: item.url
+        })
     })
 
     // 载入音频
     audios.forEach(audio => {
-        Game.load.audio('audio', audio.name, audio.url)
+        Game.asset.load({
+            type: 'audio',
+            group: 'music',
+            name: audio.name,
+            url: audio.url
+        })
     })
 
     // 调试模式

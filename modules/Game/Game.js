@@ -1,9 +1,8 @@
 "use strict"
-import { load } from "./Load.js"
+import { asset } from "./Asset.js";
 import { music } from "./Music.js";
 import { sound } from "./Sound.js";
 import { execute } from "./Execute.js";
-import { group } from "./Group.js";
 
 export class Game {
     // 初始化Game类
@@ -48,16 +47,15 @@ export class Game {
         this.mouseDown = false
         // 测试(显示精灵外框)
         this.test = false
-        // 音频路径
-        this.audioPath = options.path ? options.path.audio : ''
         // 图片路径
         this.imagePath = options.path ? options.path.image : ''
+        // 音频路径
+        this.audioPath = options.path ? options.path.audio : ''
 
         // 初始化实例方法
-        this.load = load(this)
-        this.group = group()
-        this.music = music(this.group)
-        this.sound = sound(this.group)
+        this.asset = asset(this.imagePath, this.audioPath)
+        this.music = music(this.asset)
+        this.sound = sound(this.asset)
         this.execute = execute()
 
         // 设置body属性

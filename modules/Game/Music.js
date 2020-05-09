@@ -1,16 +1,16 @@
-export function music(group) {
+export function music(asset) {
     let music = null
 
     return {
         // 播放
-        play(id, name) {
+        play(group, name) {
             // 切换音乐
             if (music) {
-                if (music !== group.get(id, name)) {
+                if (music !== asset.get(group, name)) {
                     music.currentTime = 0
                 }
             } else {
-                music = group.get(id, name)
+                music = asset.get(group, name)
             }
             music.play()
             music.loop = true

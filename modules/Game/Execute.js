@@ -7,7 +7,7 @@ export function execute() {
     return {
         // 切换场景
         switchStage(newStage) {
-            Game.load.allLoaded(() => {
+            Game.asset.allLoaded(() => {
                 // 销毁场景
                 currentStage && currentStage.execute.destory()
 
