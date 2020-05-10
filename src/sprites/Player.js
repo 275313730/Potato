@@ -11,22 +11,40 @@ export function player(x) {
             layer: 2,
         },
         data: {
-            shoot: false,
+            attacking: false,
             speed: 2,
             space: false,
             walking: false,
+            pressing: false
         },
         methods: {
             // 移动
             move(direction) {
+                if (this.attacking) { return }
                 this.direction = direction
                 this.graphics.animation(this.id, 'walk', false)
                 this.walking = true
+                this.pressing = true
             },
             // 停止
             stop() {
+                if (this.attacking) { return }
                 this.graphics.animation(this.id, 'idle', false)
                 this.walking = false
+            },
+            // 攻击
+            attack() {
+                this.stop()
+                this.attacking = true
+                this.graphics.animation(this.id, 'attack', false)
+                    .onComplete = () => {
+                        this.attacking = false
+                        if (this.pressing) {
+                            this.move(this.direction)
+                        } else {
+                            this.stop()
+                        }
+                    }
             }
         },
         created() {
@@ -34,7 +52,6 @@ export function player(x) {
             this.userEvent.add(keyDown, 'keydown', true)
             this.userEvent.add(keyUp, 'keyup')
             this.userEvent.add(mouseDown, 'mousedown', true)
-            this.userEvent.add(mouseUp, 'mouseup')
             this.event.add(walk)
             this.y = this.game.height - this.height
         }
@@ -57,6 +74,7 @@ export function player(x) {
 
     // 键盘松开
     function keyUp(key) {
+        this.pressing = false
         switch (key) {
             case 'd':
                 if (this.direction === 'left') { return }
@@ -72,14 +90,9 @@ export function player(x) {
         }
     }
 
-    // 鼠标按下射击
-    function mouseDown(mouse) {
-        this.shoot = true
-    }
-
-    // 鼠标松开停止
-    function mouseUp() {
-        this.shoot = false
+    // 鼠标按下攻击
+    function mouseDown() {
+        !this.attacking && this.attack()
     }
 
     // 移动

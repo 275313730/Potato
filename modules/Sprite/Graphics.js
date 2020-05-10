@@ -154,7 +154,7 @@ export function graphics(unit) {
             }
         },
         // 动画
-        animation(group = 'default', name, sameSize = true) {
+        animation(group, name, sameSize = true) {
             // 获取动画数据
             const animation = Game.asset.get(group, name)
 

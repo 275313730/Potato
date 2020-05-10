@@ -15,7 +15,7 @@ import { mix } from "../sprites/Mix.js";
 // events
 import { addNpc } from "../events/AddNpc.js";
 import { enterNewStage } from "../events/EnterNewStage.js";
-import { shoot } from "../events/Shoot.js";
+import { attack } from "../events/Attack.js";
 import { talk } from "../events/Talk.js";
 import { warning } from "../events/Warning.js";
 
@@ -101,7 +101,7 @@ export function forest(mapId, playerX) {
 
             // 根据地图id载入不同的事件
             if (mapId % 2 === 1) {
-                this.event.add(shoot, newPlayer)
+                this.event.add(attack, newPlayer)
                 this.event.once(warning, newPlayer, Game.unit.find('text'))
             } else {
                 this.event.add(addNpc, newPlayer)

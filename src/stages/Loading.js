@@ -21,6 +21,10 @@ export function loading(nextStage) {
                             {
                                 url: 'spritesheets/kingHuman-walk.png',
                                 name: 'walk'
+                            },
+                            {
+                                url: 'spritesheets/kingHuman-attack.png',
+                                name: 'attack'
                             }
                         ]
                     },
