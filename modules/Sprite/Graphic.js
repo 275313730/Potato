@@ -273,8 +273,8 @@ export function graphic(unit) {
         unBind() {
             executor = null
         },
-        // 执行
-        execute() {
+        // 渲染
+        render() {
             Game.context.globalAlpha = unit.alpha
             if (executor) {
                 executor()

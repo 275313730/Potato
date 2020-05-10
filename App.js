@@ -76,6 +76,7 @@ export function App(e) {
     audios.forEach(audio => {
         Game.asset.load({
             type: 'audio',
+            group: 'audio',
             name: audio.name,
             url: audio.url
         })
