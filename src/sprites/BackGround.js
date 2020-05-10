@@ -5,7 +5,7 @@ export function backGround(id, fixed) {
             fixed: fixed || 0
         },
         created() {
-            this.graphic.image('bg', id)
+            this.graphics.image('bg', id)
         }
     }
 }

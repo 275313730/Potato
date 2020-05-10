@@ -2,7 +2,7 @@
 import { Game } from "../Game/Game.js";
 import { Stage } from "../Stage/Stage.js";
 
-import { graphic } from "./Graphic.js";
+import { graphics } from "./Graphics.js";
 import { event } from "./Event.js";
 import { userEvent } from "./UserEvent.js";
 
@@ -90,7 +90,7 @@ export class Sprite {
         }
 
         // 初始化实例方法
-        this.graphic = graphic(this)
+        this.graphics = graphics(this)
         this.event = event(this)
         this.userEvent = userEvent(this)
         Game.unit.add(this)

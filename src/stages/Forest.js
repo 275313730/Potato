@@ -10,6 +10,7 @@ import { npc } from "../sprites/Npc.js";
 import { enemy } from "../sprites/Enemy.js";
 import { dialog } from "../sprites/Dialog.js";
 import { particle } from "../sprites/Particle.js";
+import { mix } from "../sprites/Mix.js";
 
 // events
 import { addNpc } from "../events/AddNpc.js";
@@ -92,6 +93,8 @@ export function forest(mapId, playerX) {
 
             // 载入粒子精灵
             new Sprite(particle('test', 'twinkling', 100, 50))
+
+            new Sprite(mix(newPlayer))
 
             // 载入事件
             this.event.add(enterNewStage, mapId, newPlayer)

@@ -29,7 +29,7 @@ export function titleFrame() {
             this.y = this.game.height / 2
             this.userEvent.add(select, 'keydown', true)
             this.event.add(twinkling)
-            this.graphic.shape(draw)
+            this.graphics.draw(draw)
         }
     }
 

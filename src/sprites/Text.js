@@ -11,7 +11,7 @@ export function text() {
         created() {
             this.x = this.game.width / 2
             this.y = this.game.height / 2
-            this.graphic.shape(draw)
+            this.graphics.draw(draw)
         }
     }
 

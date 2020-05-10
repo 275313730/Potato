@@ -118,11 +118,13 @@ export function loading(nextStage) {
                 // 载入音频
                 Game.asset.load({
                     type: 'audio',
+                    group: 'audio',
                     name: 'forest',
                     url: 'music/forest.mp3'
                 })
                 Game.asset.load({
                     type: 'audio',
+                    group: 'audio',
                     name: 'shoot',
                     url: 'sound/shoot.mp3'
                 })

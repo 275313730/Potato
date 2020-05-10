@@ -19,7 +19,7 @@ export function npc(id, x, textArr) {
             // 停止移动
             stop() {
                 this.moveStatus = 0
-                this.graphic.animation(this.id, 'idle')
+                this.graphics.animation(this.id, 'idle')
             }
         },
         created() {
@@ -47,7 +47,7 @@ export function npc(id, x, textArr) {
                 this.moveStatus = 2
                 this.waitTime = 0
                 this.direction = this.speed > 0 ? 'right' : 'left'
-                this.graphic.animation(this.id, 'walk')
+                this.graphics.animation(this.id, 'walk')
             }
         }
 

@@ -1,6 +1,6 @@
 import { Game } from "../Game/Game.js"
 
-export function graphic(unit) {
+export function graphics(unit) {
     // 执行函数
     let executor = null
     // 设置尺寸
@@ -73,11 +73,12 @@ export function graphic(unit) {
             })
         }
     }
+    const mixCanvas = Game.canvas.cloneNode()
 
     // 初始化方法
     return {
-        // 形状(canvas绘制)
-        shape(callback) {
+        // 绘制
+        draw(callback) {
             executor = () => callback.call(unit, Game.context)
         },
         // 图片
@@ -268,6 +269,28 @@ export function graphic(unit) {
 
             // 返回数据
             return options
+        },
+        // 混合
+        mix(type, mixins) {
+            const ctx = mixCanvas.getContext('2d')
+            let mixImage = new Image();
+            if (type === 'static') {
+                ctx.clearRect(0, 0, Game.width, Game.height)
+                mixins(ctx)
+                mixImage.src = mixCanvas.toDataURL("image/png");
+                executor = () => {
+                    Game.context.drawImage(mixImage, 0, 0)
+                    Game.test && Game.context.test(unit.relX, unit.y, unit.width, unit.height)
+                }
+            } else if (type === 'dynamic') {
+                executor = () => {
+                    ctx.clearRect(0, 0, Game.width, Game.height)
+                    mixins(ctx)
+                    mixImage.src = mixCanvas.toDataURL("image/png");
+                    Game.context.drawImage(mixImage, 0, 0)
+                    Game.test && Game.context.test(unit.relX, unit.y, unit.width, unit.height)
+                }
+            }
         },
         // 取消绑定
         unBind() {

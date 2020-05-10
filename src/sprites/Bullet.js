@@ -12,7 +12,7 @@ export function bullet(player) {
         },
         created() {
             this.y = this.game.height - 20
-            this.graphic.shape(draw)
+            this.graphics.draw(draw)
             this.event.add(move)
         }
     }

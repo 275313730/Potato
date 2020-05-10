@@ -20,12 +20,12 @@ export function player(x) {
             // 移动
             move(direction) {
                 this.direction = direction
-                this.graphic.animation(this.id, 'walk', false)
+                this.graphics.animation(this.id, 'walk', false)
                 this.walking = true
             },
             // 停止
             stop() {
-                this.graphic.animation(this.id, 'idle', false)
+                this.graphics.animation(this.id, 'idle', false)
                 this.walking = false
             }
         },

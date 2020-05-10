@@ -14,7 +14,7 @@ export function enemy(name, number, player) {
         },
         created() {
             this.event.add(move)
-            this.graphic.animation(this.name, 'idle')
+            this.graphics.animation(this.name, 'idle')
             this.y = this.game.height - this.height
         }
     }
@@ -30,7 +30,7 @@ export function enemy(name, number, player) {
         // 静止
         if (this.action === 0 && (this.x < player.x || this.x > player.x + this.width / 2)) {
             this.action = 1
-            this.graphic.animation(this.name, 'walk')
+            this.graphics.animation(this.name, 'walk')
         }
 
         // 移动
@@ -38,7 +38,7 @@ export function enemy(name, number, player) {
             // 如果距离小于敌人宽度/2，执行攻击
             if (Math.abs(this.x - player.x) <= this.width / 2) {
                 // 播放攻击动画
-                this.graphic.animation(this.name, 'attack')
+                this.graphics.animation(this.name, 'attack')
                 this.action = 2
                 return
             }

@@ -5,7 +5,7 @@ export function mapName(mapId) {
             y: 15
         },
         created() {
-            this.graphic.shape(draw)
+            this.graphics.draw(draw)
         }
     }
 

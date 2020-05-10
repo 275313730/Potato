@@ -7,7 +7,7 @@ export function execute(stage) {
         unit.relY = unit.y - camera.y * (1 - unit.fixed)
 
         // 绘制画面
-        unit.graphic.render()
+        unit.graphics.render()
 
         // 执行事件
         unit.event.execute()

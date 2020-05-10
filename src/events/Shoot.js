@@ -11,7 +11,7 @@ export function shoot(player) {
         player.shoot = false
 
         // 播放音效
-        Game.sound.play('shoot', 0.5)
+        Game.audio.play('sound', 'audio', 'shoot', 0.5)
 
         // 创建子弹
         new Sprite(bullet(player))
