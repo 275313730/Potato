@@ -49,10 +49,6 @@ export function talk(player, dialog, npcs) {
 
             // 离开一定范围对话直接结束对话
             if (!this.geometry.intersect(player, npc)) {
-                this.camera.shake(2, () => {
-                    this.camera.follow(player)
-                })
-
                 talkStop()
                 break
             }

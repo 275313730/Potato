@@ -95,17 +95,8 @@ export function camera(stage) {
             createMovement(x, y, time, callback)
         },
         // 移动到
-        moveTo(unit, time, callback) {
-            createMovement((unit.x - camera.x) - (Game.width - unit.width) / 2, (unit.y - camera.y), time, callback)
-        },
-        shake(intensity, callback) {
-            this.move(intensity, -intensity, 0, () => {
-                this.move(-intensity, intensity, 0, () => {
-                    this.move(intensity, -intensity, 0, () => {
-                        this.move(-intensity, intensity, 0, callback)
-                    })
-                })
-            })
+        moveTo(x, y, time, callback) {
+            createMovement((x - camera.x) - (Game.width - unit.width) / 2, (y - camera.y), time, callback)
         },
         // 获取镜头
         get() {

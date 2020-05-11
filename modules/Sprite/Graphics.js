@@ -27,15 +27,15 @@ export function graphics(unit) {
             relY: unit.relY,
             offsetLeft: unit.offsetLeft,
             offsetTop: unit.offsetTop,
-            width: unit.drawWidth,
-            height: unit.drawHeight,
+            drawWidth: unit.drawWidth,
+            drawHeight: unit.drawHeight,
             scale: unit.scale,
             alpha: unit.alpha
         }
     }
     // 绘制图片
     let drawImage = (image) => {
-        const { context, relX, relY, offsetLeft, offsetTop, width, height, scale, alpha } = getData()
+        const { context, relX, relY, offsetLeft, offsetTop, drawWidth, drawHeight, scale, alpha } = getData()
 
         context.globalAlpha = alpha
 
@@ -43,19 +43,19 @@ export function graphics(unit) {
         if (unit.direction === 'right') {
             const tranlateX = Math.floor(relX + offsetLeft)
             const tranlateY = Math.floor(relY + offsetTop)
-            context.drawImage(image, 0, 0, width, height, tranlateX, tranlateY, width * scale, height * scale)
+            context.drawImage(image, 0, 0, drawWidth, drawHeight, tranlateX, tranlateY, drawWidth * scale, drawHeight * scale)
         } else {
             const tranlateX = Game.width - unit.width - relX + offsetLeft
             const tranlateY = Math.floor(relY + offsetTop)
             context.drawFlip(Game.width, () => {
                 // 因为粒子精灵是无宽度和高度的，绘制出来的图片它与自身宽高和精灵的scale有关
-                context.drawImage(image, 0, 0, width, height, tranlateX, tranlateY, width * scale, height * scale)
+                context.drawImage(image, 0, 0, drawWidth, drawHeight, tranlateX, tranlateY, drawWidth * scale, drawHeight * scale)
             })
         }
     }
     // 绘制动画
     let drawAnimation = (image, options) => {
-        const { context, relX, relY, offsetLeft, offsetTop, width, height, scale, alpha } = getData()
+        const { context, relX, relY, offsetLeft, offsetTop, drawWidth, drawHeight, scale, alpha } = getData()
 
         context.globalAlpha = alpha
 
@@ -63,23 +63,43 @@ export function graphics(unit) {
         if (!options.flip && unit.direction === 'right' || options.flip && unit.direction === 'left') {
             const tranlateX = Math.floor(relX + offsetLeft)
             const tranlateY = Math.floor(relY + offsetTop)
-            context.drawImage(image, options.currFrame * width, 0, width, height, tranlateX, tranlateY, width * scale, height * scale)
+            context.drawImage(image, options.currFrame * drawWidth, 0, drawWidth, drawHeight, tranlateX, tranlateY, drawWidth * scale, drawHeight * scale)
         } else {
             const tranlateX = Math.floor(Game.width - unit.width * scale - relX + offsetLeft)
             const tranlateY = Math.floor(relY + offsetTop)
             // 水平翻转绘制
             context.drawFlip(Game.width, () => {
-                context.drawImage(image, options.currFrame * width, 0, width, height, tranlateX, tranlateY, width * scale, height * scale)
+                context.drawImage(image, options.currFrame * drawWidth, 0, drawWidth, drawHeight, tranlateX, tranlateY, drawWidth * scale, drawHeight * scale)
             })
         }
     }
-    const mixCanvas = Game.canvas.cloneNode()
 
     // 初始化方法
     return {
         // 绘制
         draw(callback) {
             executor = () => callback.call(unit, Game.context)
+        },
+        // 混合
+        mix(type, callback) {
+            const mixCanvas = Game.canvas.cloneNode()
+            const ctx = mixCanvas.getContext('2d')
+            let mixImage = new Image();
+            if (type === 'static') {
+                ctx.clearRect(0, 0, Game.width, Game.height)
+                callback(ctx)
+                mixImage.src = mixCanvas.toDataURL("image/png");
+                executor = () => {
+                    Game.context.drawImage(mixImage, 0, 0)
+                }
+            } else if (type === 'dynamic') {
+                executor = () => {
+                    ctx.clearRect(0, 0, Game.width, Game.height)
+                    callback(ctx)
+                    mixImage.src = mixCanvas.toDataURL("image/png");
+                    Game.context.drawImage(mixImage, 0, 0)
+                }
+            }
         },
         // 图片
         image(group, name, sameSize = true) {
@@ -260,26 +280,6 @@ export function graphics(unit) {
 
             // 返回数据
             return options
-        },
-        // 混合
-        mix(type, mixins) {
-            const ctx = mixCanvas.getContext('2d')
-            let mixImage = new Image();
-            if (type === 'static') {
-                ctx.clearRect(0, 0, Game.width, Game.height)
-                mixins(ctx)
-                mixImage.src = mixCanvas.toDataURL("image/png");
-                executor = () => {
-                    Game.context.drawImage(mixImage, 0, 0)
-                }
-            } else if (type === 'dynamic') {
-                executor = () => {
-                    ctx.clearRect(0, 0, Game.width, Game.height)
-                    mixins(ctx)
-                    mixImage.src = mixCanvas.toDataURL("image/png");
-                    Game.context.drawImage(mixImage, 0, 0)
-                }
-            }
         },
         // 取消绑定
         unBind() {

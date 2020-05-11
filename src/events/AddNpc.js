@@ -18,8 +18,8 @@ export function addNpc(player) {
         let newHatMan = new Sprite(npc(hatman.id, hatman.x, hatman.textArr))
 
         // 移动镜头
-        this.camera.moveTo(newHatMan, 2, () => {
-            this.camera.moveTo(player, 2, () => {
+        this.camera.moveTo(newHatMan.x, newHatMan.y, 2, () => {
+            this.camera.moveTo(player.x, player.y, 2, () => {
                 this.camera.follow(player)
             })
         })
