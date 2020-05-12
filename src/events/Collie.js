@@ -1,38 +1,62 @@
 export function collie(player, blocks) {
     for (const key in blocks) {
         const block = blocks[key]
-        if (this.geometry.intersect(player, block)) {
-            switch (block.type) {
-                case 8:
+        switch (block.type) {
+            case 8:
+                if (this.geometry.above(player, block) && this.geometry.distance('y', player, block) < -player.vSpeed) {
+                    player.collie = 8
                     player.jumping = false
                     player.y = block.y - player.height
-                    break
-                case 6:
-                    player.walking = false
-                    player.x = block.x + block.width
-                    break
-                case 9:
-                    if (player.x - player.speed < block.x + block.width && player.y - player.vSpeed < block.y) {
+                    return
+                }
+                break
+            case 9:
+                if (this.geometry.above(player, block)) {
+                    if (this.geometry.distance('y', player, block) < -player.vSpeed) {
+                        player.collie = 8
                         player.jumping = false
                         player.y = block.y - player.height
-                    } else {
-                        player.walking = false
+                        return
+                    }
+                } else {
+                    if (this.geometry.intersect(player, block)) {
+                        player.collie = 6
                         player.x = block.x + block.width
                     }
-                    break
-                case 3:
-                    if (player.x - player.speed < block.x + block.width && player.y - player.vSpeed > block.y) {
-                        player.y = block.y + block.height
-                    } else {
-                        player.walking = false
-                        player.x = block.x + block.width
-                    }
-                    break
-                case 2:
+                }
+                break
+            case 6:
+                if (this.geometry.intersect(player, block)) {
+                    player.collie = 6
+                    player.x = block.x + block.width
+                }
+                break
+            case 3:
+                if (player.collie === 2 && player.vSpeed >= 0) {
                     player.y = block.y + block.height
-                    break
-            }
-            return
+                    return
+                }
+                if (this.geometry.under(player, block)) {
+                    if (this.geometry.distance('y', player, block) < player.vSpeed) {
+                        player.collie = 2
+                        player.y = block.y + block.height
+                        return
+                    }
+                } else {
+                    if (this.geometry.intersect(player, block)) {
+                        player.collie = 6
+                        player.x = block.x + block.width
+                        return
+                    }
+                }
+                break
+            case 2:
+                if (this.geometry.intersect(player, block)) {
+                    player.collie = 2
+                    player.y = block.y + block.height
+                }
+                break
         }
     }
+    player.collie = null
 }

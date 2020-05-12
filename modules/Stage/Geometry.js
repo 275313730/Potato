@@ -21,7 +21,7 @@ export function geometry() {
             return true
         },
         // 相切
-        tangent(spriteA,spriteB) {
+        tangent(spriteA, spriteB) {
             const x1 = spriteA.x
             const y1 = spriteA.y
             const w1 = spriteA.width
@@ -59,12 +59,46 @@ export function geometry() {
             }
             return true
         },
+        distance(type, spriteA, spriteB) {
+            if (type === 'y') {
+                if (spriteB.y > spriteA.y + spriteA.height) {
+                    return spriteB.y - (spriteA.y + spriteA.height)
+                } else if (spriteA.y > spriteB.y + spriteB.height) {
+                    return spriteA.y - (spriteB.y + spriteB.height)
+                } else {
+                    return 0
+                }
+            }
+            if (type === 'x') {
+                if (spriteB.x > spriteA.x + spriteA.width) {
+                    return spriteB.x - (spriteA.x + spriteA.width)
+                } else if (spriteA.x > spriteB.x + spriteB.width) {
+                    return spriteA.x - (spriteB.x + spriteB.width)
+                } else {
+                    return 0
+                }
+            }
+        },
         // 在上面
-        above(sprite1, sprite2) {
-            if (sprite1.y - sprite1.height <= sprite2 && sprite1.x >= sprite2.x && sprite1.x <= sprite2.x + sprite2.width) {
+        above(spriteA, spriteB) {
+            if (spriteA.y + spriteA.height <= spriteB.y && spriteA.x + spriteA.width >= spriteB.x && spriteA.x <= spriteB.x + spriteB.width) {
                 return true
             }
             return false
         },
+        // 在下面
+        under(spriteA, spriteB) {
+            if (spriteA.y >= spriteB.y + spriteB.height && spriteA.x + spriteA.width >= spriteB.x && spriteA.x <= spriteB.x + spriteB.width) {
+                return true
+            }
+            return false
+        },
+        // 在右边
+        onRight(spriteA, spriteB) {
+            if (spriteA.x >= spriteB.x + spriteB.width && spriteA.y + spriteA.height >= spriteB.y && spriteA.y <= spriteB.y + spriteB.height) {
+                return true
+            }
+            return false
+        }
     }
 }

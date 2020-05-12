@@ -12,6 +12,7 @@ export function player() {
             layer: 2,
         },
         data: {
+            collie: false,
             attacking: false,
             speed: 2,
             space: false,
@@ -54,7 +55,7 @@ export function player() {
             // 跳跃
             jump() {
                 this.jumping = true
-                this.vSpeed = 16
+                this.vSpeed = 12
             }
         },
         created() {
@@ -116,7 +117,7 @@ export function player() {
     function jumpMove() {
         if (this.jumping === false) { return }
         this.y -= this.vSpeed
-        if (this.vSpeed >= -3) {
+        if (this.vSpeed >= -4) {
             this.vSpeed--
         }
     }
