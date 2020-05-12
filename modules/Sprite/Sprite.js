@@ -77,6 +77,10 @@ export class Sprite {
         if (this.id == null) {
             throw new Error('Sprite needs an id.')
         }
+        // 检查id是否为纯数字
+        if (this.id instanceof Number || !isNaN(Number(this.id))) {
+            throw new Error('Sprite must start with a letter.')
+        }
         // 检查width和height
         if (this.width && this.width < 0) {
             throw new Error(`Sprite's width must be greater than 0`)
@@ -93,9 +97,11 @@ export class Sprite {
         this.graphics = graphics(this)
         this.event = event(this)
         this.userEvent = userEvent(this)
-        Game.unit.add(this)
 
         // 创建实例
         options.created.call(this)
+
+        // 添加到单位
+        Game.unit.add(this)
     }
 }

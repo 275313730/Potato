@@ -4,6 +4,7 @@ export function camera(stage) {
     let camera = {
         x: 0,
         y: 0,
+        scale: 1,
         follow: null,
         movement: null
     }
@@ -13,6 +14,10 @@ export function camera(stage) {
         let frames = time * Game.frames || 1
         let perX = x / frames
         let perY = y / frames
+
+        if (perX === 0 && perY === 0) {
+            return
+        }
 
         // 取消相机跟随
         camera.follow = null
@@ -57,6 +62,7 @@ export function camera(stage) {
 
                 // 执行回调函数
                 callback && callback()
+                return
             }
         }
     }
@@ -66,13 +72,27 @@ export function camera(stage) {
         const follow = camera.follow
         // 当相机跟随精灵时
         if (follow) {
+            const fx = follow.x
+            const fy = follow.y
+            const fw = follow.width
+            const fh = follow.height
+
             // 相机处于舞台宽度范围内才会跟随精灵x变化，否则固定值
-            if (follow.x < (Game.width - follow.width) / 2) {
+            if (fx < (Game.width - fw) / 2) {
                 camera.x = 0
-            } else if (follow.x > stage.width - (Game.width + follow.width) / 2) {
+            } else if (fx > stage.width - (Game.width + fw) / 2) {
                 camera.x = stage.width - Game.width
             } else {
-                camera.x = follow.x - (Game.width - follow.width) / 2
+                camera.x = fx - (Game.width - fw) / 2
+            }
+
+            // 相机处于舞台高度范围内才会跟随精灵x变化，否则固定值
+            if (fy < (Game.height - fh) / 2) {
+                camera.y = 0
+            } else if (fy > stage.height - (Game.height + fh) / 2) {
+                camera.y = stage.height - Game.height
+            } else {
+                camera.y = fy - (Game.height - fh) / 2
             }
         } else {
             // 执行相机移动函数
@@ -96,7 +116,10 @@ export function camera(stage) {
         },
         // 移动到
         moveTo(x, y, time, callback) {
-            createMovement((x - camera.x) - (Game.width - unit.width) / 2, (y - camera.y), time, callback)
+            createMovement((x - camera.x) - Game.width / 2, (y - camera.y), time, callback)
+        },
+        moveTo(unit, time, callback) {
+            createMovement((unit.x - camera.x) - (Game.width - unit.width) / 2, (unit.y - camera.y) - (Game.height - unit.height), time, callback)
         },
         // 获取镜头
         get() {

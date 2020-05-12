@@ -1,13 +1,14 @@
-export function player(x) {
+export function player() {
     return {
         config: {
             id: 'player',
-            x,
+            x: 10,
+            y: 66,
             width: 30,
             height: 30,
             offsetLeft: -18,
-            offsetTop: -16,
-            direction: x === 10 ? 'right' : 'left',
+            offsetTop: -13,
+            direction: 'right',
             layer: 2,
         },
         data: {
@@ -15,7 +16,9 @@ export function player(x) {
             speed: 2,
             space: false,
             walking: false,
-            pressing: false
+            pressing: false,
+            jumping: true,
+            vSpeed: 0
         },
         methods: {
             // 移动
@@ -34,7 +37,9 @@ export function player(x) {
             },
             // 攻击
             attack() {
-                this.stop()
+                if (!this.jumping) {
+                    this.stop()
+                }
                 this.attacking = true
                 this.graphics.animation(this.id, 'attack', false)
                     .onComplete = () => {
@@ -45,6 +50,11 @@ export function player(x) {
                             this.stop()
                         }
                     }
+            },
+            // 跳跃
+            jump() {
+                this.jumping = true
+                this.vSpeed = 16
             }
         },
         created() {
@@ -53,7 +63,7 @@ export function player(x) {
             this.userEvent.add(keyUp, 'keyup')
             this.userEvent.add(mouseDown, 'mousedown', true)
             this.event.add(walk)
-            this.y = this.game.height - this.height
+            this.event.add(jumpMove)
         }
     }
 
@@ -67,25 +77,23 @@ export function player(x) {
                 this.move('left')
                 break
             case ' ':
-                this.space = true
+                !this.jumping && !this.attacking && this.jump()
                 break
         }
     }
 
     // 键盘松开
     function keyUp(key) {
-        this.pressing = false
         switch (key) {
             case 'd':
                 if (this.direction === 'left') { return }
+                this.pressing = false
                 this.stop()
                 break
             case 'a':
                 if (this.direction === 'right') { return }
+                this.pressing = false
                 this.stop()
-                break
-            case ' ':
-                this.space = false
                 break
         }
     }
@@ -102,6 +110,14 @@ export function player(x) {
             this.x += this.speed
         } else if (this.direction === 'left' && this.x > 0) {
             this.x -= this.speed
+        }
+    }
+
+    function jumpMove() {
+        if (this.jumping === false) { return }
+        this.y -= this.vSpeed
+        if (this.vSpeed >= -3) {
+            this.vSpeed--
         }
     }
 }

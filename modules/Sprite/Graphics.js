@@ -45,7 +45,7 @@ export function graphics(unit) {
             const tranlateY = Math.floor(relY + offsetTop)
             context.drawImage(image, 0, 0, drawWidth, drawHeight, tranlateX, tranlateY, drawWidth * scale, drawHeight * scale)
         } else {
-            const tranlateX = Game.width - unit.width - relX + offsetLeft
+            const tranlateX = Math.floor(Game.width - unit.width - relX + offsetLeft)
             const tranlateY = Math.floor(relY + offsetTop)
             context.drawFlip(Game.width, () => {
                 // 因为粒子精灵是无宽度和高度的，绘制出来的图片它与自身宽高和精灵的scale有关
@@ -285,11 +285,15 @@ export function graphics(unit) {
         unBind() {
             executor = null
         },
+        test() {
+            Game.context.strokeStyle = 'red'
+            Game.context.strokeRect(unit.relX, unit.relY, unit.width, unit.height)
+        },
         // 渲染
         render() {
             Game.context.globalAlpha = unit.alpha
             executor && executor()
-            Game.test && Game.context.test(unit.relX, unit.relY, unit.width, unit.height)
+            Game.test && this.test()
         }
     }
 }

@@ -2,7 +2,7 @@
 import { Game } from "./modules/Game/Game.js";
 
 // Title
-import { title } from "./src/stages/Title.js";
+import { test } from "./src/stages/Test.js";
 
 // 交互使音频可自动播放
 window.addEventListener('keydown', App)
@@ -13,54 +13,26 @@ export function App(e) {
     tip.parentNode.removeChild(tip)
     window.removeEventListener('keydown', App)
 
-    // 背景图片
-    const images = [
-        {
-            name: 'sky',
-            url: 'background/sky.png',
-        },
-        {
-            name: 'mounFar',
-            url: 'background/moun-far.png',
-        },
-        {
-            name: 'mounNear',
-            url: 'background/moun-near.png',
-        },
-        {
-            name: 'treeFar',
-            url: 'background/tree-far.png',
-        },
-        {
-            name: 'treeNear',
-            url: 'background/tree-near.png',
-        }
-    ]
-
-    // 音频
-    const audios = [
-        {
-            name: 'forest',
-            url: 'music/forest.mp3'
-        },
-        {
-            name: 'select',
-            url: 'sound/select.mp3'
-        }
-    ]
-
     // 初始化Game类
     Game.init({
         el: 'app',
         // 设置宽高
-        width: 272,
-        height: 160,
+        width: 480,
+        height: 370,
         // 设置文件路径
         path: {
             image: './src/assets/imgs/',
             audio: './src/assets/audio/'
         }
     })
+
+    // 背景图片
+    const images = [
+        {
+            name: 'test',
+            url: 'background/test.png',
+        },
+    ]
 
     // 载入图片
     images.forEach(item => {
@@ -72,19 +44,46 @@ export function App(e) {
         })
     })
 
-    // 载入音频
-    audios.forEach(audio => {
-        Game.asset.load({
-            type: 'audio',
-            group: 'audio',
-            name: audio.name,
-            url: audio.url
+    const roles = [
+        {
+            group: 'player',
+            width: 78,
+            interval: 8,
+            animations: [
+                {
+                    url: 'spritesheets/kingHuman-idle.png',
+                    name: 'idle'
+                },
+                {
+                    url: 'spritesheets/kingHuman-walk.png',
+                    name: 'walk'
+                },
+                {
+                    url: 'spritesheets/kingHuman-attack.png',
+                    name: 'attack'
+                }
+            ]
+        },
+    ]
+
+    // 载入动画
+    roles.forEach(role => {
+        role.animations.forEach(animation => {
+            Game.asset.load({
+                type: 'animation',
+                group: role.group,
+                name: animation.name,
+                url: animation.url,
+                width: role.width,
+                interval: role.interval,
+                flip: role.flip
+            })
         })
     })
-
     // 调试模式
     Game.test = true
 
     // 创建场景
-    Game.execute.switchStage(title())
+    Game.execute.switchStage(test())
+
 }
