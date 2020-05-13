@@ -3,7 +3,7 @@ import { Game } from "../Game/Game.js"
 export function graphics(unit) {
     // 执行函数
     let executor = null
-    
+
     // 设置尺寸
     let setSize = (width, height, sameSize) => {
         Object.defineProperties(unit, {
@@ -55,22 +55,22 @@ export function graphics(unit) {
         }
     }
     // 绘制动画
-    let drawAnimation = (image, options) => {
+    let drawAnimation = (image, flip, currFrame) => {
         const { context, relX, relY, offsetLeft, offsetTop, drawWidth, drawHeight, scale, alpha } = getData()
 
         context.globalAlpha = alpha
 
         // 图片方向
-        if (!options.flip && unit.direction === 'right' || options.flip && unit.direction === 'left') {
+        if (!flip && unit.direction === 'right' || flip && unit.direction === 'left') {
             const tranlateX = Math.floor(relX + offsetLeft)
             const tranlateY = Math.floor(relY + offsetTop)
-            context.drawImage(image, options.currFrame * drawWidth, 0, drawWidth, drawHeight, tranlateX, tranlateY, drawWidth * scale, drawHeight * scale)
+            context.drawImage(image, currFrame * drawWidth, 0, drawWidth, drawHeight, tranlateX, tranlateY, drawWidth * scale, drawHeight * scale)
         } else {
             const tranlateX = Math.floor(Game.width - unit.width * scale - relX + offsetLeft)
             const tranlateY = Math.floor(relY + offsetTop)
             // 水平翻转绘制
             context.drawFlip(Game.width, () => {
-                context.drawImage(image, options.currFrame * drawWidth, 0, drawWidth, drawHeight, tranlateX, tranlateY, drawWidth * scale, drawHeight * scale)
+                context.drawImage(image, currFrame * drawWidth, 0, drawWidth, drawHeight, tranlateX, tranlateY, drawWidth * scale, drawHeight * scale)
             })
         }
     }
@@ -212,7 +212,7 @@ export function graphics(unit) {
             // 绘制函数
             executor = () => {
                 // 绘制动画
-                drawAnimation(animation.image, options)
+                drawAnimation(animation.image, options.flip, currFrame)
 
                 // 动画间隔帧增加
                 currInterval++

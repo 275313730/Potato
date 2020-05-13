@@ -49,6 +49,7 @@ export function App(e) {
             group: 'player',
             width: 78,
             interval: 8,
+            path: 'kingHuman/',
             animations: [
                 {
                     url: 'Idle.png',
@@ -82,6 +83,48 @@ export function App(e) {
                 },
             ]
         },
+        {
+            group: 'pig',
+            width: 34,
+            interval: 8,
+            path: 'pig/',
+            animations: [
+                {
+                    url: 'Idle.png',
+                    name: 'idle'
+                },
+                {
+                    url: 'Walk.png',
+                    name: 'walk'
+                },
+                {
+                    url: 'Attack.png',
+                    name: 'attack'
+                },
+                {
+                    url: 'Hit.png',
+                    name: 'hit'
+                },
+                {
+                    url: 'Dead.png',
+                    name: 'dead'
+                }
+            ],
+            images: [
+                {
+                    url: 'Jump.png',
+                    name: 'jump'
+                },
+                {
+                    url: 'Fall.png',
+                    name: 'fall'
+                },
+                {
+                    url: 'Ground.png',
+                    name: 'ground'
+                },
+            ]
+        },
     ]
 
     // 载入动画
@@ -91,7 +134,7 @@ export function App(e) {
                 type: 'animation',
                 group: role.group,
                 name: animation.name,
-                url: 'kingHuman/' + animation.url,
+                url: role.path + animation.url,
                 width: role.width,
                 interval: role.interval,
                 flip: role.flip
@@ -102,11 +145,10 @@ export function App(e) {
                 type: 'image',
                 group: role.group,
                 name: image.name,
-                url: 'kingHuman/' + image.url,
+                url: role.path + image.url,
             })
         })
     })
-
 
     // 调试模式
     Game.test = true
