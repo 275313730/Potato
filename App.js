@@ -61,6 +61,10 @@ export function App(e) {
                 {
                     url: 'Attack.png',
                     name: 'attack'
+                },
+                {
+                    url: 'Hit.png',
+                    name: 'hit'
                 }
             ],
             images: [

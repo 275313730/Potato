@@ -3,6 +3,7 @@ import { Game } from "../Game/Game.js"
 export function graphics(unit) {
     // 执行函数
     let executor = null
+    
     // 设置尺寸
     let setSize = (width, height, sameSize) => {
         Object.defineProperties(unit, {
@@ -102,7 +103,7 @@ export function graphics(unit) {
             }
         },
         // 图片
-        image(group, name, sameSize = true) {
+        image(group, name, sameSize = false) {
             // 获取图片数据
             const image = Game.asset.get(group, name)
 
@@ -168,39 +169,26 @@ export function graphics(unit) {
             }
         },
         // 动画
-        animation(group, name, sameSize = true) {
+        animation(group, name, sameSize = false) {
             // 获取动画数据
             const animation = Game.asset.get(group, name)
 
             setSize(animation.width, animation.image.height, sameSize)
 
 
-            // 只读属性
-            let playing = true,
-                currInterval = 0,
+            // 内部属性
+            let currInterval = 0,
                 currFrame = 0
 
             // 动画属性
             let options = Object.defineProperties({}, {
-                // 总动画帧
+                // 动画帧数
                 'animationFrames': {
                     value: (animation.image.width / animation.width) - 1
-                },
-                // 当前动画帧
-                'currFrame': {
-                    get() {
-                        return currFrame
-                    }
                 },
                 // 动画间隔帧
                 'animationInterval': {
                     value: animation.interval || Game.animationInterval
-                },
-                // 当前间隔帧
-                'currInterval': {
-                    get() {
-                        return currInterval
-                    }
                 },
                 // 动画帧宽度
                 'width': {
@@ -214,37 +202,10 @@ export function graphics(unit) {
                 'flip': {
                     value: animation.flip
                 },
-                // 动画状态
-                'playing': {
-                    get() {
-                        return playing
-                    }
-                },
                 // 完成时
                 'onComplete': {
                     value: null,
                     writable: true
-                },
-                // 播放
-                'play': {
-                    value: () => {
-                        playing = true
-                    }
-                },
-                // 暂停
-                'pause': {
-                    value: () => {
-                        playing = false
-                        this.currInterval = 0
-                    }
-                },
-                // 停止
-                'stop': {
-                    value: () => {
-                        playing = false
-                        this.currFrame = 0
-                        this.currInterval = 0
-                    }
                 }
             })
 
@@ -252,9 +213,6 @@ export function graphics(unit) {
             executor = () => {
                 // 绘制动画
                 drawAnimation(animation.image, options)
-
-                // 暂停/停止
-                if (!playing) { return }
 
                 // 动画间隔帧增加
                 currInterval++

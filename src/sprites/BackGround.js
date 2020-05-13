@@ -4,7 +4,7 @@ export function backGround(id) {
             id,
         },
         created() {
-            this.graphics.image('bg', id)
+            this.graphics.image('bg', id, true)
         }
     }
 }

@@ -5,12 +5,6 @@ export function userEvent(sprite) {
 
     function bindFunction(callback, eventType, isBreak) {
         return function (e) {
-            // 没有加入到场景前禁用
-            if (!sprite.stage) { return }
-
-            // disabled时禁用
-            if (sprite.disabled) { return }
-
             // 按键间隔检测
             if (isBreak) {
                 if (e.type === 'keydown') {
@@ -29,6 +23,12 @@ export function userEvent(sprite) {
                     }
                 }
             }
+
+            // 没有加入到场景前禁用
+            if (!sprite.stage) { return }
+
+            // disabled时禁用
+            if (sprite.disabled) { return }
 
             // 判断事件类型
             // 鼠标事件

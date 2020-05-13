@@ -19,21 +19,21 @@ export function player() {
             walking: false,
             pressing: false,
             jumpStatus: 0,
-            vSpeed: 0
+            vSpeed: 0,
         },
         methods: {
             // 移动
             move(direction) {
+                this.pressing = true
                 if (this.attacking) { return }
                 this.direction = direction
-                this.graphics.animation(this.id, 'walk', false)
+                this.graphics.animation(this.id, 'walk')
                 this.walking = true
-                this.pressing = true
             },
             // 停止
             stop() {
                 if (this.attacking) { return }
-                this.graphics.animation(this.id, 'idle', false)
+                this.graphics.animation(this.id, 'idle')
                 this.walking = false
                 this.jumpStatus = 0
             },
@@ -42,10 +42,10 @@ export function player() {
                 if (this.jumpStatus !== 0) { return }
                 this.stop()
                 this.attacking = true
-                this.graphics.animation(this.id, 'attack', false)
+                this.graphics.animation(this.id, 'attack')
                     .onComplete = () => {
+                        this.attacking = false
                         if (this.pressing) {
-                            this.attacking = false
                             this.move(this.direction)
                         } else {
                             this.stop()
@@ -55,18 +55,18 @@ export function player() {
             // 跳跃
             jump() {
                 this.jumpStatus = 1
-                this.graphics.image(this.id, 'jump', false)
+                this.graphics.image(this.id, 'jump')
                 this.vSpeed = 12
             },
             // 掉落
             fall() {
                 this.jumpStatus = 2
-                this.graphics.image(this.id, 'fall', false)
+                this.graphics.image(this.id, 'fall')
             },
             // 落地
             ground() {
                 this.jumpStatus = 0
-                this.graphics.image(this.id, 'ground', false)
+                this.graphics.image(this.id, 'ground')
                 this.disabled = true
                 setTimeout(() => {
                     this.disabled = false
@@ -76,6 +76,14 @@ export function player() {
                         this.stop()
                     }
                 }, 120)
+            },
+            // 受伤
+            hit() {
+                this.attacking = false
+                this.graphics.animation(this.id, 'hit')
+                    .onComplete = () => {
+                        this.stop()
+                    }
             }
         },
         created() {
@@ -91,14 +99,17 @@ export function player() {
     // 键盘按下
     function keyDown(key) {
         switch (key) {
-            case 'd':
-                this.move('right')
-                break
             case 'a':
                 this.move('left')
                 break
+            case 'd':
+                this.move('right')
+                break
             case ' ':
                 this.jumpStatus === 0 && !this.attacking && this.jump()
+                break
+            case 'j':
+                this.hit()
                 break
         }
     }
@@ -106,13 +117,13 @@ export function player() {
     // 键盘松开
     function keyUp(key) {
         switch (key) {
-            case 'd':
-                if (this.direction === 'left') { return }
+            case 'a':
+                if (this.direction === 'right') { return }
                 this.pressing = false
                 this.stop()
                 break
-            case 'a':
-                if (this.direction === 'right') { return }
+            case 'd':
+                if (this.direction === 'left') { return }
                 this.pressing = false
                 this.stop()
                 break
