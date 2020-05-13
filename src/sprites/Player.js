@@ -18,7 +18,7 @@ export function player() {
             space: false,
             walking: false,
             pressing: false,
-            jumping: true,
+            jumpStatus: 0,
             vSpeed: 0
         },
         methods: {
@@ -35,17 +35,17 @@ export function player() {
                 if (this.attacking) { return }
                 this.graphics.animation(this.id, 'idle', false)
                 this.walking = false
+                this.jumpStatus = 0
             },
             // 攻击
             attack() {
-                if (!this.jumping) {
-                    this.stop()
-                }
+                if (this.jumpStatus !== 0) { return }
+                this.stop()
                 this.attacking = true
                 this.graphics.animation(this.id, 'attack', false)
                     .onComplete = () => {
-                        this.attacking = false
                         if (this.pressing) {
+                            this.attacking = false
                             this.move(this.direction)
                         } else {
                             this.stop()
@@ -54,8 +54,28 @@ export function player() {
             },
             // 跳跃
             jump() {
-                this.jumping = true
+                this.jumpStatus = 1
+                this.graphics.image(this.id, 'jump', false)
                 this.vSpeed = 12
+            },
+            // 掉落
+            fall() {
+                this.jumpStatus = 2
+                this.graphics.image(this.id, 'fall', false)
+            },
+            // 落地
+            ground() {
+                this.jumpStatus = 0
+                this.graphics.image(this.id, 'ground', false)
+                this.disabled = true
+                setTimeout(() => {
+                    this.disabled = false
+                    if (this.walking) {
+                        this.move(this.direction)
+                    } else {
+                        this.stop()
+                    }
+                }, 120)
             }
         },
         created() {
@@ -78,7 +98,7 @@ export function player() {
                 this.move('left')
                 break
             case ' ':
-                !this.jumping && !this.attacking && this.jump()
+                this.jumpStatus === 0 && !this.attacking && this.jump()
                 break
         }
     }
@@ -115,10 +135,13 @@ export function player() {
     }
 
     function jumpMove() {
-        if (this.jumping === false) { return }
+        if (this.jumpStatus === 0) { return }
         this.y -= this.vSpeed
         if (this.vSpeed >= -4) {
             this.vSpeed--
+            if (this.vSpeed < 0 && this.jumpStatus === 1) {
+                this.fall()
+            }
         }
     }
 }

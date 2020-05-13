@@ -51,17 +51,31 @@ export function App(e) {
             interval: 8,
             animations: [
                 {
-                    url: 'spritesheets/kingHuman-idle.png',
+                    url: 'Idle.png',
                     name: 'idle'
                 },
                 {
-                    url: 'spritesheets/kingHuman-walk.png',
+                    url: 'Walk.png',
                     name: 'walk'
                 },
                 {
-                    url: 'spritesheets/kingHuman-attack.png',
+                    url: 'Attack.png',
                     name: 'attack'
                 }
+            ],
+            images: [
+                {
+                    url: 'Jump.png',
+                    name: 'jump'
+                },
+                {
+                    url: 'Fall.png',
+                    name: 'fall'
+                },
+                {
+                    url: 'Ground.png',
+                    name: 'ground'
+                },
             ]
         },
     ]
@@ -73,13 +87,23 @@ export function App(e) {
                 type: 'animation',
                 group: role.group,
                 name: animation.name,
-                url: animation.url,
+                url: 'kingHuman/' + animation.url,
                 width: role.width,
                 interval: role.interval,
                 flip: role.flip
             })
         })
+        role.images.forEach(image => {
+            Game.asset.load({
+                type: 'image',
+                group: role.group,
+                name: image.name,
+                url: 'kingHuman/' + image.url,
+            })
+        })
     })
+
+
     // 调试模式
     Game.test = true
 

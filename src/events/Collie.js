@@ -5,8 +5,10 @@ export function collie(player, blocks) {
             case 8:
                 if (this.geometry.above(player, block) && this.geometry.distance('y', player, block) < -player.vSpeed) {
                     player.collie = 8
-                    player.jumping = false
                     player.y = block.y - player.height
+                    if (player.jumpStatus === 2) {
+                        player.ground()
+                    }
                     return
                 }
                 break
@@ -14,8 +16,10 @@ export function collie(player, blocks) {
                 if (this.geometry.above(player, block)) {
                     if (this.geometry.distance('y', player, block) < -player.vSpeed) {
                         player.collie = 8
-                        player.jumping = false
                         player.y = block.y - player.height
+                        if (player.jumpStatus === 2) {
+                            player.ground()
+                        }
                         return
                     }
                 } else {
