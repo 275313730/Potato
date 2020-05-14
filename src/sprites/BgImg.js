@@ -1,4 +1,4 @@
-export function backGround(id) {
+export function bgImg(id) {
     return {
         config: {
             id,

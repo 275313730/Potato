@@ -1,6 +1,5 @@
 "use strict"
 import { asset } from "./Asset.js";
-import { audio } from "./Audio.js";
 import { execute } from "./Execute.js";
 import { unit } from "./Unit.js";
 
@@ -54,7 +53,6 @@ export class Game {
 
         // 初始化实例方法
         this.asset = asset(this.imagePath, this.audioPath)
-        this.audio = audio(this.asset)
         this.unit = unit()
         this.execute = execute()
 

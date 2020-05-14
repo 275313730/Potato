@@ -3,6 +3,7 @@ import { Game } from "../Game/Game.js";
 import { Stage } from "../Stage/Stage.js";
 
 import { graphics } from "./Graphics.js";
+import { audio } from "./Audio.js";
 import { event } from "./Event.js";
 import { userEvent } from "./UserEvent.js";
 
@@ -44,35 +45,6 @@ export class Sprite {
         // 在0~1之间会出现分层移动效果
         this.fixed = config.fixed || 0
 
-        // Game的宽高(只读)
-        Object.defineProperties(this, {
-            'game': {
-                value: {
-                    width: Game.width,
-                    height: Game.height
-                }
-            },
-            'stage': {
-                value: {
-                    width: Stage.width,
-                    height: Stage.height
-                }
-            }
-        })
-
-        let data = options.data || {}
-        let methods = options.methods || {}
-
-        // 设置实例数据
-        for (const key in data) {
-            this[key] = data[key]
-        }
-
-        // 设置实例事件
-        for (const key in methods) {
-            this[key] = methods[key]
-        }
-
         // 检查id是否填写
         if (this.id == null) {
             throw new Error('Sprite needs an id.')
@@ -93,15 +65,42 @@ export class Sprite {
             throw new Error(`Direction isn't correct.`)
         }
 
+        // Game和Stage的宽高(只读)
+        Object.defineProperties(this, {
+            'game': {
+                value: {
+                    width: Game.width,
+                    height: Game.height
+                }
+            },
+            'stage': {
+                value: {
+                    width: Stage.width,
+                    height: Stage.height
+                }
+            }
+        })
+
+        // 暴露实例数据到this中
+        for (const key in options.data) {
+            this[key] = options.data[key]
+        }
+
+        // 暴露实例事件到this中
+        for (const key in options.methods) {
+            this[key] = options.methods[key]
+        }
+
         // 初始化实例方法
         this.graphics = graphics(this)
+        this.audio = audio(this)
         this.event = event(this)
         this.userEvent = userEvent(this)
 
         // 创建实例
         options.created.call(this)
 
-        // 添加到单位
+        // 添加到游戏单位中
         Game.unit.add(this)
     }
 }

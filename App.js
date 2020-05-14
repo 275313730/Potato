@@ -26,24 +26,15 @@ export function App(e) {
         }
     })
 
-    // 背景图片
-    const images = [
-        {
-            name: 'test',
-            url: 'background/test.png',
-        },
-    ]
-
-    // 载入图片
-    images.forEach(item => {
-        Game.asset.load({
-            type: 'image',
-            group: 'bg',
-            name: item.name,
-            url: item.url
-        })
+    // 载入背景图片
+    Game.asset.load({
+        type: 'image',
+        group: 'bg',
+        name: 'test',
+        url: 'background/test.png'
     })
 
+    // 角色图片
     const roles = [
         {
             group: 'player',
@@ -127,7 +118,7 @@ export function App(e) {
         },
     ]
 
-    // 载入动画
+    // 载入角色图片
     roles.forEach(role => {
         role.animations.forEach(animation => {
             Game.asset.load({
@@ -148,6 +139,14 @@ export function App(e) {
                 url: role.path + image.url,
             })
         })
+    })
+
+    // 音频
+    Game.asset.load({
+        type: 'audio',
+        group: 'music',
+        name: 'forest',
+        url:'music/forest.mp3'
     })
 
     // 调试模式

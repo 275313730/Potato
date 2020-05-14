@@ -2,7 +2,8 @@
 import { Sprite } from "../../modules/Sprite/Sprite.js";
 
 // sprites
-import { backGround } from "../sprites/BackGround.js";
+import { bgImg } from "../sprites/BgImg.js";
+import { bgMusic } from "../sprites/BgMusic.js";
 import { player } from "../sprites/Player.js";
 import { block } from "../sprites/Block.js";
 
@@ -16,8 +17,11 @@ import { deadCheck } from "../events/DeadCheck.js";
 export function test() {
     return {
         created() {
-            // 创建背景
-            const newBG = new Sprite(backGround('test'))
+            // 创建背景音乐
+            new Sprite(bgMusic())
+
+            // 创建背景图片
+            const newBG = new Sprite(bgImg('test'))
             this.width = newBG.width
             this.height = newBG.height
 
