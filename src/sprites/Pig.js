@@ -24,22 +24,23 @@ export function pig(id, x, y) {
                 this.hitting = true
                 this.hp--
                 this.graphics.animation('pig', 'hit')
-                    .onComplete = () => {
-                        this.graphics.wait(8, () => {
-                            this.hitting = false
-                            if (this.hp === 0) {
-                                this.die()
-                            } else {
-                                this.stop()
-                            }
-                        })
-                    }
+                    .onComplete = this.wait()
             },
             die() {
                 this.graphics.animation('pig', 'dead')
                     .onComplete = () => {
                         this.dead = true
                     }
+            },
+            wait() {
+                this.graphics.wait(16, () => {
+                    this.hitting = false
+                    if (this.hp === 0) {
+                        this.die()
+                    } else {
+                        this.stop()
+                    }
+                })
             }
         },
         created() {

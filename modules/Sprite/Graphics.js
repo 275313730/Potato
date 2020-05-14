@@ -231,7 +231,7 @@ export function graphics(unit) {
                         currFrame = 0
 
                         // 动画完成时执行函数
-                        options.onComplete && options.onComplete()
+                        options.onComplete && options.onComplete.call(this)
                     }
                 }
             }

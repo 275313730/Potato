@@ -1,7 +1,7 @@
 export function hit(player, pigs) {
     let cal = false
     return function () {
-        if (player.attacking && !cal) {
+        if (player.attackStatus === 2 && !cal) {
             cal = true
             for (const key in pigs) {
                 const pig = pigs[key]
@@ -12,7 +12,7 @@ export function hit(player, pigs) {
                 }
             }
         }
-        if (!player.attacking) {
+        if (player.attackStatus === 0) {
             cal = false
         }
     }
