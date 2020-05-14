@@ -25,14 +25,14 @@ export function player() {
             // 移动
             move(direction) {
                 this.pressing = true
-                if (this.attacking) { return }
+                if (this.attacking || this.jumpStatus === 3) { return }
                 this.direction = direction
                 this.graphics.animation(this.id, 'walk')
                 this.walking = true
             },
             // 停止
             stop() {
-                if (this.attacking) { return }
+                if (this.attacking || this.jumpStatus === 3) { return }
                 this.graphics.animation(this.id, 'idle')
                 this.walking = false
                 this.jumpStatus = 0
@@ -65,11 +65,10 @@ export function player() {
             },
             // 落地
             ground() {
-                this.jumpStatus = 0
+                this.jumpStatus = 3
                 this.graphics.image(this.id, 'ground')
-                this.disabled = true
                 setTimeout(() => {
-                    this.disabled = false
+                    this.jumpStatus = 0
                     if (this.walking) {
                         this.move(this.direction)
                     } else {
@@ -137,7 +136,7 @@ export function player() {
 
     // 移动
     function walk() {
-        if (this.walking === false) { return }
+        if (this.walking === false || this.jumpStatus === 3) { return }
         if (this.direction === 'right' && this.x < this.stage.width - this.width) {
             this.x += this.speed
         } else if (this.direction === 'left' && this.x > 0) {
@@ -146,7 +145,7 @@ export function player() {
     }
 
     function jumpMove() {
-        if (this.jumpStatus === 0) { return }
+        if (this.jumpStatus === 0 || this.jumpStatus === 3) { return }
         this.y -= this.vSpeed
         if (this.vSpeed >= -4) {
             this.vSpeed--

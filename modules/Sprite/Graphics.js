@@ -239,6 +239,19 @@ export function graphics(unit) {
             // 返回数据
             return options
         },
+        // 等待
+        wait(interval, callback) {
+            let count = 0
+            const currExecutor = executor
+            executor = () => {
+                currExecutor && currExecutor()
+                count++
+                if (count === interval) {
+                    executor = null
+                    callback()
+                }
+            }
+        },
         // 取消绑定
         unBind() {
             executor = null

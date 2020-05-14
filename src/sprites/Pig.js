@@ -25,12 +25,14 @@ export function pig(id, x, y) {
                 this.hp--
                 this.graphics.animation('pig', 'hit')
                     .onComplete = () => {
-                        this.hitting = false
-                        if (this.hp === 0) {
-                            this.die()
-                        } else {
-                            this.stop()
-                        }
+                        this.graphics.wait(8, () => {
+                            this.hitting = false
+                            if (this.hp === 0) {
+                                this.die()
+                            } else {
+                                this.stop()
+                            }
+                        })
                     }
             },
             die() {

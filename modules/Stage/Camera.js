@@ -121,7 +121,7 @@ export function camera(stage) {
         moveTo(unit, time, callback) {
             createMovement((unit.x - camera.x) - (Game.width - unit.width) / 2, (unit.y - camera.y) - (Game.height - unit.height), time, callback)
         },
-        // 获取镜头
+        // 获取镜头数据
         get() {
             // 计算镜头数据
             cal()

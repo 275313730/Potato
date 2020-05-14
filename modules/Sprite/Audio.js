@@ -12,6 +12,7 @@ export function audio(unit) {
             const name = options.name
             const range = options.range || 0
             const volume = options.volume || 1
+            const loop = options.loop || true
             const newAudio = Game.asset.get(group, name)
 
             if (type === 'sound') {
@@ -37,7 +38,7 @@ export function audio(unit) {
 
                     newAudio.currentTime = 0
                     newAudio.volume = volume
-                    newAudio.loop = options.loop || true
+                    newAudio.loop = loop
                 }
                 newAudio.play()
             }

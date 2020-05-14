@@ -34,7 +34,7 @@ export function App(e) {
         url: 'background/test.png'
     })
 
-    // 角色图片
+    // 角色图片数据
     const roles = [
         {
             group: 'player',
@@ -141,7 +141,7 @@ export function App(e) {
         })
     })
 
-    // 音频
+    // 载入音频
     Game.asset.load({
         type: 'audio',
         group: 'music',
@@ -154,5 +154,4 @@ export function App(e) {
 
     // 创建场景
     Game.execute.switchStage(test())
-
 }
