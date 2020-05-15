@@ -48,10 +48,13 @@ export function graphics(unit) {
         } else {
             const tranlateX = Math.floor(Game.width - unit.width - relX + offsetLeft)
             const tranlateY = Math.floor(relY + offsetTop)
-            context.drawFlip(Game.width, () => {
-                // 因为粒子精灵是无宽度和高度的，绘制出来的图片它与自身宽高和精灵的scale有关
-                context.drawImage(image, 0, 0, drawWidth, drawHeight, tranlateX, tranlateY, drawWidth * scale, drawHeight * scale)
-            })
+
+            // 水平翻转绘制
+            context.translate(Game.width, 0);
+            context.scale(-1, 1);
+            context.drawImage(image, 0, 0, drawWidth, drawHeight, tranlateX, tranlateY, drawWidth * scale, drawHeight * scale)
+            context.translate(Game.width, 0);
+            context.scale(-1, 1);
         }
     }
     // 绘制动画
@@ -68,10 +71,13 @@ export function graphics(unit) {
         } else {
             const tranlateX = Math.floor(Game.width - unit.width * scale - relX + offsetLeft)
             const tranlateY = Math.floor(relY + offsetTop)
+
             // 水平翻转绘制
-            context.drawFlip(Game.width, () => {
-                context.drawImage(image, currFrame * drawWidth, 0, drawWidth, drawHeight, tranlateX, tranlateY, drawWidth * scale, drawHeight * scale)
-            })
+            context.translate(Game.width, 0);
+            context.scale(-1, 1);
+            context.drawImage(image, currFrame * drawWidth, 0, drawWidth, drawHeight, tranlateX, tranlateY, drawWidth * scale, drawHeight * scale)
+            context.translate(Game.width, 0);
+            context.scale(-1, 1);
         }
     }
 

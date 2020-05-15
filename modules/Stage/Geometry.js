@@ -95,7 +95,14 @@ export function geometry() {
         },
         // 在右边
         onRight(spriteA, spriteB) {
-            if (spriteA.x >= spriteB.x + spriteB.width && spriteA.y + spriteA.height >= spriteB.y && spriteA.y <= spriteB.y + spriteB.height) {
+            if (spriteA.x >= spriteB.x + spriteB.width) {
+                return true
+            }
+            return false
+        },
+        // 在左边
+        onLeft(spriteA, spriteB) {
+            if (spriteA.x + spriteA.width <= spriteB.x) {
                 return true
             }
             return false

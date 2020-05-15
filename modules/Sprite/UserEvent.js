@@ -37,11 +37,12 @@ export function userEvent(sprite) {
 
                 // 计算画面缩放比例
                 const scale = canvas.clientHeight / Game.height
-
-                // 计
+                
+                // 简化事件属性
                 const mouse = {
                     x: (e.clientX - canvas.offsetLeft) / scale,
-                    y: (e.clientY - canvas.offsetTop) / scale
+                    y: (e.clientY - canvas.offsetTop) / scale,
+                    button: e.button
                 }
                 callback.call(sprite, mouse)
                 return

@@ -11,22 +11,23 @@ export class Game {
             e.stopPropagation()
             e.preventDefault()
         })
-        window.addEventListener('keyup', function (e) {
+        window.addEventListener('keyup', e => {
             e.stopPropagation()
             e.preventDefault()
             if (this.key === e.key) {
                 this.key = null
             }
-        }.bind(this))
-        window.addEventListener('mousedown', function (e) {
-            e.stopPropagation()
-            e.preventDefault()
         })
-        window.addEventListener('mouseup', function (e) {
+        window.addEventListener('mouseup', e => {
             e.stopPropagation()
             e.preventDefault()
             this.mouseDown = false
-        }.bind(this))
+        })
+
+        // 禁用右键菜单
+        window.oncontextmenu = function () {
+            return false;
+        }
 
         // 获取canvas
         this.canvas = document.getElementById(options.el)
