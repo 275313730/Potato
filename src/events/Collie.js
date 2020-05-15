@@ -1,7 +1,7 @@
 export function collie(player, blocks) {
     for (const key in blocks) {
         const block = blocks[key]
-        switch (block.type) {
+        switch (block.collieType) {
             case 8:
                 if (this.geometry.above(player, block) && this.geometry.distance('y', player, block) < -player.vSpeed) {
                     player.collie = 8

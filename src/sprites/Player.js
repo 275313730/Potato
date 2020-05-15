@@ -54,7 +54,7 @@ export function player() {
                 if (this.jumpStatus > 0 || this.attackStatus > 0 || this.hitting) { return }
                 this.jumpStatus = 1
                 this.graphics.image(this.id, 'jump')
-                this.vSpeed = 12
+                this.vSpeed = 8
             },
             // 掉落
             fall() {
@@ -155,8 +155,8 @@ export function player() {
     function jumpMove() {
         if (this.jumpStatus === 0 || this.jumpStatus === 3) { return }
         this.y -= this.vSpeed
-        if (this.vSpeed >= -4) {
-            this.vSpeed--
+        if (this.vSpeed >= -3.5) {
+            this.vSpeed -= 0.5
             if (this.vSpeed === 0 && this.jumpStatus === 1) {
                 this.fall()
             }

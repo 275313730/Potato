@@ -97,8 +97,8 @@ export class Sprite {
         this.event = event(this)
         this.userEvent = userEvent(this)
 
-        // 创建实例
-        options.created.call(this)
+        // 执行生命周期函数
+        options.created && options.created.call(this)
 
         // 添加到游戏单位中
         Game.unit.add(this)
