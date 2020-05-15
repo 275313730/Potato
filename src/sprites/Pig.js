@@ -1,13 +1,14 @@
-export function pig(id, x, y) {
+export function pig(id, x, y, direction) {
     return {
         config: {
-            id,
+            id: 'pig' + id,
             x,
             y,
             width: 19,
             height: 18,
             offsetLeft: -10,
-            offsetTop: -10
+            offsetTop: -10,
+            direction
         },
         data: {
             type: 'enemy',

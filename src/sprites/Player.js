@@ -64,16 +64,16 @@ export function player() {
             },
             // 落地
             ground() {
-                if (this.y - this.jumpY > 64) {
+                if (this.y - this.jumpY > 32 * 3) {
                     this.jumpStatus = 3
                     this.graphics.image(this.id, 'ground')
                     this.event.add(wait(4, () => {
                         this.hitting = false
                         this.jumpStatus = 0
-                        if (this.y - this.jumpY > 32*5) {
+                        if (this.y - this.jumpY > 32 * 5) {
                             this.hit()
                         } else {
-                            this.restore() 
+                            this.restore()
                         }
                     }))
                 } else {

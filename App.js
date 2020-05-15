@@ -79,6 +79,7 @@ export function App(e) {
             group: 'pig',
             width: 34,
             interval: 8,
+            flip: true,
             path: 'pig/',
             animations: [
                 {
@@ -147,7 +148,7 @@ export function App(e) {
         type: 'audio',
         group: 'music',
         name: 'forest',
-        url:'music/forest.mp3'
+        url: 'music/forest.mp3'
     })
 
     // 调试模式

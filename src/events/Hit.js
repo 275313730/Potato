@@ -1,8 +1,11 @@
-export function hit(player, pigs) {
+import { Game } from "../../modules/Game/Game.js"
+
+export function hit(player) {
     let cal = false
     return function () {
         if (player.attackStatus === 2 && !cal) {
             cal = true
+            const pigs = Game.unit.filter(unit => { return unit.type === 'enemy' })
             for (const key in pigs) {
                 const pig = pigs[key]
                 if (this.geometry.distance('y', player, pig) < 30 &&

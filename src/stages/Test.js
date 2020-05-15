@@ -25,8 +25,10 @@ export function test() {
             this.width = newBG.width
             this.height = newBG.height
 
-            // 创建阻挡物
+            // 阻挡物
             let blocks = []
+
+            // 创建墙壁和地板
             const blocksData = [
                 [8, 0, 3, 5, 1],
                 [9, 5, 3, 1, 1],
@@ -42,8 +44,7 @@ export function test() {
                 blocks.push(new Sprite(block('block', data)))
             })
 
-
-            // 创建平台
+            // 创建跳台
             const flatsData = [
                 [7, 4, 3],
                 [11, 5, 1],
@@ -54,7 +55,6 @@ export function test() {
                 [13, 16, 3],
                 [17, 17, 1]
             ]
-            
             flatsData.forEach(data => {
                 blocks.push(new Sprite(block('flat', data)))
             })
@@ -63,12 +63,20 @@ export function test() {
             const newPlayer = new Sprite(player())
             this.camera.follow(newPlayer)
 
-            const pigs = []
-            pigs.push(new Sprite(pig('pig1', 150, 78)))
+            // 创建猪
+            const pigsData = [
+                [1, 150, 78, 'left'],
+                [2, 200, 334, 'right'],
+                [3, 280, 589, 'right']
+            ]
+            pigsData.forEach(data => {
+                new Sprite(pig(...data))
+            })
 
+            // 添加场景事件
             this.event.add(collie, newPlayer, blocks)
             this.event.add(gravity, newPlayer, blocks)
-            this.event.add(hit(newPlayer, pigs))
+            this.event.add(hit(newPlayer))
             this.event.add(deadCheck)
         }
     }
