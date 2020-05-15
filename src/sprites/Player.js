@@ -58,18 +58,23 @@ export function player() {
             },
             // 掉落
             fall() {
+                this.jumpY = this.y
                 this.jumpStatus = 2
                 this.graphics.image(this.id, 'fall')
             },
             // 落地
             ground() {
-                if (this.vSpeed === -4) {
+                if (this.y - this.jumpY > 64) {
                     this.jumpStatus = 3
                     this.graphics.image(this.id, 'ground')
                     this.event.add(wait(4, () => {
                         this.hitting = false
                         this.jumpStatus = 0
-                        this.restore()
+                        if (this.y - this.jumpY > 32*5) {
+                            this.hit()
+                        } else {
+                            this.restore() 
+                        }
                     }))
                 } else {
                     this.hitting = false
@@ -174,7 +179,7 @@ export function player() {
         let count = 0
         return function wait() {
             count++
-            if (count === interval) {
+            if (count >= interval) {
                 this.event.del('wait')
                 callback()
             }
