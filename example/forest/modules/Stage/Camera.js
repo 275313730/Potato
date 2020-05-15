@@ -13,6 +13,7 @@ export function camera() {
     let createMovement = (x, y, time, callback, disable = true) => {
         // 计算数据
         let frames = time * Game.frames || 1
+
         let perX = x / frames
         let perY = y / frames
 
@@ -50,7 +51,7 @@ export function camera() {
             count++
 
             // 判断移动计数和相机位置
-            if (count > frames || (camera.x < 0 || camera.x > Stage.width - Game.width)) {
+            if (count > frames || (camera.x <= 0 || camera.x >= Stage.width - Game.width)) {
                 // 清空相机移动函数
                 camera.movement = null
 
@@ -77,7 +78,7 @@ export function camera() {
             const fy = follow.y
             const fw = follow.width
             const fh = follow.height
-            
+
             // 相机处于舞台宽度范围内才会跟随精灵x变化，否则固定值
             if (fx < (Game.width - fw) / 2) {
                 camera.x = 0
@@ -120,11 +121,34 @@ export function camera() {
         },
         // 移动到
         moveTo(unit, time, callback) {
-            createMovement((unit.x - camera.x) - (Game.width - unit.width) / 2, (unit.y - camera.y) - (Game.height - unit.height), time, callback)
-        },
-        // 移动到
-        moveTo(x, y, time, callback) {
-            createMovement((x - camera.x) - Game.width / 2, (y - camera.y), time, callback)
+            let x = unit.x
+            let y = unit.y
+            if (Game.width === Stage.width) {
+                x = 0
+            } else {
+                if (x < Game.width / 2) {
+                    x = 0
+                } else if (x > Stage.width - Game.width) {
+                    x = Stage.width - Game.width + unit.width / 2
+                } else {
+                    x -= (Game.width - unit.width) / 2
+                }
+            }
+
+            if (Game.height === Stage.height) {
+                y = 0
+            } else {
+                if (y < Game.height / 2) {
+                    y = 0
+                } else if (y > Stage.height - Game.height) {
+                    y = Stage.height - Game.height + unit.height / 2
+                } else {
+                    y -= (Game.height - unit.height) / 2
+                }
+            }
+            console.log(x, y)
+
+            createMovement((x - camera.x), (y - camera.y), time, callback)
         },
         // 解除跟随
         unFollow() {

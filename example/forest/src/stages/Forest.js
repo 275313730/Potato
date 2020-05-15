@@ -95,7 +95,7 @@ export function forest(mapId, playerX) {
                 this.event.add(shoot)
                 this.event.once(warning)
             } else {
-                this.event.add(addNpc)
+                this.event.add(addNpc, newPlayer)
                 this.event.add(talk, newPlayer, newDialog)
             }
         }

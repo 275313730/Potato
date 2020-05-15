@@ -2,7 +2,7 @@ import { Game } from "../../modules/Game/Game.js";
 import { Sprite } from "../../modules/Sprite/Sprite.js";
 import { npc } from "../sprites/Npc.js";
 
-export function addNpc() {
+export function addNpc(player) {
     if (Game.key === 'Escape') {
         // 删除当前事件
         this.event.del('addNpc')
@@ -17,12 +17,11 @@ export function addNpc() {
         // 添加hatman
         let newHatMan = new Sprite(npc(hatman.id, hatman.x, hatman.textArr))
 
-        /* // 移动镜头
+        // 移动镜头
         this.camera.moveTo(newHatMan, 2, () => {
-            const player = this.sprite.find('player')
             this.camera.moveTo(player, 2, () => {
                 this.camera.follow(player)
             })
-        }) */
+        })
     }
 }
