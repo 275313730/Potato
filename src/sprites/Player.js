@@ -38,16 +38,16 @@ export function player() {
             },
             // 攻击
             attack() {
-                if (this.jumpStatus > 0 || this.hitting) { return }
+                if (this.jumpStatus > 0 || this.hitting || this.attackStatus > 0) { return }
                 this.attackStatus = 1
-                this.graphics.wait(4, () => {
+                this.event.add(wait(4, () => {
                     this.attackStatus = 2
                     this.graphics.animation(this.id, 'attack')
                         .onComplete = () => {
                             this.attackStatus = 0
                             this.restore()
                         }
-                })
+                }))
             },
             // 跳跃
             jump() {
@@ -63,13 +63,20 @@ export function player() {
             },
             // 落地
             ground() {
-                this.jumpStatus = 3
-                this.graphics.image(this.id, 'ground')
-                this.graphics.wait(4, () => {
+                if (this.vSpeed === -4) {
+                    this.jumpStatus = 3
+                    this.graphics.image(this.id, 'ground')
+                    this.event.add(wait(4, () => {
+                        this.hitting = false
+                        this.jumpStatus = 0
+                        this.restore()
+                    }))
+                } else {
                     this.hitting = false
                     this.jumpStatus = 0
                     this.restore()
-                })
+                }
+                this.vSpeed = 0
             },
             // 受伤
             hit() {
@@ -78,11 +85,11 @@ export function player() {
                 this.attackStatus = 0
                 this.graphics.animation(this.id, 'hit')
                     .onComplete = () => {
-                        this.graphics.wait(8, () => {
+                        this.event.add(wait(8, () => {
                             this.hitting = false
                             if (this.jumpStatus === 3) { return }
                             this.restore()
-                        })
+                        }))
                     }
             },
             restore() {
@@ -91,7 +98,7 @@ export function player() {
                 } else {
                     this.stop()
                 }
-            }
+            },
         },
         created() {
             this.stop()
@@ -155,10 +162,21 @@ export function player() {
     function jumpMove() {
         if (this.jumpStatus === 0 || this.jumpStatus === 3) { return }
         this.y -= this.vSpeed
-        if (this.vSpeed >= -3.5) {
+        if (this.vSpeed > -4) {
             this.vSpeed -= 0.5
             if (this.vSpeed === 0 && this.jumpStatus === 1) {
                 this.fall()
+            }
+        }
+    }
+
+    function wait(interval, callback) {
+        let count = 0
+        return function wait() {
+            count++
+            if (count === interval) {
+                this.event.del('wait')
+                callback()
             }
         }
     }

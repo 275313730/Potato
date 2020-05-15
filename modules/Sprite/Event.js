@@ -6,18 +6,14 @@ export function event(sprite) {
         // 添加
         add(func) {
             // 判断事件是否存在
-            if (events[func.name]) {
-                throw new Error(`Event '${func.name}' exists.`)
-            }
+            if (events[func.name]) { return }
             // 添加事件
             events[func.name] = func
         },
         // 删除
         del(name) {
             // 判断事件是否存在
-            if (!events[name]) {
-                throw new Error(`Event ${func.name} doesn't exist.`)
-            }
+            if (!events[name]) { return }
             // 删除事件
             delete events[name]
         },

@@ -12,6 +12,7 @@ export function execute(stage) {
         unit.relX = unit.x - camera.x * (1 - unit.fixed)
         unit.relY = unit.y - camera.y * (1 - unit.fixed)
 
+        // 计算音量
         unit.audio.cal()
 
         // 绘制画面

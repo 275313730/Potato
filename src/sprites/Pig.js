@@ -24,7 +24,16 @@ export function pig(id, x, y) {
                 this.hitting = true
                 this.hp--
                 this.graphics.animation('pig', 'hit')
-                    .onComplete = this.wait()
+                    .onComplete = () => {
+                        this.event.add(wait(16, () => {
+                            this.hitting = false
+                            if (this.hp === 0) {
+                                this.die()
+                            } else {
+                                this.stop()
+                            }
+                        }))
+                    }
             },
             die() {
                 this.graphics.animation('pig', 'dead')
@@ -32,19 +41,20 @@ export function pig(id, x, y) {
                         this.dead = true
                     }
             },
-            wait() {
-                this.graphics.wait(16, () => {
-                    this.hitting = false
-                    if (this.hp === 0) {
-                        this.die()
-                    } else {
-                        this.stop()
-                    }
-                })
-            }
         },
         created() {
             this.stop()
+        }
+    }
+
+    function wait(interval, callback) {
+        let count = 0
+        return function wait() {
+            count++
+            if (count === interval) {
+                this.event.del('wait')
+                callback()
+            }
         }
     }
 }
