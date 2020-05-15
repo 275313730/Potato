@@ -1,7 +1,6 @@
 export function event(sprite) {
     let events = {}
 
-    // 初始化方法
     return {
         // 添加
         add(func) {

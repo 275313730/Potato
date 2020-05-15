@@ -1,6 +1,5 @@
 export function geometry() {
     return {
-
         // 在上面
         above(spriteA, spriteB) {
             if (spriteA.y + spriteA.height <= spriteB.y && spriteA.x + spriteA.width >= spriteB.x && spriteA.x <= spriteB.x + spriteB.width) {
@@ -27,6 +26,7 @@ export function geometry() {
             }
             return true
         },
+        // 距离
         distance(type, spriteA, spriteB) {
             if (type === 'y') {
                 if (spriteB.y > spriteA.y + spriteA.height) {

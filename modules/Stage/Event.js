@@ -4,23 +4,17 @@ export function event(stage) {
     return {
         // 添加
         add(fn, ...args) {
-            if (events[fn.name]) {
-                throw new Error(`Event '${fn.name}' exists.`)
-            }
+            if (events[fn.name]) { reutrn }
             events[fn.name] = fn.bind(stage, ...args)
         },
         // 删除
         del(name) {
-            if (!events[name]) {
-                throw new Error(`Event '${name}' doesn't exist.`)
-            }
+            if (!events[name]) { return }
             delete events[name]
         },
         // 单次
         once(fn, ...args) {
-            if (events[fn.name]) {
-                throw new Error(`Event '${fn.name}' exists.`)
-            }
+            if (events[fn.name]) { return }
             events[fn.name] = () => {
                 fn.call(stage, ...args)
                 delete events[fn.name]

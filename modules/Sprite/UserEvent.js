@@ -37,7 +37,7 @@ export function userEvent(sprite) {
 
                 // 计算画面缩放比例
                 const scale = canvas.clientHeight / Game.height
-                
+
                 // 简化事件属性
                 const mouse = {
                     x: (e.clientX - canvas.offsetLeft) / scale,
@@ -55,17 +55,14 @@ export function userEvent(sprite) {
         }
     }
 
-    // 初始化方法
     return {
         // 添加
         add(callback, eventType, isBreak) {
             // 判断用户事件是否存在
-            if (userEvents[eventType]) {
-                throw new Error(`UserEvent '${eventType}' exists.`)
-            }
+            if (userEvents[eventType]) { return }
 
             // 添加事件到userEvents中
-            userEvents[eventType] = bindFunction.call(sprite, callback, eventType, isBreak)
+            userEvents[eventType] = bindFunction(callback, eventType, isBreak)
 
             // 监听事件
             window.addEventListener(eventType, userEvents[eventType])
@@ -98,7 +95,7 @@ export function userEvent(sprite) {
         // 一次
         once(func, eventType) {
             // 监听事件
-            window.addEventListener(eventType, bindFunction.call(sprite, func), { once: true })
+            window.addEventListener(eventType, bindFunction(func), { once: true })
         },
     };
 }

@@ -1,7 +1,11 @@
 import { Game } from "../Game/Game.js"
 
 export function graphics(unit) {
-    // 执行函数
+    // 声明常量
+    const ctx = Game.context
+    const floor = Math.floor
+
+    // 初始化执行函数
     let executor = null
 
     // 设置尺寸
@@ -20,65 +24,69 @@ export function graphics(unit) {
             unit.height = height
         }
     }
+
     // 获取绘制数据
     let getData = () => {
         return {
-            context: Game.context,
             relX: unit.relX,
             relY: unit.relY,
             offsetLeft: unit.offsetLeft,
             offsetTop: unit.offsetTop,
+            width: unit.width,
             drawWidth: unit.drawWidth,
             drawHeight: unit.drawHeight,
             scale: unit.scale,
-            alpha: unit.alpha
+            direction: unit.direction
         }
     }
+
     // 绘制图片
     let drawImage = (image) => {
-        const { context, relX, relY, offsetLeft, offsetTop, drawWidth, drawHeight, scale, alpha } = getData()
-
-        context.globalAlpha = alpha
+        const { relX, relY, offsetLeft, offsetTop, width, drawWidth, drawHeight, scale, direction } = getData()
 
         // 图片方向
-        if (unit.direction === 'right') {
-            const tranlateX = Math.floor(relX + offsetLeft)
-            const tranlateY = Math.floor(relY + offsetTop)
-            context.drawImage(image, 0, 0, drawWidth, drawHeight, tranlateX, tranlateY, drawWidth * scale, drawHeight * scale)
+        if (direction === 'right') {
+            const tranlateX = floor(relX + offsetLeft)
+            const tranlateY = floor(relY + offsetTop)
+            ctx.drawImage(image, 0, 0, drawWidth, drawHeight, tranlateX, tranlateY, drawWidth * scale, drawHeight * scale)
         } else {
-            const tranlateX = Math.floor(Game.width - unit.width - relX + offsetLeft)
-            const tranlateY = Math.floor(relY + offsetTop)
+            const tranlateX = floor(Game.width - width - relX + offsetLeft)
+            const tranlateY = floor(relY + offsetTop)
 
             // 水平翻转绘制
-            context.translate(Game.width, 0);
-            context.scale(-1, 1);
-            context.drawImage(image, 0, 0, drawWidth, drawHeight, tranlateX, tranlateY, drawWidth * scale, drawHeight * scale)
-            context.translate(Game.width, 0);
-            context.scale(-1, 1);
+            drawFlip(Game.width, () => {
+                ctx.drawImage(image, 0, 0, drawWidth, drawHeight, tranlateX, tranlateY, drawWidth * scale, drawHeight * scale)
+            })
         }
     }
+
     // 绘制动画
     let drawAnimation = (image, flip, currFrame) => {
-        const { context, relX, relY, offsetLeft, offsetTop, drawWidth, drawHeight, scale, alpha } = getData()
-
-        context.globalAlpha = alpha
+        const { relX, relY, offsetLeft, offsetTop, width, drawWidth, drawHeight, scale, direction } = getData()
 
         // 图片方向
-        if (!flip && unit.direction === 'right' || flip && unit.direction === 'left') {
-            const tranlateX = Math.floor(relX + offsetLeft)
-            const tranlateY = Math.floor(relY + offsetTop)
-            context.drawImage(image, currFrame * drawWidth, 0, drawWidth, drawHeight, tranlateX, tranlateY, drawWidth * scale, drawHeight * scale)
+        if (!flip && direction === 'right' || flip && direction === 'left') {
+            const tranlateX = floor(relX + offsetLeft)
+            const tranlateY = floor(relY + offsetTop)
+            ctx.drawImage(image, currFrame * drawWidth, 0, drawWidth, drawHeight, tranlateX, tranlateY, drawWidth * scale, drawHeight * scale)
         } else {
-            const tranlateX = Math.floor(Game.width - unit.width * scale - relX + offsetLeft)
-            const tranlateY = Math.floor(relY + offsetTop)
+            const tranlateX = floor(Game.width - width * scale - relX + offsetLeft)
+            const tranlateY = floor(relY + offsetTop)
 
             // 水平翻转绘制
-            context.translate(Game.width, 0);
-            context.scale(-1, 1);
-            context.drawImage(image, currFrame * drawWidth, 0, drawWidth, drawHeight, tranlateX, tranlateY, drawWidth * scale, drawHeight * scale)
-            context.translate(Game.width, 0);
-            context.scale(-1, 1);
+            drawFlip(Game.width, () => {
+                ctx.drawImage(image, currFrame * drawWidth, 0, drawWidth, drawHeight, tranlateX, tranlateY, drawWidth * scale, drawHeight * scale)
+            })
         }
+    }
+
+    // 翻转绘制
+    function drawFlip(width, callback) {
+        ctx.translate(width, 0);
+        ctx.scale(-1, 1);
+        callback()
+        ctx.translate(width, 0);
+        ctx.scale(-1, 1);
     }
 
     // 初始化方法
@@ -154,6 +162,10 @@ export function graphics(unit) {
             // 返回数据
             return options
         },
+        // 清除
+        clear() {
+            executor = null
+        },
         // 绘制
         draw(callback) {
             executor = () => callback.call(unit, Game.context)
@@ -170,7 +182,7 @@ export function graphics(unit) {
                 drawImage(image)
             }
         },
-        // 混合
+        // 混合(混合和绘制的区别在于混合可以清除画布再继续绘制而不会影响原画布)
         mix(type, callback) {
             const mixCanvas = Game.canvas.cloneNode()
             const ctx = mixCanvas.getContext('2d')
@@ -244,20 +256,17 @@ export function graphics(unit) {
 
                 drawImage(image)
             }
-        },   
+        },
         // 渲染
         render() {
             Game.context.globalAlpha = unit.alpha
             executor && executor()
             Game.test && this.test()
         },
+        // 测试
         test() {
             Game.context.strokeStyle = 'red'
             Game.context.strokeRect(unit.relX, unit.relY, unit.width, unit.height)
-        },
-        // 取消绑定
-        unBind() {
-            executor = null
         },
     }
 }

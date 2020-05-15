@@ -22,7 +22,6 @@ export class Game {
             e.preventDefault()
             this.mouseDown = false
         })
-
         // 禁用右键菜单
         window.oncontextmenu = function () {
             return false;

@@ -53,17 +53,6 @@ export class Sprite {
         if (this.id instanceof Number || !isNaN(Number(this.id))) {
             throw new Error('Sprite must start with a letter.')
         }
-        // 检查width和height
-        if (this.width && this.width < 0) {
-            throw new Error(`Sprite's width must be greater than 0`)
-        }
-        if (this.height && this.height < 0) {
-            throw new Error(`Sprite's height must be greater than 0`)
-        }
-        // 检查方向
-        if (this.direction && this.direction !== 'right' && this.direction !== 'left') {
-            throw new Error(`Direction isn't correct.`)
-        }
 
         // Game和Stage的宽高(只读)
         Object.defineProperties(this, {
