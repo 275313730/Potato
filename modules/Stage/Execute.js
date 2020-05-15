@@ -49,10 +49,6 @@ export function execute(stage) {
     }
 
     return {
-        // 开始
-        start() {
-            refresh()
-        },
         // 销毁
         destory() {
             // 退出循环
@@ -60,6 +56,10 @@ export function execute(stage) {
 
             // 清空场景精灵
             Game.unit.delAll()
-        }
+        },
+        // 进入循环
+        loop() {
+            refresh()
+        },
     }
 }

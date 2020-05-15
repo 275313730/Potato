@@ -9,6 +9,13 @@ export function event(stage) {
             }
             events[fn.name] = fn.bind(stage, ...args)
         },
+        // 删除
+        del(name) {
+            if (!events[name]) {
+                throw new Error(`Event '${name}' doesn't exist.`)
+            }
+            delete events[name]
+        },
         // 单次
         once(fn, ...args) {
             if (events[fn.name]) {
@@ -18,13 +25,6 @@ export function event(stage) {
                 fn.call(stage, ...args)
                 delete events[fn.name]
             }
-        },
-        // 删除
-        del(name) {
-            if (!events[name]) {
-                throw new Error(`Event '${name}' doesn't exist.`)
-            }
-            delete events[name]
         },
         // 遍历
         travel(callback) {

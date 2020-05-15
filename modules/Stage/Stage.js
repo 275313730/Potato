@@ -44,7 +44,7 @@ export class Stage {
             options.created && options.created.call(this)
 
             // 进入循环
-            this.execute.start()
+            this.execute.loop()
         })
     }
 }

@@ -106,27 +106,28 @@ export function camera(stage) {
             if (unit === camera.follow) { return }
             camera.follow = unit
         },
-        // 解除跟随
-        unFollow() {
-            camera.follow = null
-        },
-        // 移动
-        move(x, y, time, callback) {
-            createMovement(x, y, time, callback)
-        },
-        // 移动到
-        moveTo(x, y, time, callback) {
-            createMovement((x - camera.x) - Game.width / 2, (y - camera.y), time, callback)
-        },
-        moveTo(unit, time, callback) {
-            createMovement((unit.x - camera.x) - (Game.width - unit.width) / 2, (unit.y - camera.y) - (Game.height - unit.height), time, callback)
-        },
         // 获取镜头数据
         get() {
             // 计算镜头数据
             cal()
             // 返回镜头数据(只读)
             return Object.assign({}, camera)
-        }
+        },
+        // 移动
+        move(x, y, time, callback) {
+            createMovement(x, y, time, callback)
+        },
+        // 移动到
+        moveTo(unit, time, callback) {
+            createMovement((unit.x - camera.x) - (Game.width - unit.width) / 2, (unit.y - camera.y) - (Game.height - unit.height), time, callback)
+        },
+        // 移动到
+        moveTo(x, y, time, callback) {
+            createMovement((x - camera.x) - Game.width / 2, (y - camera.y), time, callback)
+        },
+        // 解除跟随
+        unFollow() {
+            camera.follow = null
+        },
     }
 }

@@ -83,97 +83,6 @@ export function graphics(unit) {
 
     // 初始化方法
     return {
-        // 绘制
-        draw(callback) {
-            executor = () => callback.call(unit, Game.context)
-        },
-        // 混合
-        mix(type, callback) {
-            const mixCanvas = Game.canvas.cloneNode()
-            const ctx = mixCanvas.getContext('2d')
-            let mixImage = new Image();
-            if (type === 'static') {
-                ctx.clearRect(0, 0, Game.width, Game.height)
-                callback(ctx)
-                mixImage.src = mixCanvas.toDataURL("image/png");
-                executor = () => {
-                    Game.context.drawImage(mixImage, 0, 0)
-                }
-            } else if (type === 'dynamic') {
-                executor = () => {
-                    ctx.clearRect(0, 0, Game.width, Game.height)
-                    callback(ctx)
-                    mixImage.src = mixCanvas.toDataURL("image/png");
-                    Game.context.drawImage(mixImage, 0, 0)
-                }
-            }
-        },
-        // 图片
-        image(group, name, sameSize = false) {
-            // 获取图片数据
-            const image = Game.asset.get(group, name)
-
-            setSize(image.width, image.height, sameSize)
-
-            // 绘制函数
-            executor = () => {
-                drawImage(image)
-            }
-        },
-        // 粒子
-        particle(group, name, interval, alphaRange, scaleRange) {
-            const image = Game.asset.get(group, name)
-
-            // 设置精灵尺寸(粒子精灵没有宽度和高度)
-            Object.defineProperties(unit, {
-                'width': {
-                    value: 0
-                },
-                'height': {
-                    value: 0
-                },
-                'drawWidth': {
-                    value: image.width
-                },
-                'drawHeight': {
-                    value: image.height
-                }
-            })
-
-            // 设置粒子属性
-            let nextAlpha, nextscale
-
-            // 检查粒子是否有透明度变化
-            if (alphaRange) {
-                nextAlpha = (alphaRange[1] - alphaRange[0]) / interval
-            }
-
-            // 检查粒子是否有尺寸变化
-            if (scaleRange) {
-                nextscale = (scaleRange[1] - scaleRange[0]) / interval
-                unit.scale = scaleRange[1]
-            }
-
-            executor = () => {
-                // 透明度变化
-                if (nextAlpha != null) {
-                    if (unit.alpha + nextAlpha <= alphaRange[0] || unit.alpha + nextAlpha >= alphaRange[1]) {
-                        nextAlpha = -nextAlpha
-                    }
-                    unit.alpha += nextAlpha
-                }
-
-                // 尺寸变化
-                if (nextscale != null) {
-                    if (unit.scale + nextscale <= scaleRange[0] || unit.scale + nextscale >= scaleRange[1]) {
-                        nextscale = - nextscale
-                    }
-                    unit.scale += nextscale
-                }
-
-                drawImage(image)
-            }
-        },
         // 动画
         animation(group, name, sameSize = false) {
             // 获取动画数据
@@ -245,19 +154,110 @@ export function graphics(unit) {
             // 返回数据
             return options
         },
-        // 取消绑定
-        unBind() {
-            executor = null
+        // 绘制
+        draw(callback) {
+            executor = () => callback.call(unit, Game.context)
         },
-        test() {
-            Game.context.strokeStyle = 'red'
-            Game.context.strokeRect(unit.relX, unit.relY, unit.width, unit.height)
+        // 图片
+        image(group, name, sameSize = false) {
+            // 获取图片数据
+            const image = Game.asset.get(group, name)
+
+            setSize(image.width, image.height, sameSize)
+
+            // 绘制函数
+            executor = () => {
+                drawImage(image)
+            }
         },
+        // 混合
+        mix(type, callback) {
+            const mixCanvas = Game.canvas.cloneNode()
+            const ctx = mixCanvas.getContext('2d')
+            let mixImage = new Image();
+            if (type === 'static') {
+                ctx.clearRect(0, 0, Game.width, Game.height)
+                callback(ctx)
+                mixImage.src = mixCanvas.toDataURL("image/png");
+                executor = () => {
+                    Game.context.drawImage(mixImage, 0, 0)
+                }
+            } else if (type === 'dynamic') {
+                executor = () => {
+                    ctx.clearRect(0, 0, Game.width, Game.height)
+                    callback(ctx)
+                    mixImage.src = mixCanvas.toDataURL("image/png");
+                    Game.context.drawImage(mixImage, 0, 0)
+                }
+            }
+        },
+        // 粒子
+        particle(group, name, interval, alphaRange, scaleRange) {
+            const image = Game.asset.get(group, name)
+
+            // 设置精灵尺寸(粒子精灵没有宽度和高度)
+            Object.defineProperties(unit, {
+                'width': {
+                    value: 0
+                },
+                'height': {
+                    value: 0
+                },
+                'drawWidth': {
+                    value: image.width
+                },
+                'drawHeight': {
+                    value: image.height
+                }
+            })
+
+            // 设置粒子属性
+            let nextAlpha, nextscale
+
+            // 检查粒子是否有透明度变化
+            if (alphaRange) {
+                nextAlpha = (alphaRange[1] - alphaRange[0]) / interval
+            }
+
+            // 检查粒子是否有尺寸变化
+            if (scaleRange) {
+                nextscale = (scaleRange[1] - scaleRange[0]) / interval
+                unit.scale = scaleRange[1]
+            }
+
+            executor = () => {
+                // 透明度变化
+                if (nextAlpha != null) {
+                    if (unit.alpha + nextAlpha <= alphaRange[0] || unit.alpha + nextAlpha >= alphaRange[1]) {
+                        nextAlpha = -nextAlpha
+                    }
+                    unit.alpha += nextAlpha
+                }
+
+                // 尺寸变化
+                if (nextscale != null) {
+                    if (unit.scale + nextscale <= scaleRange[0] || unit.scale + nextscale >= scaleRange[1]) {
+                        nextscale = - nextscale
+                    }
+                    unit.scale += nextscale
+                }
+
+                drawImage(image)
+            }
+        },   
         // 渲染
         render() {
             Game.context.globalAlpha = unit.alpha
             executor && executor()
             Game.test && this.test()
-        }
+        },
+        test() {
+            Game.context.strokeStyle = 'red'
+            Game.context.strokeRect(unit.relX, unit.relY, unit.width, unit.height)
+        },
+        // 取消绑定
+        unBind() {
+            executor = null
+        },
     }
 }

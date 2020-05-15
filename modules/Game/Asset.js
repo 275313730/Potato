@@ -3,10 +3,23 @@ export function asset(imagePath, audioPath) {
     let assets = {}
 
     return {
-        // 载入图片
+        // 全部载入完成
+        allLoaded(callback) {
+            if (loadings.length > 0) {
+                Promise.all(loadings)
+                    .then(() => callback())
+            } else {
+                callback()
+            }
+        },
+        // 获取资源
+        get(group, name) {
+            return assets[group][name]
+        },
+        // 载入资源
         load(options) {
             const type = options.type
-            const group = options.group 
+            const group = options.group
             const name = options.name
             const url = options.url
 
@@ -51,16 +64,5 @@ export function asset(imagePath, audioPath) {
                 assets[group][name] = new Audio(audioPath + url)
             }
         },
-        allLoaded(callback) {
-            if (loadings.length > 0) {
-                Promise.all(loadings)
-                    .then(() => callback())
-            } else {
-                callback()
-            }
-        },
-        get(group, name) {
-            return assets[group][name]
-        }
     }
 }

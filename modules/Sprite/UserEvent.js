@@ -70,11 +70,6 @@ export function userEvent(sprite) {
             // 监听事件
             window.addEventListener(eventType, userEvents[eventType])
         },
-        // 一次
-        once(func, eventType) {
-            // 监听事件
-            window.addEventListener(eventType, bindFunction.call(sprite, func), { once: true })
-        },
         // 删除
         del(eventType) {
             // 没有传参视为无效
@@ -99,6 +94,11 @@ export function userEvent(sprite) {
 
             // 清空用户事件
             userEvents = {}
-        }
+        },
+        // 一次
+        once(func, eventType) {
+            // 监听事件
+            window.addEventListener(eventType, bindFunction.call(sprite, func), { once: true })
+        },
     };
 }

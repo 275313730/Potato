@@ -61,6 +61,21 @@ export function unit() {
 
             return Object.keys(units)
         },
+        // 删除所有
+        delAll(boolean) {
+            if (boolean) {
+                for (const key in units) {
+                    this.del(key)
+                }
+            } else {
+                let unGlobal = this.filter(unit => {
+                    return !unit.global
+                })
+                for (const key in unGlobal) {
+                    this.del(key)
+                }
+            }
+        },
         // 查找
         find(id) {
             return units[id]
@@ -78,21 +93,7 @@ export function unit() {
 
             return newUnits
         },
-        // 删除所有
-        delAll(boolean) {
-            if (boolean) {
-                for (const key in units) {
-                    this.del(key)
-                }
-            } else {
-                let unGlobal = this.filter(unit => {
-                    return !unit.global
-                })
-                for (const key in unGlobal) {
-                    this.del(key)
-                }
-            }
-        },
+        
         // 遍历
         travel(callback) {
             for (const key in units) {
