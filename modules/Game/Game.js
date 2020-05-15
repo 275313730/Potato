@@ -1,6 +1,5 @@
 "use strict"
 import { asset } from "./Asset.js";
-import { execute } from "./Execute.js";
 import { unit } from "./Unit.js";
 
 export class Game {
@@ -55,7 +54,6 @@ export class Game {
         // 初始化实例方法
         this.asset = asset(this.imagePath, this.audioPath)
         this.unit = unit()
-        this.execute = execute()
 
         // 设置body属性
         document.body.style.userSelect = 'none'

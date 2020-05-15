@@ -1,5 +1,6 @@
 // Modules
 import { Game } from "./modules/Game/Game.js";
+import { Stage } from "./modules/Stage/Stage.js";
 
 // Title
 import { test } from "./src/stages/Test.js";
@@ -150,8 +151,8 @@ export function App(e) {
     })
 
     // 调试模式
-    Game.test = false
+    Game.test = true
 
     // 创建场景
-    Game.execute.switchStage(test())
+    new Stage(test())
 }
