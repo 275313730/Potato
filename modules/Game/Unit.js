@@ -44,13 +44,20 @@ export function unit() {
         },
         // 删除
         del(id) {
-            if (!units[id]) {
+            const unit = units[id]
+            if (!unit) {
                 throw new Error(`Unit ${id} doesn't exist`)
             }
 
+            // 单位销毁前
+            unit.beforeDestroy && unit.beforeDestroy()
+
             // 解绑精灵用户事件
-            units[id].userEvent.delAll()
+            unit.userEvent.delAll()
             delete units[id]
+
+            // 单位销毁后
+            unit.destroyed && unit.destroyed()
 
             return Object.keys(units)
         },

@@ -21,7 +21,7 @@ export class Sprite {
         this.offsetLeft = config.offsetLeft || 0
         this.offsetTop = config.offsetTop || 0
 
-        // global 决定是否全局精灵
+        // global 决定是否为全局单位
         this.global = config.global || false
 
         // alpha 决定绘制透明度
@@ -36,7 +36,7 @@ export class Sprite {
         // layer 决定图片上下关系
         this.layer = config.layer || 0
 
-        // diasabled 为true时无法执行精灵事件和用户事件
+        // diasabled 为true时无法执行单位事件和用户事件
         this.disabled = config.disabled || false
 
         // fixed
@@ -97,10 +97,13 @@ export class Sprite {
         this.event = event(this)
         this.userEvent = userEvent(this)
 
-        // 执行生命周期函数
+        // 单位创建后
         options.created && options.created.call(this)
 
         // 添加到游戏单位中
         Game.unit.add(this)
+
+        // 单位挂载后
+        options.mounted && options.mounted()
     }
 }
