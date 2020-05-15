@@ -74,32 +74,42 @@ export function camera() {
         const follow = camera.follow
         // 当相机跟随精灵时
         if (follow) {
-            const fx = follow.x
-            const fy = follow.y
-            const fw = follow.width
-            const fh = follow.height
-
-            // 相机处于舞台宽度范围内才会跟随精灵x变化，否则固定值
-            if (fx < (Game.width - fw) / 2) {
-                camera.x = 0
-            } else if (fx > Stage.width - (Game.width + fw) / 2) {
-                camera.x = Stage.width - Game.width
-            } else {
-                camera.x = fx - (Game.width - fw) / 2
-            }
-
-            // 相机处于舞台高度范围内才会跟随精灵x变化，否则固定值
-            if (fy < (Game.height - fh) / 2) {
-                camera.y = 0
-            } else if (fy > Stage.height - (Game.height + fh) / 2) {
-                camera.y = Stage.height - Game.height
-            } else {
-                camera.y = fy - (Game.height - fh) / 2
-            }
+            const position = borderCal(follow)
+            camera.x = position.x
+            camera.y = position.y
         } else {
             // 执行相机移动函数
             camera.movement && camera.movement()
         }
+    }
+
+    // 计算边界问题
+    function borderCal(unit) {
+        const fx = unit.x
+        const fy = unit.y
+        const fw = unit.width
+        const fh = unit.height
+        let x, y
+
+        // 相机处于舞台宽度范围内才会跟随精灵x变化，否则固定值
+        if (fx < (Game.width - fw) / 2) {
+            x = 0
+        } else if (fx > Stage.width - (Game.width + fw) / 2) {
+            x = Stage.width - Game.width
+        } else {
+            x = fx - (Game.width - fw) / 2
+        }
+
+        // 相机处于舞台高度范围内才会跟随精灵x变化，否则固定值
+        if (fy < (Game.height - fh) / 2) {
+            y = 0
+        } else if (fy > Stage.height - (Game.height + fh) / 2) {
+            y = Stage.height - Game.height
+        } else {
+            y = fy - (Game.height - fh) / 2
+        }
+
+        return { x, y }
     }
 
     return {
@@ -121,32 +131,7 @@ export function camera() {
         },
         // 移动到
         moveTo(unit, time, callback) {
-            let x = unit.x
-            let y = unit.y
-            if (Game.width === Stage.width) {
-                x = 0
-            } else {
-                if (x < Game.width / 2) {
-                    x = 0
-                } else if (x > Stage.width - Game.width) {
-                    x = Stage.width - Game.width + unit.width / 2
-                } else {
-                    x -= (Game.width - unit.width) / 2
-                }
-            }
-
-            if (Game.height === Stage.height) {
-                y = 0
-            } else {
-                if (y < Game.height / 2) {
-                    y = 0
-                } else if (y > Stage.height - Game.height) {
-                    y = Stage.height - Game.height + unit.height / 2
-                } else {
-                    y -= (Game.height - unit.height) / 2
-                }
-            }
-            console.log(x, y)
+            const { x, y } = borderCal(unit)
 
             createMovement((x - camera.x), (y - camera.y), time, callback)
         },
