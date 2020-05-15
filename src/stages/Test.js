@@ -67,7 +67,7 @@ export function test() {
             const pigsData = [
                 [1, 150, 78, 'left'],
                 [2, 200, 334, 'right'],
-                [3, 280, 589, 'right']
+                [3, 280, 590, 'right']
             ]
             pigsData.forEach(data => {
                 new Sprite(pig(...data))

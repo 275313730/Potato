@@ -152,7 +152,7 @@ export function App(e) {
     })
 
     // 调试模式
-    Game.test = true
+    Game.test = false
 
     // 创建场景
     new Stage(test())
