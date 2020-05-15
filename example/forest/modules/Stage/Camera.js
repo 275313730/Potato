@@ -77,7 +77,7 @@ export function camera() {
             const fy = follow.y
             const fw = follow.width
             const fh = follow.height
-
+            
             // 相机处于舞台宽度范围内才会跟随精灵x变化，否则固定值
             if (fx < (Game.width - fw) / 2) {
                 camera.x = 0
