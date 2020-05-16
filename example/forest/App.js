@@ -1,13 +1,9 @@
 // modules
 import { Game } from "./modules/Game/Game.js";
 import { Stage } from "./modules/Stage/Stage.js";
-import { Sprite } from "./modules/Sprite/Sprite.js";
 
 // stages
 import { title } from "./src/stages/Title.js";
-
-// sprites
-import { text } from "./src/sprites/Text.js";
 
 // 交互使音频可自动播放
 window.addEventListener('keydown', App)
@@ -200,7 +196,4 @@ export function App(e) {
 
     // 创建场景
     new Stage(title())
-
-    // 创建全局精灵
-    new Sprite(text())
 }

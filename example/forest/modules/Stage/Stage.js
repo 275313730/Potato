@@ -21,6 +21,28 @@ export class Stage {
             const config = options.config
             Stage.width = (config && config.width) || Game.width
             Stage.height = (config && config.height) || Game.height
+            Object.defineProperties(this, {
+                'width': {
+                    get() {
+                        return Stage.width
+                    },
+                    set(newVal) {
+                        if (Stage.width !== newVal) {
+                            Stage.width = newVal
+                        }
+                    }
+                },
+                'height': {
+                    get() {
+                        return Stage.height
+                    },
+                    set(newVal) {
+                        if (Stage.height !== newVal) {
+                            Stage.height = newVal
+                        }
+                    }
+                }
+            })
 
             // 初始化实例方法
             this.camera = camera()

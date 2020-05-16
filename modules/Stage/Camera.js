@@ -85,28 +85,28 @@ export function camera() {
 
     // 计算边界问题
     function borderCal(unit) {
-        const fx = unit.x
-        const fy = unit.y
-        const fw = unit.width
-        const fh = unit.height
+        const ux = unit.x
+        const uy = unit.y
+        const uw = unit.width
+        const uh = unit.height
         let x, y
 
         // 相机处于舞台宽度范围内才会跟随精灵x变化，否则固定值
-        if (fx < (Game.width - fw) / 2) {
+        if (ux < (Game.width - uw) / 2) {
             x = 0
-        } else if (fx > Stage.width - (Game.width + fw) / 2) {
+        } else if (ux > Stage.width - (Game.width + uw) / 2) {
             x = Stage.width - Game.width
         } else {
-            x = fx - (Game.width - fw) / 2
+            x = ux - (Game.width - uw) / 2
         }
 
         // 相机处于舞台高度范围内才会跟随精灵x变化，否则固定值
-        if (fy < (Game.height - fh) / 2) {
+        if (uy < (Game.height - uh) / 2) {
             y = 0
-        } else if (fy > Stage.height - (Game.height + fh) / 2) {
+        } else if (uy > Stage.height - (Game.height + uh) / 2) {
             y = Stage.height - Game.height
         } else {
-            y = fy - (Game.height - fh) / 2
+            y = uy - (Game.height - uh) / 2
         }
 
         return { x, y }

@@ -11,11 +11,12 @@ export function addNpc(player) {
         const hatman = {
             id: 'hatman',
             x: 420,
-            textArr: [`hatman: "Wow, you created me.You can walk forward to the next map."`],
+            top: -5,
+            textArr: [`hatman: "Wow, you created me.It's amazing."`],
         }
 
         // 添加hatman
-        let newHatMan = new Sprite(npc(hatman.id, hatman.x, hatman.textArr))
+        let newHatMan = new Sprite(npc(hatman.id, hatman.x, hatman.top, hatman.textArr))
 
         // 移动镜头
         this.camera.moveTo(newHatMan, 2, () => {

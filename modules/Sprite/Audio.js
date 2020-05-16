@@ -7,6 +7,10 @@ export function audio(unit) {
     return {
         // 计算音量
         cal() {
+            if (music.audio && sounds.length > 0) {
+                return
+            }
+            
             const relX = unit.relX
             const relY = unit.relY
             const distance = Math.sqrt(relX * relX + relY * relY)

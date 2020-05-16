@@ -1,10 +1,11 @@
-export function npc(id, x, textArr) {
+export function npc(id, x, top, textArr) {
     return {
         config: {
             id,
             x,
             height: 48,
             width: 40,
+            offsetTop: top || 0,
             direction: 'left',
             layer: 1,
         },

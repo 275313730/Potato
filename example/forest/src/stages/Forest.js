@@ -1,21 +1,16 @@
 // modules
-import { Stage } from "../../modules/Stage/Stage.js";
 import { Sprite } from "../../modules/Sprite/Sprite.js";
 
 // sprites
 import { backGround } from "../sprites/BackGround.js";
 import { player } from "../sprites/Player.js";
 import { npc } from "../sprites/Npc.js";
-import { enemy } from "../sprites/Enemy.js";
 import { dialog } from "../sprites/Dialog.js";
 import { particle } from "../sprites/Particle.js";
 
 // events
 import { addNpc } from "../events/AddNpc.js";
-import { enterNewStage } from "../events/EnterNewStage.js";
-import { shoot } from "../events/Shoot.js";
 import { talk } from "../events/Talk.js";
-import { warning } from "../events/Warning.js";
 
 export function forest(mapId, playerX) {
     // 背景分层
@@ -50,6 +45,7 @@ export function forest(mapId, playerX) {
         {
             id: 'oldman',
             x: 280,
+            top: 7,
             textArr: [`oldman: "Try to press 'Esc', you can create a new sprite."`,
                 `You: "I will try."`]
         }
@@ -61,7 +57,7 @@ export function forest(mapId, playerX) {
             bgs.forEach(bg => {
                 const unit = new Sprite(backGround(bg.id, bg.fixed))
                 if (bg.fixed === 0) {
-                    Stage.width = unit.width
+                    this.width = unit.width
                 }
             })
 
@@ -69,17 +65,10 @@ export function forest(mapId, playerX) {
             const newPlayer = new Sprite(player(playerX || 10))
             this.camera.follow(newPlayer)
 
-            if (mapId % 2 === 0) {
-                // 载入npc
-                npcs.forEach(n => {
-                    new Sprite(npc(n.id, n.x, n.textArr))
-                })
-            } else {
-                // 载入敌人
-                for (let i = 0; i < 3; i++) {
-                    new Sprite(enemy('hyena', i, newPlayer))
-                }
-            }
+            // 载入npc
+            npcs.forEach(n => {
+                new Sprite(npc(n.id, n.x, n.top, n.textArr))
+            })
 
             // 载入对话框
             const newDialog = new Sprite(dialog())
@@ -88,16 +77,8 @@ export function forest(mapId, playerX) {
             new Sprite(particle('test', 'twinkling', 100, 50))
 
             // 载入事件
-            this.event.add(enterNewStage, newPlayer, mapId)
-
-            // 根据地图id载入不同的事件
-            if (mapId % 2 === 1) {
-                this.event.add(shoot)
-                this.event.once(warning)
-            } else {
-                this.event.add(addNpc, newPlayer)
-                this.event.add(talk, newPlayer, newDialog)
-            }
+            this.event.add(addNpc, newPlayer)
+            this.event.add(talk, newPlayer, newDialog)
         }
     }
 }
