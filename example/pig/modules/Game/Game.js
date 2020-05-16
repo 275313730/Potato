@@ -38,24 +38,24 @@ export class Game {
 
 
         // 禁用原生事件
-        this.canvas.addEventListener('keydown', e => {
+        window.addEventListener('keydown', e => {
             e.stopPropagation()
             e.preventDefault()
         })
-        this.canvas.addEventListener('keyup', e => {
+        window.addEventListener('keyup', e => {
             e.stopPropagation()
             e.preventDefault()
             if (this.key === e.key) {
                 this.key = null
             }
         })
-        this.canvas.addEventListener('mouseup', e => {
+        window.addEventListener('mouseup', e => {
             e.stopPropagation()
             e.preventDefault()
             this.mouseDown = false
         })
         // 禁用右键菜单
-        this.canvas.oncontextmenu = function () {
+        window.oncontextmenu = function () {
             return false;
         }
     }

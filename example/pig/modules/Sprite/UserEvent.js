@@ -1,6 +1,6 @@
 import { Game } from "../Game/Game.js"
 
-export function userEvent(sprite) {
+export function userEvent(unit) {
     let userEvents = {}
 
     function bindFunction(callback, eventType, isBreak) {
@@ -25,10 +25,10 @@ export function userEvent(sprite) {
             }
 
             // 没有加入到场景前禁用
-            if (!sprite.stage) { return }
+            if (!unit.stage) { return }
 
             // disabled时禁用
-            if (sprite.disabled) { return }
+            if (unit.disabled) { return }
 
             // 判断事件类型
             // 鼠标事件
@@ -44,13 +44,13 @@ export function userEvent(sprite) {
                     y: (e.clientY - canvas.offsetTop) / scale,
                     button: e.button
                 }
-                callback.call(sprite, mouse)
+                callback.call(unit, mouse)
                 return
             }
 
             // 键盘事件
             if (eventType.indexOf('key') > -1) {
-                callback.call(sprite, e.key)
+                callback.call(unit, e.key)
             }
         }
     }
@@ -65,7 +65,7 @@ export function userEvent(sprite) {
             userEvents[eventType] = bindFunction(callback, eventType, isBreak)
 
             // 监听事件
-            Game.canvas.addEventListener(eventType, userEvents[eventType])
+            window.addEventListener(eventType, userEvents[eventType])
         },
         // 删除
         del(eventType) {
@@ -73,7 +73,7 @@ export function userEvent(sprite) {
             if (!eventType || !userEvents[eventType]) { return }
 
             // 解除监听
-            Game.canvas.removeEventListener(eventType, events[eventType])
+            window.removeEventListener(eventType, events[eventType])
         },
         // 删除所有
         delAll() {
