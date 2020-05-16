@@ -12,7 +12,7 @@ import { particle } from "../sprites/Particle.js";
 import { addNpc } from "../events/AddNpc.js";
 import { talk } from "../events/Talk.js";
 
-export function forest(mapId, playerX) {
+export function forest() {
     // 背景分层
     const bgs = [
         {
@@ -62,7 +62,7 @@ export function forest(mapId, playerX) {
             })
 
             // 载入玩家
-            const newPlayer = new Sprite(player(playerX || 10))
+            const newPlayer = new Sprite(player())
             this.camera.follow(newPlayer)
 
             // 载入npc

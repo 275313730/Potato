@@ -4,18 +4,18 @@ export function unit() {
     let layers = []
     // 排序
     function sort() {
-        let newSprites = {}
+        let newUnits = {}
         // 根据图层值排序
         layers.forEach(layer => {
             for (const key in units) {
-                const sprite = units[key]
-                if (sprite.layer === layer) {
-                    newSprites[sprite.id] = sprite
+                const unit = units[key]
+                if (unit.layer === layer) {
+                    newUnits[unit.id] = unit
                     delete units[key]
                 }
             }
         })
-        units = newSprites
+        units = newUnits
     }
 
     return {
@@ -26,7 +26,7 @@ export function unit() {
                 throw new Error(`Sprite '${newUnit.id}' exists.`)
             }
 
-            // 加入场景精灵
+            // 加入场景单位
             units[newUnit.id] = newUnit
 
             // 如果图层值不在layers中则新增图层值并排序layers
@@ -37,7 +37,7 @@ export function unit() {
                 layers.sort()
             }
 
-            // 精灵排序
+            // 单位排序
             sort()
 
             return newUnit

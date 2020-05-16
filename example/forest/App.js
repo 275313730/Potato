@@ -11,7 +11,7 @@ window.addEventListener('keydown', App)
 export function App(e) {
     // 移除事件
     if (e.key !== ' ') { return }
-    tip.parentNode.removeChild(tip)
+    tip.remove()
     window.removeEventListener('keydown', App)
 
     // 初始化Game类

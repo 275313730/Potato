@@ -65,37 +65,25 @@ export function userEvent(sprite) {
             userEvents[eventType] = bindFunction(callback, eventType, isBreak)
 
             // 监听事件
-            window.addEventListener(eventType, userEvents[eventType])
+            Game.canvas.addEventListener(eventType, userEvents[eventType])
         },
         // 删除
         del(eventType) {
-            // 没有传参视为无效
-            if (!eventType) {
-                throw new Error(`This function need an eventType`)
-            }
-
             // 判断用户事件是否存在
-            if (!userEvents[eventType]) {
-                throw new Error(`UserEvent ${eventType} doesn't exist.`)
-            }
+            if (!eventType || !userEvents[eventType]) { return }
 
             // 解除监听
-            window.removeEventListener(eventType, events[eventType])
+            Game.canvas.removeEventListener(eventType, events[eventType])
         },
         // 删除所有
         delAll() {
             // 解绑用户事件
             for (const key in userEvents) {
-                window.removeEventListener(key, userEvents[key])
+                this.del(key)
             }
 
             // 清空用户事件
             userEvents = {}
-        },
-        // 一次
-        once(func, eventType) {
-            // 监听事件
-            window.addEventListener(eventType, bindFunction(func), { once: true })
         },
     };
 }

@@ -1,11 +1,11 @@
-export function player(x) {
+export function player() {
     return {
         config: {
             id: 'player',
-            x,
+            x: 10,
             width: 40,
             height: 48,
-            direction: x === 10 ? 'right' : 'left',
+            direction: 'right',
             layer: 2,
         },
         data: {

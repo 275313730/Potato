@@ -5,13 +5,12 @@ import { Stage } from "./modules/Stage/Stage.js";
 // Title
 import { test } from "./src/stages/Test.js";
 
-// 交互使音频可自动播放
 window.addEventListener('keydown', App)
 
 export function App(e) {
     // 移除事件
     if (e.key !== ' ') { return }
-    tip.parentNode.removeChild(tip)
+    tip.remove()
     window.removeEventListener('keydown', App)
 
     // 初始化Game类

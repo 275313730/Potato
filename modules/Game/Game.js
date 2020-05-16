@@ -5,28 +5,6 @@ import { unit } from "./Unit.js";
 export class Game {
     // 初始化Game类
     static init(options) {
-        // 禁用原生事件
-        window.addEventListener('keydown', e => {
-            e.stopPropagation()
-            e.preventDefault()
-        })
-        window.addEventListener('keyup', e => {
-            e.stopPropagation()
-            e.preventDefault()
-            if (this.key === e.key) {
-                this.key = null
-            }
-        })
-        window.addEventListener('mouseup', e => {
-            e.stopPropagation()
-            e.preventDefault()
-            this.mouseDown = false
-        })
-        // 禁用右键菜单
-        window.oncontextmenu = function () {
-            return false;
-        }
-
         // 获取canvas
         this.canvas = document.getElementById(options.el)
         // canvas上下文
@@ -54,15 +32,31 @@ export class Game {
         this.asset = asset(this.imagePath, this.audioPath)
         this.unit = unit()
 
-        // 设置body属性
-        document.body.style.userSelect = 'none'
-        document.body.style.margin = 0
-        document.body.style.padding = 0
-        document.body.style.overflow = 'hidden'
-        document.body.style.textAlign = 'center'
-
         // 设置canvas宽高
         this.canvas.setAttribute('width', this.width + 'px')
         this.canvas.setAttribute('height', this.height + 'px')
+
+
+        // 禁用原生事件
+        this.canvas.addEventListener('keydown', e => {
+            e.stopPropagation()
+            e.preventDefault()
+        })
+        this.canvas.addEventListener('keyup', e => {
+            e.stopPropagation()
+            e.preventDefault()
+            if (this.key === e.key) {
+                this.key = null
+            }
+        })
+        this.canvas.addEventListener('mouseup', e => {
+            e.stopPropagation()
+            e.preventDefault()
+            this.mouseDown = false
+        })
+        // 禁用右键菜单
+        this.canvas.oncontextmenu = function () {
+            return false;
+        }
     }
 }
