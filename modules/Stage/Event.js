@@ -20,10 +20,10 @@ export function event(stage) {
                 delete events[fn.name]
             }
         },
-        // 遍历
-        travel(callback) {
+        // 执行
+        execute() {
             for (const key in events) {
-                callback(events[key])
+                events[key].call(stage)
             }
         }
     }

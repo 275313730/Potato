@@ -54,8 +54,6 @@ export class Sprite {
             throw new Error('Sprite must start with a letter.')
         }
 
-
-
         // 暴露实例数据到this中
         for (const key in options.data) {
             this[key] = options.data[key]

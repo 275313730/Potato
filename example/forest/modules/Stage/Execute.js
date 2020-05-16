@@ -36,9 +36,7 @@ export function execute(stage) {
         let camera = stage.camera.get()
 
         // 执行场景事件
-        stage.event.travel(event => {
-            event.call(stage)
-        })
+        stage.event.execute()
 
         // 执行精灵渲染和事件
         Game.unit.travel(unit => {

@@ -89,6 +89,12 @@ export function graphics(unit) {
         ctx.scale(-1, 1);
     }
 
+    // 测试
+    function test() {
+        Game.context.strokeStyle = 'red'
+        Game.context.strokeRect(unit.relX, unit.relY, unit.width, unit.height)
+    }
+
     // 初始化方法
     return {
         // 动画
@@ -261,12 +267,7 @@ export function graphics(unit) {
         render() {
             Game.context.globalAlpha = unit.alpha
             executor && executor()
-            Game.test && this.test()
-        },
-        // 测试
-        test() {
-            Game.context.strokeStyle = 'red'
-            Game.context.strokeRect(unit.relX, unit.relY, unit.width, unit.height)
+            Game.test && test()
         },
     }
 }
