@@ -23,12 +23,14 @@ export function camera(stage) {
         // 取消相机跟随
         camera.follow = null
 
+        const sw = sw
+
         // 调整相机位置
         if (camera.x < 0) {
             camera.x = 0
         }
-        if (camera.x > stage.width - stage.width) {
-            camera.x = stage.width - stage.width
+        if (camera.x > sw - gw) {
+            camera.x = sw - gw
         }
 
         // 移动计数
@@ -50,7 +52,7 @@ export function camera(stage) {
             count++
 
             // 判断移动计数和相机位置
-            if (count > frames || (camera.x <= 0 || camera.x >= stage.width - Game.width)) {
+            if (count > frames || (camera.x <= 0 || camera.x >= sw - gw)) {
                 // 清空相机移动函数
                 camera.movement = null
 
@@ -88,24 +90,28 @@ export function camera(stage) {
         const uy = unit.y
         const uw = unit.width
         const uh = unit.height
+        const sw = stage.width
+        const sh = stage.height
+        const gw = Game.width
+        const gh = Game.height
         let x, y
 
         // 相机处于舞台宽度范围内才会跟随精灵x变化，否则固定值
-        if (ux < (Game.width - uw) / 2) {
+        if (ux < (gw - uw) / 2) {
             x = 0
-        } else if (ux > stage.width - (Game.width + uw) / 2) {
-            x = stage.width - Game.width
+        } else if (ux > sw - (gw + uw) / 2) {
+            x = sw - gw
         } else {
-            x = ux - (Game.width - uw) / 2
+            x = ux - (gw - uw) / 2
         }
 
         // 相机处于舞台高度范围内才会跟随精灵x变化，否则固定值
-        if (uy < (Game.height - uh) / 2) {
+        if (uy < (gh - uh) / 2) {
             y = 0
-        } else if (uy > stage.height - (Game.height + uh) / 2) {
-            y = stage.height - Game.height
+        } else if (uy > sh - (gh + uh) / 2) {
+            y = sh - gh
         } else {
-            y = uy - (Game.height - uh) / 2
+            y = uy - (gh - uh) / 2
         }
 
         return { x, y }
