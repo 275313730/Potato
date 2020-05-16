@@ -73,7 +73,7 @@ export function userEvent(unit) {
             if (!eventType || !userEvents[eventType]) { return }
 
             // 解除监听
-            window.removeEventListener(eventType, events[eventType])
+            window.removeEventListener(eventType, userEvents[eventType])
         },
         // 删除所有
         delAll() {

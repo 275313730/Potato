@@ -1,7 +1,6 @@
 import { Game } from "../Game/Game.js"
-import { Stage } from "./Stage.js"
 
-export function camera() {
+export function camera(stage) {
     let camera = {
         x: 0,
         y: 0,
@@ -28,8 +27,8 @@ export function camera() {
         if (camera.x < 0) {
             camera.x = 0
         }
-        if (camera.x > Stage.width - Game.width) {
-            camera.x = Stage.width - Game.width
+        if (camera.x > stage.width - stage.width) {
+            camera.x = stage.width - stage.width
         }
 
         // 移动计数
@@ -51,7 +50,7 @@ export function camera() {
             count++
 
             // 判断移动计数和相机位置
-            if (count > frames || (camera.x <= 0 || camera.x >= Stage.width - Game.width)) {
+            if (count > frames || (camera.x <= 0 || camera.x >= stage.width - Game.width)) {
                 // 清空相机移动函数
                 camera.movement = null
 
@@ -94,8 +93,8 @@ export function camera() {
         // 相机处于舞台宽度范围内才会跟随精灵x变化，否则固定值
         if (ux < (Game.width - uw) / 2) {
             x = 0
-        } else if (ux > Stage.width - (Game.width + uw) / 2) {
-            x = Stage.width - Game.width
+        } else if (ux > stage.width - (Game.width + uw) / 2) {
+            x = stage.width - Game.width
         } else {
             x = ux - (Game.width - uw) / 2
         }
@@ -103,8 +102,8 @@ export function camera() {
         // 相机处于舞台高度范围内才会跟随精灵x变化，否则固定值
         if (uy < (Game.height - uh) / 2) {
             y = 0
-        } else if (uy > Stage.height - (Game.height + uh) / 2) {
-            y = Stage.height - Game.height
+        } else if (uy > stage.height - (Game.height + uh) / 2) {
+            y = stage.height - Game.height
         } else {
             y = uy - (Game.height - uh) / 2
         }

@@ -12,7 +12,7 @@ export class Game {
             },
             // canvas上下文
             context: {
-                value: this.canvas.getContext('2d')
+                value: document.getElementById(options.el).getContext('2d')
             },
             // 宽度
             width: {

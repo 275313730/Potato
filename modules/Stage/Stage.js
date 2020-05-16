@@ -19,33 +19,11 @@ export class Stage {
 
             // 初始化场景数据
             const config = options.config
-            Stage.width = (config && config.width) || Game.width
-            Stage.height = (config && config.height) || Game.height
-            Object.defineProperties(this, {
-                'width': {
-                    get() {
-                        return Stage.width
-                    },
-                    set(newVal) {
-                        if (Stage.width !== newVal) {
-                            Stage.width = newVal
-                        }
-                    }
-                },
-                'height': {
-                    get() {
-                        return Stage.height
-                    },
-                    set(newVal) {
-                        if (Stage.height !== newVal) {
-                            Stage.height = newVal
-                        }
-                    }
-                }
-            })
+            this.width = (config && config.width) || Game.width
+            this.height = (config && config.height) || Game.height
 
             // 初始化实例方法
-            this.camera = camera()
+            this.camera = camera(this)
             this.event = event(this)
             this.geometry = geometry()
             this.execute = execute(this)

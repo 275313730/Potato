@@ -54,21 +54,7 @@ export class Sprite {
             throw new Error('Sprite must start with a letter.')
         }
 
-        // Game和Stage的宽高(只读)
-        Object.defineProperties(this, {
-            'game': {
-                value: {
-                    width: Game.width,
-                    height: Game.height
-                }
-            },
-            'stage': {
-                value: {
-                    width: Stage.width,
-                    height: Stage.height
-                }
-            }
-        })
+
 
         // 暴露实例数据到this中
         for (const key in options.data) {
@@ -86,11 +72,11 @@ export class Sprite {
         this.event = event(this)
         this.userEvent = userEvent(this)
 
-        // 单位创建后
-        options.created && options.created.call(this)
-
         // 添加到游戏单位中
         Game.unit.add(this)
+
+        // 单位创建后
+        options.created && options.created.call(this)
 
         // 单位挂载后
         options.mounted && options.mounted()

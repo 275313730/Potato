@@ -1,3 +1,5 @@
+import { Game } from "./Game.js"
+
 export function unit() {
     let units = {}
     // 图层数组
@@ -25,6 +27,22 @@ export function unit() {
             if (units[newUnit.id]) {
                 throw new Error(`Sprite '${newUnit.id}' exists.`)
             }
+
+            // Game和Stage的宽高(只读)
+            Object.defineProperties(newUnit, {
+                'game': {
+                    value: {
+                        width: Game.width,
+                        height: Game.height
+                    }
+                },
+                'stage': {
+                    value: {
+                        width: Game.stage.width,
+                        height: Game.stage.height
+                    }
+                }
+            })
 
             // 加入场景单位
             units[newUnit.id] = newUnit
@@ -63,8 +81,6 @@ export function unit() {
 
             // 单位销毁后
             unit.destroyed && unit.destroyed()
-
-            return Object.keys(units)
         },
         // 删除所有
         delAll(boolean) {
