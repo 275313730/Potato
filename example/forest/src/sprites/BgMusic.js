@@ -1,14 +1,14 @@
 export function bgMusic() {
     return {
         config: {
-            id: 'bgMusic'
+            id: 'bgMusic',
+            global: true
         },
         created() {
             this.audio.play({
                 type: "music",
-                group: "music",
+                group: "audio",
                 name: "forest",
-                range: 200
             })
         }
     }

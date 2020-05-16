@@ -52,8 +52,13 @@ export function unit() {
             // 单位销毁前
             unit.beforeDestroy && unit.beforeDestroy()
 
-            // 解绑精灵用户事件
+            // 解绑单位用户事件
             unit.userEvent.delAll()
+
+            // 解绑单位音频
+            unit.audio.delAll()
+
+            // 删除单位
             delete units[id]
 
             // 单位销毁后

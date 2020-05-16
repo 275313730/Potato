@@ -7,10 +7,10 @@ export function audio(unit) {
     return {
         // 计算音量
         cal() {
-            if (music.audio && sounds.length > 0) {
+            if (!music.audio && sounds.length === 0) {
                 return
             }
-            
+
             const relX = unit.relX
             const relY = unit.relY
             const distance = Math.sqrt(relX * relX + relY * relY)
@@ -33,20 +33,19 @@ export function audio(unit) {
 
                 if (audio.ended === true) {
                     sounds.splice(i, 1)
+                    audio.remove()
                     i--
                     continue
                 }
 
-                if (distance >= range) {
-                    audio.volume = 0
-                } else {
-                    audio.volume = sound.defalutVolume * ((range - distance) / range)
+                if (range) {
+                    if (distance >= range) {
+                        audio.volume = 0
+                    } else {
+                        audio.volume = sound.defalutVolume * ((range - distance) / range)
+                    }
                 }
             }
-        },
-        // 暂停
-        pause() {
-            music.pause()
         },
         // 播放
         play(options) {
@@ -59,16 +58,16 @@ export function audio(unit) {
             const newAudio = Game.asset.get(group, name)
 
             if (type === 'sound') {
-                const sound = newAudio.cloneNode()
+                const newSound = newAudio.cloneNode()
+
+                newSound.volume = volume
+                newSound.play()
 
                 sounds.push({
-                    audio: sound,
+                    audio: newSound,
                     defalutVolume: volume,
                     range
                 })
-
-                sound.volume = volume
-                sound.play()
 
                 return
             }
@@ -91,5 +90,13 @@ export function audio(unit) {
             music.pause()
             music.currentTime = 0
         },
+        delAll() {
+            if (music.audio) {
+                music.audio.remove()
+            }
+            sounds.forEach(sound => {
+                sound.audio.remove()
+            })
+        }
     }
 }

@@ -177,10 +177,6 @@ export function App(e) {
             name: 'select',
             url: 'sound/select.mp3'
         },
-        {
-            name: 'shoot',
-            url: 'sound/shoot.mp3'
-        }
     ]
     audios.forEach(audio => {
         Game.asset.load({
@@ -192,7 +188,7 @@ export function App(e) {
     })
 
     // 调试模式
-    Game.test = true
+    Game.test = false
 
     // 创建场景
     new Stage(title())

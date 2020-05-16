@@ -53,7 +53,7 @@ export function forest(mapId, playerX) {
 
     return {
         created() {
-            // 载入背景
+            // 载入背景图片
             bgs.forEach(bg => {
                 const unit = new Sprite(backGround(bg.id, bg.fixed))
                 if (bg.fixed === 0) {

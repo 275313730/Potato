@@ -21,6 +21,11 @@ export function titleFrame() {
                 this.arrow = '→'
                 this.count = 0
                 this.arrowY = 10 + this.selection * 18
+                this.audio.play({
+                    type: 'sound',
+                    group: 'audio',
+                    name: 'select'
+                })
             }
         },
         created() {
@@ -34,8 +39,8 @@ export function titleFrame() {
 
     // 绘制
     function draw(ctx) {
-        const w = this.game.width 
-        const h = this.game.height 
+        const w = this.game.width
+        const h = this.game.height
 
         // drawTitle
         ctx.fillStyle = '#CD2626'
@@ -72,13 +77,12 @@ export function titleFrame() {
                 this.reset()
                 break
             case ' ':
+                this.reset()
                 if (this.selection === 0) {
                     new Stage(forest(0))
                 } else {
-                    this.userEvent.delAll()
-                    this.egg = 'Suprise!'
+                    this.egg = ''
                 }
-                this.reset()
                 break
         }
     }
