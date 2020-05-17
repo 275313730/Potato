@@ -1,4 +1,4 @@
-import { Stage } from "../../modules/Stage/Stage.js";
+import { Stage } from "../../modules/Potato.js";
 import { forest } from "../stages/Forest.js";
 
 export function titleFrame() {

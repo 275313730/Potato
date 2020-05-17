@@ -1,5 +1,4 @@
-import { Game } from "../../modules/Game/Game.js";
-import { Sprite } from "../../modules/Sprite/Sprite.js";
+import { Game, Sprite } from "../../modules/Potato.js";
 import { npc } from "../sprites/Npc.js";
 
 export function addNpc(player) {

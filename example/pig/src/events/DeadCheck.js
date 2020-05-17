@@ -1,4 +1,4 @@
-import { Game } from "../../modules/Game/Game.js"
+import { Game } from "../../modules/Potato.js"
 
 export function deadCheck() {
     const pigs = Game.unit.filter(unit => { return unit.type === 'enemy' })

@@ -1,5 +1,5 @@
 // modules
-import { Sprite } from "../../modules/Sprite/Sprite.js";
+import { Sprite } from "../../modules/Potato.js";
 
 // sprites
 import { bgImg } from "../sprites/BgImg.js";
