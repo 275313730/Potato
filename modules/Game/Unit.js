@@ -1,4 +1,5 @@
 import { Game } from "./Game.js"
+import { Sprite } from "../Sprite/Sprite.js"
 
 export function unit() {
     let units = {}
@@ -44,7 +45,7 @@ export function unit() {
                 }
             })
 
-            // 加入场景单位
+            // 加入单位组
             units[newUnit.id] = newUnit
 
             // 如果图层值不在layers中则新增图层值并排序layers
@@ -59,6 +60,9 @@ export function unit() {
             sort()
 
             return newUnit
+        },
+        create(options) {
+            new Sprite(options)
         },
         // 删除
         del(id) {
