@@ -28,7 +28,7 @@ export class Stage {
             this.geometry = geometry()
             this.execute = execute(this)
             Stage.mixins.forEach(mixin => {
-                mixin.call(this)
+                mixin(this)
             });
 
             // 执行回调函数
