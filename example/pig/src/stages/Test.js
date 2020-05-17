@@ -74,6 +74,8 @@ export function test() {
             this.event.add(gravity, newPlayer, blocks)
             this.event.add(hit(newPlayer))
             this.event.add(deadCheck)
+
+            this.pop.test()
         }
     }
 }
