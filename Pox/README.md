@@ -1,1 +1,1 @@
-Pox是一个用于Sprite组件间通信的库，Sprite组件通过this.$store可以获取和修改共用的响应式数据，从而进行通信。
+Pox是一个用于Sprite组件间通信的库，Sprite组件通过this.pox.xxx可以监听，获取和修改共用数据，从而进行通信。
