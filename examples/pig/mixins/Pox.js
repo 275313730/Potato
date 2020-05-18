@@ -1,5 +1,12 @@
 export function pox(data) {
     let observer = {}
+    function notify(keyString, newVal) {
+        for (const key in observer) {
+            const unit = observer[key]
+            unit.keyString = keyString
+            unit.callback(newVal)
+        }
+    }
     return function () {
         const id = this.id
         this.pox = {
@@ -18,7 +25,7 @@ export function pox(data) {
                 })
                 if (currData[lastKey] !== newVal) {
                     currData[lastKey] = newVal
-                    this.notify(keyString, newVal)
+                    notify(keyString, newVal)
                 }
             },
             get(keyString) {
@@ -29,13 +36,6 @@ export function pox(data) {
                 })
                 return currData
             },
-            notify(keyString, newVal) {
-                for (const key in observer) {
-                    const unit = observer[key]
-                    unit.keyString = keyString
-                    unit.callback(newVal)
-                }
-            }
         }
     }
 }

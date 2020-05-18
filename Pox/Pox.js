@@ -1,5 +1,12 @@
-function pox(data) {
+export function pox(data) {
     let observer = {}
+    function notify(keyString, newVal) {
+        for (const key in observer) {
+            const unit = observer[key]
+            unit.keyString = keyString
+            unit.callback(newVal)
+        }
+    }
     return function () {
         const id = this.id
         this.pox = {
@@ -18,16 +25,17 @@ function pox(data) {
                 })
                 if (currData[lastKey] !== newVal) {
                     currData[lastKey] = newVal
-                    this.notify(keyString, newVal)
+                    notify(keyString, newVal)
                 }
             },
-            notify(keyString, newVal) {
-                for (const key in observer) {
-                    const unit = observer[key]
-                    unit.keyString = keyString
-                    unit.callback(newVal)
-                }
-            }
+            get(keyString) {
+                const keyArr = keyString.split('.')
+                let currData = data
+                keyArr.forEach(key => {
+                    currData = currData[key]
+                })
+                return currData
+            },
         }
     }
 }
