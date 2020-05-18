@@ -1,8 +1,11 @@
 // core
-import { Game, Stage } from "./core/Potato.js";
+import { Game, Stage, Sprite } from "./core/Potato.js";
 
 // Title
 import { test } from "./src/stages/Test.js";
+
+// mixin
+import { pox } from "./mixins/Pox.js";
 
 window.addEventListener('keydown', App)
 
@@ -143,6 +146,8 @@ export function App(e) {
 
     // 调试模式
     Game.test = false
+
+    Game.mix(Sprite, pox({ deaths: 0 }))
 
     // 创建场景
     new Stage(test())

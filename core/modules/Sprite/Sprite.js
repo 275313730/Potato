@@ -63,6 +63,14 @@ export class Sprite {
             this[key] = options.methods[key]
         }
 
+
+        // 初始化生命周期函数
+        this.created = options.created
+        this.beforeUpdate = options.beforeUpdate
+        this.updated = options.updated
+        this.beforeDestroy = options.beforeDestroy
+        this.destroyed = options.destroyed
+
         // 初始化实例方法
         this.graphics = graphics(this)
         this.audio = audio(this)
@@ -81,8 +89,5 @@ export class Sprite {
 
         // 单位创建后
         options.created && options.created.call(this)
-
-        // 单位挂载后
-        options.mounted && options.mounted()
     }
 }
