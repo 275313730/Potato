@@ -38,11 +38,4 @@ export class Stage {
             this.execute.loop()
         })
     }
-
-    static mix(func) {
-        if (!Stage.mixins) {
-            Stage.mixins = []
-        }
-        Stage.mixins.push(func)
-    }
 }

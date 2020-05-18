@@ -1,6 +1,5 @@
 "use strict"
 import { Game } from "../Game/Game.js";
-import { Stage } from "../Stage/Stage.js";
 
 import { graphics } from "./Graphics.js";
 import { audio } from "./Audio.js";
@@ -69,6 +68,11 @@ export class Sprite {
         this.audio = audio(this)
         this.event = event(this)
         this.userEvent = userEvent(this)
+        if (Sprite.mixins) {
+            Sprite.mixins.forEach(mixin => {
+                mixin(this)
+            });
+        }
 
         // 添加到游戏单位中
         Game.unit.add(this)

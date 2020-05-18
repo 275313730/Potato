@@ -27,11 +27,9 @@ export class Stage {
             this.event = event(this)
             this.geometry = geometry()
             this.execute = execute(this)
-            if (Stage.mixins) {
-                Stage.mixins.forEach(mixin => {
-                    mixin(this)
-                });
-            }
+            Stage.mixins.forEach(mixin => {
+                mixin(this)
+            });
 
             // 执行回调函数
             options.created && options.created.call(this)
@@ -39,12 +37,5 @@ export class Stage {
             // 进入循环
             this.execute.loop()
         })
-    }
-
-    static mix(func) {
-        if (!Stage.mixins) {
-            Stage.mixins = []
-        }
-        Stage.mixins.push(func)
     }
 }

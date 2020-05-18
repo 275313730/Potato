@@ -1,6 +1,7 @@
 "use strict"
 import { asset } from "./Asset.js";
 import { unit } from "./Unit.js";
+import { mix } from "./Mix.js";
 
 export class Game {
     // 初始化Game类
@@ -57,6 +58,7 @@ export class Game {
         // 初始化实例方法
         this.asset = asset(this.imagePath, this.audioPath)
         this.unit = unit()
+        this.mix = mix
 
         // 设置canvas宽高
         this.canvas.setAttribute('width', this.width + 'px')
