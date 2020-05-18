@@ -37,5 +37,9 @@ export function pox(data) {
                 return currData
             },
         }
+        this.destroyed = () => {
+            this.destroyed && this.destroyed()
+            this.pox.unwatch()
+        }
     }
 }
