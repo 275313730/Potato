@@ -49,11 +49,15 @@ export function execute(stage) {
     return {
         // 销毁
         destory() {
+            stage.beforeDestroy && stage.beforeDestroy()
+
             // 退出循环
             stop = true
 
             // 清空场景精灵
             Game.unit.delAll()
+
+            stage.destoryed && stage.destoryed()
         },
         // 进入循环
         loop() {

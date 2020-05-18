@@ -28,6 +28,11 @@ export class Stage {
             this.geometry = geometry()
             this.execute = execute(this)
 
+            // 初始化生命周期函数
+            this.created = options.created
+            this.beforeDestroy = options.beforeDestroy
+            this.destoryed = options.destoryed
+
             // 混入
             if (Stage.mixins) {
                 Stage.mixins.forEach(mixin => {
@@ -36,7 +41,7 @@ export class Stage {
             }
 
             // 执行回调函数
-            options.created && options.created.call(this)
+            this.created && this.created.call(this)
 
             // 进入循环
             this.execute.loop()
