@@ -1,6 +1,5 @@
-// Modules
-import { Game } from "./modules/Game/Game.js";
-import { Stage } from "./modules/Stage/Stage.js";
+// core
+import { Game, Stage } from "./core/Potato.js";
 
 // Title
 import { test } from "./src/stages/Test.js";

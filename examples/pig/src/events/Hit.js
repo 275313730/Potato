@@ -1,4 +1,4 @@
-import { Game } from "../../modules/Game/Game.js"
+import { Game } from "../../core/Potato.js"
 
 export function hit(player) {
     let cal = false

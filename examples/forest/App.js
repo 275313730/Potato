@@ -1,5 +1,5 @@
-// modules
-import { Game, Stage } from "./modules/Potato.js";
+// core
+import { Game, Stage } from "./core/Potato.js";
 
 // stages
 import { title } from "./src/stages/Title.js";

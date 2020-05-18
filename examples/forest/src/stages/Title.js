@@ -1,4 +1,4 @@
-import { Sprite } from "../../modules/Potato.js";
+import { Sprite } from "../../core/Potato.js";
 
 import { titleFrame } from "../sprites/TitleFrame.js";
 import { backGround } from "../sprites/BackGround.js";

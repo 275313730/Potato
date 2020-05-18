@@ -1,5 +1,5 @@
 // modules
-import { Sprite } from "../../modules/Potato.js";
+import { Sprite } from "../../core/Potato.js";
 
 // sprites
 import { backGround } from "../sprites/BackGround.js";

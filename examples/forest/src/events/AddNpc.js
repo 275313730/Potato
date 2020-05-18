@@ -1,4 +1,4 @@
-import { Game, Sprite } from "../../modules/Potato.js";
+import { Game, Sprite } from "../../core/Potato.js";
 import { npc } from "../sprites/Npc.js";
 
 export function addNpc(player) {

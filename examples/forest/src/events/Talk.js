@@ -1,4 +1,4 @@
-import { Game } from "../../modules/Potato.js"
+import { Game } from "../../core/Potato.js"
 
 export function talk(player, dialog) {
     const npcs = Game.unit.filter(unit => {

@@ -68,6 +68,8 @@ export class Sprite {
         this.audio = audio(this)
         this.event = event(this)
         this.userEvent = userEvent(this)
+
+        // 混入
         if (Sprite.mixins) {
             Sprite.mixins.forEach(mixin => {
                 mixin(this)
