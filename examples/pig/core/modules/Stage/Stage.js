@@ -31,7 +31,7 @@ export class Stage {
             // 混入
             if (Stage.mixins) {
                 Stage.mixins.forEach(mixin => {
-                    mixin(this)
+                    mixin.call(this)
                 });
             }
 
