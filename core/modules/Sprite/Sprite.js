@@ -72,7 +72,7 @@ export class Sprite {
         // 混入
         if (Sprite.mixins) {
             Sprite.mixins.forEach(mixin => {
-                mixin(this)
+                mixin.call(this)
             });
         }
 
