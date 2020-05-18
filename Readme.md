@@ -1,6 +1,6 @@
 ## Potato
 
-   * Potato是一个用js和canvas来制作游戏的渐进式框架，源码中包含了一些示例游戏
+   * Potato是一个用js和canvas来制作游戏的渐进式框架，目前包含源码(core)，两个示例游戏(examples)和地图制作器(Pomap)
 
 ## 框架思想
 
