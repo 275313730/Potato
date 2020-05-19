@@ -3,7 +3,7 @@ import { Game } from "../Game/Game.js"
 export function userEvent(unit) {
     let userEvents = {}
 
-    function bindFunction(callback, eventType, isBreak) {
+    function bindFunction(eventType, callback, isBreak) {
         return function (e) {
             // 按键间隔检测
             if (isBreak) {

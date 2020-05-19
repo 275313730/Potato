@@ -23,7 +23,8 @@ export function camera(stage) {
         // 取消相机跟随
         camera.follow = null
 
-        const sw = sw
+        const sw = stage.width
+        const gw = Game.width
 
         // 调整相机位置
         if (camera.x < 0) {

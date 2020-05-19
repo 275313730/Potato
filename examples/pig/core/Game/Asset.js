@@ -3,7 +3,7 @@ export function asset(imagePath, audioPath) {
     let assets = {}
 
     return {
-        // 全部载入完成
+        // new Stage()时会自动调用该函数
         allLoaded(callback) {
             if (loadings.length > 0) {
                 Promise.all(loadings)
