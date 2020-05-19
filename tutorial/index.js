@@ -50,9 +50,19 @@ const player = {
     data: {
         walking: false
     },
+    methods: {
+        walk() {
+            this.walking = true
+            this.graphics.animation('player', 'walk', true)
+        },
+        stop() {
+            this.walking = false
+            this.graphics.animation('player', 'idle', true)
+        }
+    },
     created() {
         // 绘制动画
-        this.graphics.animation('player', 'idle', true)
+        this.stop()
 
         // 调整纵坐标
         this.y = this.game.height - this.height
@@ -60,20 +70,17 @@ const player = {
         // 交互功能
         this.userEvent.add('keydown', key => {
             if (key === 'd') {
-                this.walking = true
                 this.direction = 'right'
-                this.graphics.animation('player', 'walk', true)
+                this.walk()
             }
             if (key === 'a') {
-                this.walking = true
                 this.direction = 'left'
-                this.graphics.animation('player', 'walk', true)
+                this.walk()
             }
         }, true)
         this.userEvent.add('keyup', key => {
             if ((key === 'd' && this.direction === 'right') || (key === 'a' && this.direction === 'left')) {
-                this.walking = false
-                this.graphics.animation('player', 'idle', true)
+                this.stop()
             }
         })
 
