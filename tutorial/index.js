@@ -47,17 +47,12 @@ const player = {
     config: {
         id: 'player',
     },
-    data: {
-        walking: false
-    },
     methods: {
         walk() {
-            this.walking = true
             this.graphics.animation('player', 'walk', true)
             this.event.add(this.move)
         },
         stop() {
-            this.walking = false
             this.graphics.animation('player', 'idle', true)
             this.event.del('move')
         },

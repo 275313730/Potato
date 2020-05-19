@@ -9,29 +9,31 @@ export function player() {
             layer: 2,
         },
         data: {
-            shoot: false,
             speed: 1.5,
             space: false,
-            walking: false,
         },
         methods: {
-            // 移动
-            move(direction) {
+            walk(direction) {
                 this.direction = direction
                 this.graphics.animation(this.id, 'walk')
-                this.walking = true
+                this.event.add(this.move)
             },
-            // 停止
             stop() {
                 this.graphics.animation(this.id, 'idle')
-                this.walking = false
+                this.event.del('move')
+            },
+            move() {
+                if (this.direction === 'right' && this.x < this.stage.width - this.width) {
+                    this.x += this.speed
+                } else if (this.direction === 'left' && this.x > 0) {
+                    this.x -= this.speed
+                }
             }
         },
         created() {
-            this.graphics.animation(this.id, 'idle')
+            this.stop()
             this.userEvent.add('keydown', keyDown, true)
             this.userEvent.add('keyup', keyUp)
-            this.event.add(walk)
             this.y = this.game.height - this.height
         }
     }
@@ -40,10 +42,10 @@ export function player() {
     function keyDown(key) {
         switch (key) {
             case 'd':
-                this.move('right')
+                this.walk('right')
                 break
             case 'a':
-                this.move('left')
+                this.walk('left')
                 break
             case ' ':
                 this.space = true
@@ -65,16 +67,6 @@ export function player() {
             case ' ':
                 this.space = false
                 break
-        }
-    }
-
-    // 移动
-    function walk() {
-        if (this.walking === false) { return }
-        if (this.direction === 'right' && this.x < this.stage.width - this.width) {
-            this.x += this.speed
-        } else if (this.direction === 'left' && this.x > 0) {
-            this.x -= this.speed
         }
     }
 }
