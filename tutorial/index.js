@@ -8,11 +8,21 @@ Game.init({
     height: 160
 })
 
-Game.asset.load({
-    type: 'image',
-    group: 'bgImage',
-    name: 'sky',
-    url: './img/sky.png'
+const bgs = [
+    ['sky', 1],
+    ['moun-far', 1],
+    ['moun-near', 0.6],
+    ['tree-far', 0.3],
+    ['tree-near', 0]
+]
+
+bgs.forEach(bg => {
+    Game.asset.load({
+        type: 'image',
+        group: 'bgImage',
+        name: bg[0],
+        url: './img/' + bg[0] + '.png'
+    })
 })
 
 Game.asset.load({
@@ -24,11 +34,21 @@ Game.asset.load({
     interval: 16
 })
 
+Game.asset.load({
+    type: 'animation',
+    group: 'player',
+    name: 'walk',
+    url: './img/walk.png',
+    width: 40,
+    interval: 16
+})
+
 const player = {
     config: {
         id: 'player',
-        x: 0,
-        y: 0
+    },
+    data: {
+        walking: false
     },
     created() {
         // 绘制动画
@@ -39,27 +59,60 @@ const player = {
 
         // 交互功能
         this.userEvent.add('keydown', key => {
-            console.log(0)
             if (key === 'd') {
-                this.x += 5
+                this.walking = true
+                this.direction = 'right'
+                this.graphics.animation('player', 'walk', true)
+            }
+            if (key === 'a') {
+                this.walking = true
+                this.direction = 'left'
+                this.graphics.animation('player', 'walk', true)
+            }
+        }, true)
+        this.userEvent.add('keyup', key => {
+            if ((key === 'd' && this.direction === 'right') || (key === 'a' && this.direction === 'left')) {
+                this.walking = false
+                this.graphics.animation('player', 'idle', true)
+            }
+        })
+
+        // 移动事件
+        this.event.add(() => {
+            if (this.walking === true) {
+                if (this.direction === 'right' && this.x < this.stage.width - this.width) {
+                    this.x += 1
+                } else if (this.direction === 'left' && this.x > 0) {
+                    this.x -= 1
+                }
             }
         })
     }
 }
 
-const sky = {
-    config: {
-        id: 'sky',
-    },
-    created() {
-        // 绘制图片
-        this.graphics.image('bgImage', 'sky', true)
+function background(id, fixed) {
+    return {
+        config: {
+            id,
+            fixed
+        },
+        created() {
+            // 绘制图片
+            this.graphics.image('bgImage', id, true)
+        }
     }
 }
 
 new Stage({
     created() {
-        new Sprite(sky)
-        new Sprite(player)
+        bgs.forEach(bg => {
+            new Sprite(background(bg[0], bg[1]))
+        })
+
+        this.width = 544
+
+        const newPlayer = new Sprite(player)
+
+        this.camera.follow(newPlayer)
     }
 })
