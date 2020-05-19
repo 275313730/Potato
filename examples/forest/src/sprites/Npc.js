@@ -26,8 +26,8 @@ export function npc(id, x, top, textArr) {
             }
         },
         created() {
-            this.event.add(move)
             this.stop()
+            this.event.add(move)
             this.y = this.game.height - this.height
         }
     }
