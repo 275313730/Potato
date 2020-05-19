@@ -57,12 +57,12 @@ export function userEvent(unit) {
 
     return {
         // 添加
-        add(callback, eventType, isBreak) {
+        add(eventType, callback, isBreak) {
             // 判断用户事件是否存在
             if (userEvents[eventType]) { return }
 
             // 添加事件到userEvents中
-            userEvents[eventType] = bindFunction(callback, eventType, isBreak)
+            userEvents[eventType] = bindFunction(eventType, callback, isBreak)
 
             // 监听事件
             window.addEventListener(eventType, userEvents[eventType])

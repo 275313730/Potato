@@ -29,9 +29,8 @@ export function player() {
         },
         created() {
             this.graphics.animation(this.id, 'idle')
-            this.userEvent.add(keyDown, 'keydown', true)
-            this.userEvent.add(keyUp, 'keyup')
-            this.userEvent.add(mouseDown, 'mousedown')
+            this.userEvent.add('keydown', keyDown, true)
+            this.userEvent.add('keyup', keyUp)
             this.event.add(walk)
             this.y = this.game.height - this.height
         }
@@ -67,11 +66,6 @@ export function player() {
                 this.space = false
                 break
         }
-    }
-
-    // 鼠标按下射击
-    function mouseDown() {
-        this.shoot = true
     }
 
     // 移动
