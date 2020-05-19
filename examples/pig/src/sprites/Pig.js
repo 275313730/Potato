@@ -51,7 +51,6 @@ export function pig(id, x, y, direction) {
         },
         beforeDestroy() {
             this.pox.set('deaths', this.pox.get('deaths') + 1)
-            this.pox.unwatch()
         }
     }
 
