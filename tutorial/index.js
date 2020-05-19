@@ -54,10 +54,19 @@ const player = {
         walk() {
             this.walking = true
             this.graphics.animation('player', 'walk', true)
+            this.event.add(this.move)
         },
         stop() {
             this.walking = false
             this.graphics.animation('player', 'idle', true)
+            this.event.del('move')
+        },
+        move() {
+            if (this.direction === 'right' && this.x < this.stage.width - this.width) {
+                this.x += 1
+            } else if (this.direction === 'left' && this.x > 0) {
+                this.x -= 1
+            }
         }
     },
     created() {
@@ -81,17 +90,6 @@ const player = {
         this.userEvent.add('keyup', key => {
             if ((key === 'd' && this.direction === 'right') || (key === 'a' && this.direction === 'left')) {
                 this.stop()
-            }
-        })
-
-        // 移动事件
-        this.event.add(() => {
-            if (this.walking === true) {
-                if (this.direction === 'right' && this.x < this.stage.width - this.width) {
-                    this.x += 1
-                } else if (this.direction === 'left' && this.x > 0) {
-                    this.x -= 1
-                }
             }
         })
     }

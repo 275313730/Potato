@@ -31,7 +31,7 @@ export function titleFrame() {
         created() {
             this.x = this.game.width / 2
             this.y = this.game.height / 2
-            this.userEvent.add(select, 'keydown', true)
+            this.userEvent.add('keydown', select, true)
             this.event.add(twinkling)
             this.graphics.draw(draw)
         }
