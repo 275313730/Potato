@@ -2,6 +2,8 @@
 
    * Potato是一个用js和canvas来制作游戏的渐进式框架，包含源码(core)，示例游戏(examples),制作工具(tools)和库文件(libs)。
 
+   * [使用方法及API文档](https://www.yuque.com/books/share/662514e0-513d-44b6-9f95-343b279351b8?#)
+
 ## 框架思想
 
    ### 组件化
@@ -43,7 +45,3 @@
    * 美术资源来源网络,均为CC0协议
 
    * 音乐资源来源网络
-
-## API文档
-
-   [Potato API](https://www.yuque.com/books/share/662514e0-513d-44b6-9f95-343b279351b8?#)
