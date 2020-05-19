@@ -10,7 +10,7 @@ export function player() {
         },
         data: {
             shoot: false,
-            speed: 2,
+            speed: 1.5,
             space: false,
             walking: false,
         },
