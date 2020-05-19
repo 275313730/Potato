@@ -49,7 +49,6 @@ export function asset(imagePath, audioPath) {
                         assets[group][name] = {
                             image,
                             width: options.width,
-                            height: options.height,
                             interval: options.interval,
                             flip: options.flip
                         }
