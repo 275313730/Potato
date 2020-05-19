@@ -5,9 +5,6 @@ export function execute(stage) {
 
     // 单位渲染和事件
     function unitExecute(unit, camera) {
-        // 单位更新前
-        unit.beforeUpdate && unit.beforeUpdate()
-
         // 计算相对位置
         unit.relX = unit.x - camera.x * (1 - unit.fixed)
         unit.relY = unit.y - camera.y * (1 - unit.fixed)
@@ -20,9 +17,6 @@ export function execute(stage) {
 
         // 执行事件
         unit.event.execute()
-
-        // 单位更新后
-        unit.updated && unit.updated()
     }
 
     // 场景刷新
