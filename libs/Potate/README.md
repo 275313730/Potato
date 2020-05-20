@@ -32,12 +32,12 @@
                 this.potate.addState('stop', this.stop)
                 this.potate.addState('walk', this.walk)
                 this.potate.addState('jump', this.jump, nextState => {
-                    if(nextState==='attack'){
-                        return false
+                    if(nextState === 'stop'){
+                        return true
                     }
                 })
                 this.potate.addState('attack', this.attack, nextState => {
-                    if(nextState==='jump'){
+                    if(nextState === 'jump'){
                         return false
                     }
                 })
