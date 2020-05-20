@@ -11,6 +11,17 @@ export class Stage {
             // 销毁场景
             Game.stage && Game.stage.execute.destory()
 
+            // 初始化生命周期函数
+            this.beforeCreate = options.beforeCreate
+            this.created = options.created
+            this.beforeUpdate = options.beforeUpdate
+            this.updated = options.updated
+            this.beforeDestroy = options.beforeDestroy
+            this.destoryed = options.destoryed
+
+            // 创建前函数
+            this.beforeCreate && this.beforeCreate()
+
             // 清空按键
             Game.key = null
 
@@ -28,11 +39,6 @@ export class Stage {
             this.geometry = geometry()
             this.execute = execute(this)
 
-            // 初始化生命周期函数
-            this.created = options.created
-            this.beforeDestroy = options.beforeDestroy
-            this.destoryed = options.destoryed
-
             // 混入
             if (Stage.mixins) {
                 Stage.mixins.forEach(mixin => {
@@ -40,7 +46,7 @@ export class Stage {
                 });
             }
 
-            // 执行回调函数
+            // 创建后函数
             this.created && this.created.call(this)
 
             // 进入循环

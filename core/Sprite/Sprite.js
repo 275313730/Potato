@@ -8,6 +8,16 @@ import { userEvent } from "./UserEvent.js";
 
 export class Sprite {
     constructor(options) {
+        // 初始化生命周期函数
+        this.beforeCreate = options.beforeCreate
+        this.created = options.created
+        this.beforeUpdate = options.beforeUpdate
+        this.updated = options.updated
+        this.beforeDestroy = options.beforeDestroy
+        this.destroyed = options.destroyed
+
+        this.beforeCreate && this.beforeCreate()
+
         // 设置参数
         const config = options.config
 
@@ -62,14 +72,6 @@ export class Sprite {
         for (const key in options.methods) {
             this[key] = options.methods[key]
         }
-
-
-        // 初始化生命周期函数
-        this.created = options.created
-        this.beforeUpdate = options.beforeUpdate
-        this.updated = options.updated
-        this.beforeDestroy = options.beforeDestroy
-        this.destroyed = options.destroyed
 
         // 初始化实例方法
         this.graphics = graphics(this)
