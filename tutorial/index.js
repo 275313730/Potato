@@ -65,7 +65,7 @@ const player = {
         }
     },
     created() {
-        // 绘制动画
+        // 默认静止
         this.stop()
 
         // 调整纵坐标
