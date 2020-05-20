@@ -54,6 +54,7 @@ export function audio(unit) {
             const name = options.name
             const range = options.range || 0
             const volume = options.volume || 1
+            const startTime = options.startTime || 0
             const loop = options.loop || true
             const newAudio = Game.asset.get(group, name)
 
@@ -61,6 +62,7 @@ export function audio(unit) {
                 const newSound = newAudio.cloneNode()
 
                 newSound.volume = volume
+                newSound.currentTime = startTime
                 newSound.play()
 
                 sounds.push({
@@ -78,7 +80,7 @@ export function audio(unit) {
                     music.defalutVolume = volume
                     music.range = range
 
-                    newAudio.currentTime = 0
+                    newAudio.currentTime = startTime
                     newAudio.volume = volume
                     newAudio.loop = loop
                 }

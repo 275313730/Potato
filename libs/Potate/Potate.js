@@ -1,4 +1,4 @@
-    export function potate() {
+export function potate() {
     let states = {}
     let currState = null
     const unit = this
@@ -7,13 +7,18 @@
             states[state] = { action, condition }
         },
         setState(nextState) {
+            if (currState === nextState) {
+                return false
+            }
             if (currState != null) {
-                if (states[currState].condition && !states[currState].condition(nextState)) {
+                const condition = states[currState].condition
+                if (condition && !condition(nextState)) {
                     return false
                 }
             }
             currState = nextState
-            states[currState].action && states[currState].action.call(unit)
+            const action = states[currState].action
+            action && action.call(unit)
             return true
         },
         getState() {
