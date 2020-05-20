@@ -32,7 +32,7 @@ export function player() {
         },
         created() {
             this.stop()
-            this.userEvent.add('keydown', keyDown, true)
+            this.userEvent.add('keydown', keyDown)
             this.userEvent.add('keyup', keyUp)
             this.y = this.game.height - this.height
         }
