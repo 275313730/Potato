@@ -3,8 +3,9 @@ export function pox(data) {
     function notify(keyString, newVal) {
         for (const key in observer) {
             const unit = observer[key]
-            unit.keyString = keyString
-            unit.callback(newVal)
+            if (unit.keyString === keyString) {
+                unit.callback(newVal)
+            }
         }
     }
     return function () {
@@ -36,10 +37,6 @@ export function pox(data) {
                 })
                 return currData
             },
-        }
-        this.destroyed = () => {
-            this.destroyed && this.destroyed()
-            this.pox.unwatch()
         }
     }
 }
