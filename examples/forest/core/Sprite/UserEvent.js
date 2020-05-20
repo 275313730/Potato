@@ -2,25 +2,22 @@ import { Game } from "../Game/Game.js"
 
 export function userEvent(unit) {
     let userEvents = {}
+    let key = null
 
-    function bindFunction(eventType, callback, isBreak) {
+    function bindFunction(eventType, callback) {
         return function (e) {
             // 按键间隔检测
-            if (isBreak) {
-                if (e.type === 'keydown') {
-                    if (Game.key === e.key) {
-                        return
-                    } else {
-                        Game.key = e.key
-                    }
+            if (e.type === 'keydown') {
+                if (key === e.key) {
+                    return
+                } else {
+                    key = e.key
                 }
+            }
 
-                if (e.type === 'mousedown') {
-                    if (Game.mouseDown === true) {
-                        return
-                    } else {
-                        Game.mouseDown = true
-                    }
+            if (e.type === 'keyup') {
+                if (e.key === key) {
+                    key = null
                 }
             }
 
@@ -57,12 +54,12 @@ export function userEvent(unit) {
 
     return {
         // 添加
-        add(eventType, callback, isBreak) {
+        add(eventType, callback) {
             // 判断用户事件是否存在
             if (userEvents[eventType]) { return }
 
             // 添加事件到userEvents中
-            userEvents[eventType] = bindFunction(eventType, callback, isBreak)
+            userEvents[eventType] = bindFunction(eventType, callback)
 
             // 监听事件
             window.addEventListener(eventType, userEvents[eventType])

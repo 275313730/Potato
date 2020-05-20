@@ -28,16 +28,6 @@ export class Game {
                 value: options.animationInterval || 16,
                 writable: true
             },
-            // 键盘状态
-            key: {
-                value: null,
-                writable: true
-            },
-            // 鼠标状态
-            mouseDown: {
-                value: false,
-                writable: true
-            },
             // 测试(显示精灵外框)
             test: {
                 value: false,
@@ -73,14 +63,14 @@ export class Game {
         window.addEventListener('keyup', e => {
             e.stopPropagation()
             e.preventDefault()
-            if (this.key === e.key) {
-                this.key = null
-            }
+        })
+        window.addEventListener('mousedown', e => {
+            e.stopPropagation()
+            e.preventDefault()
         })
         window.addEventListener('mouseup', e => {
             e.stopPropagation()
             e.preventDefault()
-            this.mouseDown = false
         })
         // 禁用右键菜单
         window.oncontextmenu = function () {

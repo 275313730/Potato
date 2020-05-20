@@ -34,10 +34,10 @@ export class Sprite {
         this.global = config.global || false
 
         // alpha 决定绘制透明度
-        this.alpha = config.alpha || 1
+        this.alpha = config.alpha == null ? 1 : config.alpha
 
         // scale 决定实际绘制尺寸
-        this.scale = config.scale || 1
+        this.scale = config.scale == null ? 1 : config.scale
 
         // direction 决定图片的左右位置
         this.direction = config.direction || 'right'
