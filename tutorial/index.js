@@ -72,7 +72,7 @@ const player = {
         this.y = this.game.height - this.height
 
         // 交互功能
-        this.userEvent.add('keydown', key => {
+        this.userEvent.watch('keydown', key => {
             if (key === 'd') {
                 this.direction = 'right'
                 this.walk()
@@ -82,7 +82,7 @@ const player = {
                 this.walk()
             }
         }, true)
-        this.userEvent.add('keyup', key => {
+        this.userEvent.watch('keyup', key => {
             if ((key === 'd' && this.direction === 'right') || (key === 'a' && this.direction === 'left')) {
                 this.stop()
             }

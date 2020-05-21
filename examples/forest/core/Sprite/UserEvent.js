@@ -1,86 +1,24 @@
 import { Game } from "../Game/Game.js"
 
 export function userEvent(unit) {
-    let userEvents = {}
-    let key = null
-
-    function bindFunction(eventType, callback) {
-        return function (e) {
-            // 按键间隔检测
-            if (e.type === 'keydown') {
-                if (key === e.key) {
-                    return
-                } else {
-                    key = e.key
-                }
-            }
-
-            if (e.type === 'keyup') {
-                if (e.key === key) {
-                    key = null
-                }
-            }
-
-            // 没有加入到场景前禁用
-            if (!unit.stage) { return }
-
-            // disabled时禁用
-            if (unit.disabled) { return }
-
-            // 判断事件类型
-            // 鼠标事件
-            if (eventType === 'click' || eventType.indexOf('mouse') > -1) {
-                const canvas = Game.canvas
-
-                // 计算画面缩放比例
-                const scale = canvas.clientHeight / Game.height
-
-                // 简化事件属性
-                const mouse = {
-                    x: (e.clientX - canvas.offsetLeft) / scale,
-                    y: (e.clientY - canvas.offsetTop) / scale,
-                    button: e.button
-                }
-                callback.call(unit, mouse)
-                return
-            }
-
-            // 键盘事件
-            if (eventType.indexOf('key') > -1) {
-                callback.call(unit, e.key)
-            }
-        }
-    }
+    const userEvents = Game.userEvents
 
     return {
-        // 添加
-        add(eventType, callback) {
-            // 判断用户事件是否存在
-            if (userEvents[eventType]) { return }
-
+        // 监听
+        watch(eventType, callback) {
+            if (!userEvents[unit.id]) {
+                userEvents[unit.id] = {}
+            }
             // 添加事件到userEvents中
-            userEvents[eventType] = bindFunction(eventType, callback)
-
-            // 监听事件
-            window.addEventListener(eventType, userEvents[eventType])
+            userEvents[unit.id][eventType] = callback.bind(unit)
         },
-        // 删除
-        del(eventType) {
+        // 解除监听
+        unwatch(eventType) {
             // 判断用户事件是否存在
-            if (!eventType || !userEvents[eventType]) { return }
+            if (!eventType || !userEvents[unit.id] || !userEvents[unit.id][eventType]) { return }
 
             // 解除监听
-            window.removeEventListener(eventType, userEvents[eventType])
-        },
-        // 删除所有
-        delAll() {
-            // 解绑用户事件
-            for (const key in userEvents) {
-                this.del(key)
-            }
-
-            // 清空用户事件
-            userEvents = {}
+            delete Game.userEvents[unit.id][eventType]
         },
     };
 }

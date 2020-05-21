@@ -1,7 +1,6 @@
-import { Game } from "./Game.js"
 import { Sprite } from "../Sprite/Sprite.js"
 
-export function unit() {
+export function unit(Game) {
     let units = {}
     // 图层数组
     let layers = []
@@ -75,7 +74,7 @@ export function unit() {
             unit.beforeDestroy && unit.beforeDestroy()
 
             // 解绑单位用户事件
-            unit.userEvent.delAll()
+            delete Game.userEvents[id]
 
             // 解绑单位音频
             unit.audio.delAll()

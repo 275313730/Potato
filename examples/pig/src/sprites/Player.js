@@ -103,9 +103,9 @@ export function player() {
         },
         created() {
             this.stop()
-            this.userEvent.add('keydown', keyDown)
-            this.userEvent.add('keyup', keyUp)
-            this.userEvent.add('mousedown', mouseDown)
+            this.userEvent.watch('keydown', keyDown)
+            this.userEvent.watch('keyup', keyUp)
+            this.userEvent.watch('mousedown', mouseDown)
             this.event.add(walkMove)
             this.event.add(jumpMove)
         }

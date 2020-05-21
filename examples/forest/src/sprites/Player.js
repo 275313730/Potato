@@ -32,8 +32,8 @@ export function player() {
         },
         created() {
             this.stop()
-            this.userEvent.add('keydown', keyDown)
-            this.userEvent.add('keyup', keyUp)
+            this.userEvent.watch('keydown', keyDown)
+            this.userEvent.watch('keyup', keyUp)
             this.y = this.game.height - this.height
         }
     }

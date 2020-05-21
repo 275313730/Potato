@@ -23,6 +23,14 @@ export class Game {
             height: {
                 value: options.height
             },
+            // 键盘状态
+            key: {
+                value: null,
+                writable: true
+            },
+            userEvents: {
+                value: {}
+            },
             // 动画间隔帧(每隔n帧绘制下一个关键帧)
             animationInterval: {
                 value: options.animationInterval || 16,
@@ -47,31 +55,70 @@ export class Game {
 
         // 初始化实例方法
         this.asset = asset(this.imagePath, this.audioPath)
-        this.unit = unit()
+        this.unit = unit(Game)
         this.mix = mix
 
         // 设置canvas宽高
         this.canvas.setAttribute('width', this.width + 'px')
         this.canvas.setAttribute('height', this.height + 'px')
 
+        // 执行用户事件
+        function executeUserEvents(eventType, data) {
+            const units = Game.userEvents
+            for (const key in units) {
+                const unit = units[key]
+                if (unit[eventType]) {
+                    unit[eventType](data)
+                }
+            }
+        }
 
-        // 禁用原生事件
+        // 键盘事件
         window.addEventListener('keydown', e => {
             e.stopPropagation()
             e.preventDefault()
+            if (Game.key !== e.key) {
+                Game.key = e.key
+                executeUserEvents('keydown', e.key)
+            }
         })
         window.addEventListener('keyup', e => {
             e.stopPropagation()
             e.preventDefault()
+            if (Game.key === e.key) {
+                Game.key = null
+            }
+            executeUserEvents('keyup', e.key)
         })
+
+        // 计算鼠标数据
+        function calMouse(e) {
+            const canvas = Game.canvas
+
+            // 计算画面缩放比例
+            const scale = canvas.clientHeight / Game.height
+
+            // 简化事件属性
+            const mouse = {
+                x: (e.clientX - canvas.offsetLeft) / scale,
+                y: (e.clientY - canvas.offsetTop) / scale,
+                button: e.button
+            }
+            return mouse
+        }
+
+        // 鼠标事件
         window.addEventListener('mousedown', e => {
             e.stopPropagation()
             e.preventDefault()
+            executeUserEvents('mousedown', calMouse(e))
         })
         window.addEventListener('mouseup', e => {
             e.stopPropagation()
             e.preventDefault()
+            executeUserEvents('mousedown', calMouse(e))
         })
+
         // 禁用右键菜单
         window.oncontextmenu = function () {
             return false;
