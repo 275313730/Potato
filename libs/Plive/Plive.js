@@ -2,7 +2,7 @@ export function plive() {
     let stageData = {}
     let lastStage = null
     return function () {
-        this.plive = {
+        this.$plive = {
             save(name, data) {
                 stageData[name] = data
                 lastStage = name
