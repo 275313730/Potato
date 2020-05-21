@@ -10,7 +10,7 @@ export function pox(data) {
     }
     return function () {
         const id = this.id
-        this.pox = {
+        this.$pox = {
             watch(keyString, callback) {
                 observer[id] = { keyString, callback }
             },

@@ -2,7 +2,7 @@ export function potate() {
     let states = {}
     let currState = null
     const unit = this
-    this.potate = {
+    this.$potate = {
         addState(state, action, condition) {
             states[state] = { action, condition }
         },
