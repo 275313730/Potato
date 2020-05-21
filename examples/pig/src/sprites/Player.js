@@ -12,147 +12,145 @@ export function player() {
             layer: 2,
         },
         data: {
+            exp: 0,
             collie: null,
-            attackStatus: 0,
+            state: 'stop',
             speed: 2,
-            space: false,
+            attacking: false,
             walkDirection: null,
-            hitting: false,
-            jumpStatus: 0,
             vSpeed: 0,
         },
         methods: {
-            // 移动
-            move(direction) {
-                this.walkDirection = direction
-                if (this.attackStatus > 0 || this.jumpStatus === 3 || this.hitting) { return }
+            walk() {
                 this.direction = this.walkDirection
                 this.graphics.animation(this.id, 'walk')
             },
-            // 停止
             stop() {
-                this.walkDirection = null
-                if (this.attackStatus > 0 || this.jumpStatus > 0 || this.hitting) { return }
                 this.graphics.animation(this.id, 'idle')
-                this.jumpStatus = 0
             },
-            // 攻击
             attack() {
-                if (this.jumpStatus > 0 || this.hitting || this.attackStatus > 0) { return }
-                this.attackStatus = 1
                 this.event.add(wait(4, () => {
-                    this.attackStatus = 2
+                    this.attacking = true
                     this.graphics.animation(this.id, 'attack')
                         .onComplete = () => {
-                            this.attackStatus = 0
+                            this.attacking = false
                             this.restore()
                         }
                 }))
             },
-            // 跳跃
             jump() {
-                if (this.jumpStatus > 0 || this.attackStatus > 0 || this.hitting) { return }
-                this.jumpStatus = 1
                 this.graphics.image(this.id, 'jump')
                 this.vSpeed = 8
             },
-            // 掉落
             fall() {
-                this.jumpY = this.y
-                this.jumpStatus = 2
+                this.jumpTop = this.y
                 this.graphics.image(this.id, 'fall')
             },
-            // 落地
             ground() {
-                if (this.y - this.jumpY > 32 * 3) {
-                    this.jumpStatus = 3
+                this.vSpeed = 0
+                if (this.y - this.jumpTop > 32 * 3) {
                     this.graphics.image(this.id, 'ground')
                     this.event.add(wait(6, () => {
-                        this.hitting = false
-                        this.jumpStatus = 0
                         this.restore()
                     }))
                 } else {
-                    this.hitting = false
-                    this.jumpStatus = 0
                     this.restore()
                 }
-                this.vSpeed = 0
             },
-            // 受伤
             hit() {
-                if (this.hitting) { return }
-                this.hitting = true
-                this.attackStatus = 0
                 this.graphics.animation(this.id, 'hit')
                     .onComplete = () => {
                         this.event.add(wait(8, () => {
-                            this.hitting = false
-                            if (this.jumpStatus === 3) { return }
                             this.restore()
                         }))
                     }
             },
             restore() {
                 if (this.walkDirection) {
-                    this.move(this.walkDirection)
+                    this.$potate.setState('walk')
                 } else {
-                    this.stop()
+                    this.$potate.setState('stop')
                 }
             },
+            initState() {
+                this.$potate.addState('stop', this.stop)
+                this.$potate.addState('walk', this.walk)
+                this.$potate.addState('ground', this.ground)
+                this.$potate.addState('attack', this.attack, nextState => {
+                    if (nextState === 'stop' || nextState === 'walk') { return true }
+                })
+                this.$potate.addState('jump', this.jump, nextState => {
+                    if (nextState === 'fall') { return true }
+                })
+                this.$potate.addState('fall', this.fall, nextState => {
+                    if (nextState === 'ground') { return true }
+                })
+                this.$potate.addState('hit', this.hit, nextState => {
+                    if (nextState === 'stop') { return true }
+                })
+
+                this.$potate.setState('stop')
+            }
         },
         created() {
-            this.stop()
+            this.initState()
             this.userEvent.watch('keydown', keyDown)
             this.userEvent.watch('keyup', keyUp)
             this.userEvent.watch('mousedown', mouseDown)
             this.event.add(walkMove)
             this.event.add(jumpMove)
+            this.$pox.watch('deaths', () => {
+                this.$pox.set('player.exp', value => { return value + 1 })
+            })
         }
     }
 
-    // 键盘按下
     function keyDown(key) {
         switch (key) {
             case 'a':
-                this.move('left')
+                this.walkDirection = 'left'
+                if (this.$potate.getState() === 'attack') { return }
+                this.direction = this.walkDirection
+                this.$potate.setState('walk')
                 break
             case 'd':
-                this.move('right')
+                this.walkDirection = 'right'
+                if (this.$potate.getState() === 'attack') { return }
+                this.direction = this.walkDirection
+                this.$potate.setState('walk')
                 break
             case ' ':
-                this.jump()
-                break
-            case 'j':
-                this.hit()
+                this.$potate.setState('jump')
                 break
         }
     }
 
-    // 键盘松开
     function keyUp(key) {
         switch (key) {
             case 'a':
                 if (this.walkDirection === 'right') { return }
-                this.stop()
+                this.walkDirection = null
+                if (this.$potate.getState() === 'attack') { return }
+                this.$potate.setState('stop')
                 break
             case 'd':
                 if (this.walkDirection === 'left') { return }
-                this.stop()
+                this.walkDirection = null
+                if (this.$potate.getState() === 'attack') { return }
+                this.$potate.setState('stop')
                 break
         }
     }
 
-    // 鼠标按下攻击
     function mouseDown(e) {
         if (e.button === 0) {
-            !this.attacking && this.attack()
+            this.$potate.setState('attack')
         }
     }
 
-    // 移动
     function walkMove() {
-        if (this.walkDirection === null || this.jumpStatus === 3 || this.hitting || this.attackStatus > 0) { return }
+        const state = this.$potate.getState()
+        if (!this.walkDirection || state === 'attack' || state === 'ground') { return }
         if (this.direction === 'right' && this.x < this.stage.width - this.width) {
             this.x += this.speed
         } else if (this.direction === 'left' && this.x > 0) {
@@ -161,12 +159,13 @@ export function player() {
     }
 
     function jumpMove() {
-        if (this.jumpStatus === 0 || this.jumpStatus === 3) { return }
+        const state = this.$potate.getState()
+        if (state !== 'jump' && state !== 'fall') { return }
         this.y -= this.vSpeed
         if (this.vSpeed > -4) {
             this.vSpeed -= 0.5
-            if (this.vSpeed === 0 && this.jumpStatus === 1) {
-                this.fall()
+            if (this.vSpeed === 0) {
+                this.$potate.setState('fall')
             }
         }
     }

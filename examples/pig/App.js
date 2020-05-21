@@ -2,25 +2,20 @@
 import { Game, Stage, Sprite } from "./core/Potato.js";
 
 // Title
-import { test } from "./src/stages/Test.js";
+import { title } from "./src/stages/Title.js";
 
 // mixin
 import { pox } from "./mixins/Pox.js";
+import { potate } from "./mixins/Potate.js";
 
-window.addEventListener('keydown', App)
 
-export function App(e) {
-    // 移除事件
-    if (e.key !== ' ') { return }
-    tip.remove()
-    window.removeEventListener('keydown', App)
-
+export default function () {
     // 初始化Game类
     Game.init({
         el: 'app',
         // 设置宽高
-        width: 480,
-        height: 370,
+        width: 320,
+        height: 240,
         // 设置文件路径
         path: {
             image: './src/assets/imgs/',
@@ -28,12 +23,12 @@ export function App(e) {
         }
     })
 
-    // 载入背景图片
+    // 载入标题图片
     Game.asset.load({
         type: 'image',
-        group: 'bg',
-        name: 'test',
-        url: 'background/test.png'
+        group: 'title',
+        name: 'title',
+        url: 'kings and pigs.png'
     })
 
     // 角色图片数据
@@ -144,11 +139,28 @@ export function App(e) {
         })
     })
 
+    // 载入场景图片
+    Game.asset.load({
+        type: 'image',
+        group: 'bg',
+        name: 'test',
+        url: 'background/test.png'
+    })
+
     // 调试模式
     Game.test = false
 
-    Game.mix(Sprite, pox({ deaths: 0 }))
+    // 全局player属性
+    const player = {
+        hp: 3,
+        attack: 1,
+        exp: 0,
+        level: 1,
+    }
+
+    Game.mix(Sprite, pox({ deaths: 0, player }))
+    Game.mix(Sprite, potate)
 
     // 创建场景
-    new Stage(test())
+    new Stage(title())
 }

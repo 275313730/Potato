@@ -3,7 +3,7 @@ import { Game } from "../../core/Potato.js"
 export function hit(player) {
     let cal = false
     return function () {
-        if (player.attackStatus === 2 && !cal) {
+        if (player.attacking && !cal) {
             cal = true
             const pigs = Game.unit.filter(unit => { return unit.type === 'enemy' })
             for (const key in pigs) {
@@ -18,7 +18,7 @@ export function hit(player) {
                 }
             }
         }
-        if (player.attackStatus === 0) {
+        if (!player.attacking) {
             cal = false
         }
     }

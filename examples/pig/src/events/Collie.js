@@ -6,8 +6,8 @@ export function collie(player, blocks) {
                 if (this.geometry.above(player, block) && this.geometry.distance('y', player, block) < -player.vSpeed) {
                     player.collie = 8
                     player.y = block.y - player.height
-                    if (player.jumpStatus === 2) {
-                        player.ground()
+                    if (player.$potate.getState() === 'fall') {
+                        player.$potate.setState('ground')
                     }
                     return
                 }
@@ -17,8 +17,8 @@ export function collie(player, blocks) {
                     if (this.geometry.distance('y', player, block) < -player.vSpeed) {
                         player.collie = 8
                         player.y = block.y - player.height
-                        if (player.jumpStatus === 2) {
-                            player.ground()
+                        if (player.$potate.getState() === 'fall') {
+                            player.$potate.setState('ground')
                         }
                         return
                     }

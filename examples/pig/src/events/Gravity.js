@@ -1,10 +1,11 @@
 export function gravity(player, blocks) {
-    if (player.jumpStatus !== 0) { return }
+    const state = player.$potate.getState()
+    if (state === 'jump' || state === 'fall') { return }
     for (const key in blocks) {
         const block = blocks[key]
         if (this.geometry.tangent(player, block)) {
             return
         }
     }
-    player.fall()
+    player.$potate.setState('fall')
 }

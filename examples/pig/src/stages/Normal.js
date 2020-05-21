@@ -5,6 +5,7 @@ import { Sprite } from "../../core/Potato.js";
 import { bgImg } from "../sprites/BgImg.js";
 import { player } from "../sprites/Player.js";
 import { block } from "../sprites/Block.js";
+import { exp } from "../sprites/Exp.js";
 
 // events
 import { collie } from "../events/Collie.js";
@@ -13,7 +14,7 @@ import { pig } from "../sprites/Pig.js";
 import { hit } from "../events/Hit.js";
 import { deadCheck } from "../events/DeadCheck.js";
 
-export function test() {
+export function normal() {
     return {
         created() {
             // 创建背景图片
@@ -58,6 +59,9 @@ export function test() {
             // 创建玩家
             const newPlayer = new Sprite(player())
             this.camera.follow(newPlayer)
+
+            //  创建经验条
+            new Sprite(exp())
 
             // 创建猪
             const pigsData = [

@@ -10,21 +10,23 @@ export function pox(data) {
     }
     return function () {
         const id = this.id
-        this.pox = {
+        this.$pox = {
             watch(keyString, callback) {
                 observer[id] = { keyString, callback }
             },
             unwatch() {
                 delete observer[id]
             },
-            set(keyString, newVal) {
+            set(keyString, callback) {
                 const keyArr = keyString.split('.')
                 const lastKey = keyArr.pop()
                 let currData = data
                 keyArr.forEach(key => {
                     currData = currData[key]
                 })
-                if (currData[lastKey] !== newVal) {
+                const value = currData[lastKey]
+                const newVal = callback(value)
+                if (value !== newVal) {
                     currData[lastKey] = newVal
                     notify(keyString, newVal)
                 }
