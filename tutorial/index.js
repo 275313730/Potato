@@ -50,7 +50,7 @@ const player = {
     methods: {
         walk() {
             this.graphics.animation('player', 'walk', true)
-            this.event.add(this.move)
+            this.event.add('move', this.move)
         },
         stop() {
             this.graphics.animation('player', 'idle', true)
