@@ -1,30 +1,40 @@
+/**
+ * version = 0.1.1
+ */
+
 export function pox(data) {
     let observer = {}
     function notify(keyString, newVal) {
         for (const key in observer) {
             const unit = observer[key]
-            if (unit.keyString === keyString) {
-                unit.callback(newVal)
+            for (const key in unit) {
+                if (key === keyString) {
+                    unit[key](newVal)
+                }
             }
+
         }
     }
     return function () {
         const id = this.id
+        observer[id] = {}
         this.$pox = {
             watch(keyString, callback) {
-                observer[id] = { keyString, callback }
+                observer[id][keyString] = callback
             },
-            unwatch() {
-                delete observer[id]
+            unwatch(keyString) {
+                delete observer[id][keyString]
             },
-            set(keyString, newVal) {
+            set(keyString, callback) {
                 const keyArr = keyString.split('.')
                 const lastKey = keyArr.pop()
                 let currData = data
                 keyArr.forEach(key => {
                     currData = currData[key]
                 })
-                if (currData[lastKey] !== newVal) {
+                const value = currData[lastKey]
+                const newVal = callback(value)
+                if (value !== newVal) {
                     currData[lastKey] = newVal
                     notify(keyString, newVal)
                 }

@@ -94,21 +94,6 @@ export class Game {
             executeUserEvents('keyup', e.key)
         })
 
-        // 计算鼠标数据
-        function calMouse(e) {
-            const canvas = Game.canvas
-
-            // 计算画面缩放比例
-            const scale = canvas.clientHeight / Game.height
-
-            // 简化事件属性
-            return {
-                x: (e.clientX - canvas.offsetLeft) / scale,
-                y: (e.clientY - canvas.offsetTop) / scale,
-                button: e.button
-            }
-        }
-
         // 鼠标事件
         window.addEventListener('mousedown', e => {
             e.stopPropagation()
@@ -125,16 +110,6 @@ export class Game {
             }
         })
 
-        function calTouch(e) {
-            const canvas = Game.canvas
-            const scale = canvas.clientHeight / Game.height
-            const target = e.targetTouches[0]
-            return {
-                x: (target.clientX - canvas.offsetLeft) / scale,
-                y: (target.clientY - canvas.offsetTop) / scale,
-            }
-        }
-
         // 触屏事件
         window.addEventListener('touchstart', e => {
             executeUserEvents('touchstart', calTouch(e))
@@ -143,7 +118,7 @@ export class Game {
             executeUserEvents('touchmove', calTouch(e))
         })
         window.addEventListener('touchend', e => {
-            executeUserEvents('touchend', e)
+            executeUserEvents('touchend', calTouch(e))
         })
 
         // 禁用右键菜单
@@ -153,10 +128,11 @@ export class Game {
     }
 }
 
+// 检查是否为移动端
 function check() {
     var browser = {
         versions: function () {
-            var u = navigator.userAgent, app = navigator.appVersion;
+            var u = navigator.userAgent;
             return {//移动终端浏览器版本信息   
                 trident: u.indexOf('Trident') > -1, //IE内核  
                 presto: u.indexOf('Presto') > -1, //opera内核  
@@ -182,3 +158,36 @@ function check() {
         return false
     }
 }
+
+// 计算鼠标数据
+function calMouse(e) {
+    const canvas = Game.canvas
+
+    // 计算画面缩放比例
+    const scale = canvas.clientHeight / Game.height
+
+    // 简化事件属性
+    return {
+        x: (e.clientX - canvas.offsetLeft) / scale,
+        y: (e.clientY - canvas.offsetTop) / scale,
+        button: e.button
+    }
+}
+
+// 计算触控数据
+function calTouch(e) {
+    const canvas = Game.canvas
+    const scale = canvas.clientHeight / Game.height
+    let touches = []
+    for (let i = 0; i < e.targetTouches.length; i++) {
+        const touch = e.targetTouches[i];
+        touches.push({
+            x: (touch.clientX - canvas.offsetLeft) / scale,
+            y: (touch.clientY - canvas.offsetTop) / scale,
+            id: touch.identifier,
+            type: e.type
+        })
+    }
+    return touches
+}
+

@@ -1,3 +1,7 @@
+/**
+ * version = 0.1.0
+ */
+
 export function potate() {
     let states = {}
     let currState = null
