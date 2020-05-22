@@ -3,11 +3,11 @@ export function event(unit) {
 
     return {
         // 添加
-        add(func) {
+        add(name, func) {
             // 判断事件是否存在
-            if (events[func.name]) { return }
+            if (events[name]) { return }
             // 添加事件
-            events[func.name] = func
+            events[name] = func
         },
         // 删除
         del(name) {

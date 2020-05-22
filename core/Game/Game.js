@@ -119,6 +119,14 @@ export class Game {
             executeUserEvents('mousedown', calMouse(e))
         })
 
+        // 触屏事件
+        window.addEventListener('touchstart', e => {
+            executeUserEvents('touchstart', e)
+        })
+        window.addEventListener('touchend', e => {
+            executeUserEvents('touchend', e)
+        })
+
         // 禁用右键菜单
         window.oncontextmenu = function () {
             return false;
