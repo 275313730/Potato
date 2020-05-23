@@ -2,6 +2,10 @@ import { Game } from "../Game/Game.js"
 
 export function graphics(unit) {
     // 声明常量
+    const GAME_WIDTH = Game.width
+    const GAME_HEIGHT = Game.height
+
+    // 声明函数
     const ctx = Game.context
     const floor = Math.floor
 
@@ -106,7 +110,7 @@ export function graphics(unit) {
 
 
             // 内部属性
-            let currInterval = 0,
+            let intervalCount = 0,
                 currFrame = 0
 
             // 动画属性
@@ -143,13 +147,13 @@ export function graphics(unit) {
                 // 绘制动画
                 drawAnimation(animation.image, options.flip, currFrame)
 
-                // 动画间隔帧增加
-                currInterval++
+                // 间隔帧计数
+                intervalCount++
 
                 // 判断计数是否小于间隔帧数
-                if (currInterval >= options.animationInterval) {
+                if (intervalCount >= options.animationInterval) {
                     // 动画当前间隔帧归零
-                    currInterval = 0
+                    intervalCount = 0
 
                     // 动画关键帧增加
                     currFrame++
@@ -265,7 +269,12 @@ export function graphics(unit) {
         },
         // 渲染
         render() {
-            Game.context.globalAlpha = unit.alpha
+            const { relX, relY, drawWidth, drawHeight, scale } = getData()
+            if (relX + drawWidth * scale < 0 || relX > GAME_WIDTH ||
+                relY + drawHeight * scale < 0 || relY > GAME_HEIGHT) {
+                return
+            }
+            ctx.globalAlpha = unit.alpha
             executor && executor()
             Game.test && test()
         },
