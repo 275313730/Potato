@@ -1,8 +1,7 @@
 import { Game } from "../Game/Game.js"
 
 export function graphics(unit) {
-    // 声明常量
-    const ctx = Game.context
+    const context = Game.canvas.getContext('2d')
     const floor = Math.floor
 
     // 初始化执行函数
@@ -48,14 +47,14 @@ export function graphics(unit) {
         if (direction === 'right') {
             const tranlateX = floor(relX + offsetLeft)
             const tranlateY = floor(relY + offsetTop)
-            ctx.drawImage(image, 0, 0, drawWidth, drawHeight, tranlateX, tranlateY, drawWidth * scale, drawHeight * scale)
+            context.drawImage(image, 0, 0, drawWidth, drawHeight, tranlateX, tranlateY, drawWidth * scale, drawHeight * scale)
         } else {
             const tranlateX = floor(Game.width - width - relX + offsetLeft)
             const tranlateY = floor(relY + offsetTop)
 
             // 水平翻转绘制
             drawFlip(Game.width, () => {
-                ctx.drawImage(image, 0, 0, drawWidth, drawHeight, tranlateX, tranlateY, drawWidth * scale, drawHeight * scale)
+                context.drawImage(image, 0, 0, drawWidth, drawHeight, tranlateX, tranlateY, drawWidth * scale, drawHeight * scale)
             })
         }
     }
@@ -68,31 +67,31 @@ export function graphics(unit) {
         if (!flip && direction === 'right' || flip && direction === 'left') {
             const tranlateX = floor(relX + offsetLeft)
             const tranlateY = floor(relY + offsetTop)
-            ctx.drawImage(image, currFrame * drawWidth, 0, drawWidth, drawHeight, tranlateX, tranlateY, drawWidth * scale, drawHeight * scale)
+            context.drawImage(image, currFrame * drawWidth, 0, drawWidth, drawHeight, tranlateX, tranlateY, drawWidth * scale, drawHeight * scale)
         } else {
             const tranlateX = floor(Game.width - width * scale - relX + offsetLeft)
             const tranlateY = floor(relY + offsetTop)
 
             // 水平翻转绘制
             drawFlip(Game.width, () => {
-                ctx.drawImage(image, currFrame * drawWidth, 0, drawWidth, drawHeight, tranlateX, tranlateY, drawWidth * scale, drawHeight * scale)
+                context.drawImage(image, currFrame * drawWidth, 0, drawWidth, drawHeight, tranlateX, tranlateY, drawWidth * scale, drawHeight * scale)
             })
         }
     }
 
     // 翻转绘制
     function drawFlip(width, callback) {
-        ctx.translate(width, 0);
-        ctx.scale(-1, 1);
+        context.translate(width, 0);
+        context.scale(-1, 1);
         callback()
-        ctx.translate(width, 0);
-        ctx.scale(-1, 1);
+        context.translate(width, 0);
+        context.scale(-1, 1);
     }
 
     // 测试
     function test() {
-        Game.context.strokeStyle = 'red'
-        Game.context.strokeRect(unit.relX, unit.relY, unit.width, unit.height)
+        context.strokeStyle = 'red'
+        context.strokeRect(unit.relX, unit.relY, unit.width, unit.height)
     }
 
     // 初始化方法
@@ -174,7 +173,7 @@ export function graphics(unit) {
         },
         // 绘制
         draw(callback) {
-            executor = () => callback.call(unit, Game.context)
+            executor = () => callback.call(unit, context)
         },
         // 图片
         image(group, name, sameSize = false) {
@@ -198,14 +197,14 @@ export function graphics(unit) {
                 callback(ctx)
                 mixImage.src = mixCanvas.toDataURL("image/png");
                 executor = () => {
-                    Game.context.drawImage(mixImage, 0, 0)
+                    context.drawImage(mixImage, 0, 0)
                 }
             } else if (type === 'dynamic') {
                 executor = () => {
                     ctx.clearRect(0, 0, Game.width, Game.height)
                     callback(ctx)
                     mixImage.src = mixCanvas.toDataURL("image/png");
-                    Game.context.drawImage(mixImage, 0, 0)
+                    context.drawImage(mixImage, 0, 0)
                 }
             }
         },
@@ -275,7 +274,7 @@ export function graphics(unit) {
             if (ux + uw * scale < 0 || ux > gw || uy + uh * scale < 0 || uy > gh) {
                 return
             }
-            Game.context.globalAlpha = unit.alpha
+            context.globalAlpha = unit.alpha
             executor && executor()
             Game.test && test()
         },

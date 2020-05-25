@@ -1,6 +1,7 @@
 import { Game } from "../Game/Game.js"
 
 export function execute(stage) {
+    const context = Game.canvas.getContext('2d')
     let stop = false
 
     // 单位渲染和事件
@@ -32,14 +33,14 @@ export function execute(stage) {
         // 更新前函数
         stage.beforeUpdate && stage.beforeUpdate()
 
-        // 清除canvas
-        Game.context.clearRect(0, 0, Game.width, Game.height)
-
         // 获取镜头数据
         let camera = stage.camera.get()
 
         // 执行场景事件
         stage.event.execute()
+
+        // 清除canvas
+        context.clearRect(0, 0, Game.width, Game.height)
 
         // 执行精灵渲染和事件
         Game.unit.travel(unit => {

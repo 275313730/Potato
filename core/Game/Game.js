@@ -6,13 +6,9 @@ export class Game {
     // 初始化Game类
     static init(options) {
         Object.defineProperties(this, {
-            // canvas
+            // 游戏画布
             canvas: {
                 value: document.getElementById(options.el)
-            },
-            // canvas上下文
-            context: {
-                value: document.getElementById(options.el).getContext('2d')
             },
             // 宽度
             width: {
@@ -56,9 +52,9 @@ export class Game {
         })
 
         // 初始化实例方法
-        this.asset = asset(this.imagePath, this.audioPath)
-        this.unit = unit(Game)
-        this.mix = function(Class, func) {
+        this.asset = asset(this)
+        this.unit = unit(this)
+        this.mix = function (Class, func) {
             if (!Class['mixins']) {
                 Class['mixins'] = []
             }

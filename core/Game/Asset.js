@@ -1,4 +1,6 @@
-export function asset(imagePath, audioPath) {
+export function asset(Game) {
+    const imagePath = Game.imagePath
+    const audioPath = Game.audioPath
     let loadings = []
     let assets = {}
 
@@ -28,21 +30,18 @@ export function asset(imagePath, audioPath) {
 
             if (type === 'image') {
                 const image = new Image()
-                image.src = imagePath + url
-
                 loadings.push(new Promise(resolve => {
                     image.onload = () => {
                         assets[group][name] = image
                         resolve(true)
                     }
                 }))
+                image.src = imagePath + url
                 return
             }
 
             if (type === 'animation') {
                 const image = new Image()
-                image.src = imagePath + url
-
                 loadings.push(new Promise(resolve => {
                     image.onload = () => {
                         assets[group][name] = {
@@ -54,6 +53,7 @@ export function asset(imagePath, audioPath) {
                         resolve(true)
                     }
                 }))
+                image.src = imagePath + url
                 return
             }
 
