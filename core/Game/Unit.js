@@ -82,17 +82,12 @@ export function unit(Game) {
         },
         // 删除所有
         delAll(includeGlobal) {
-            if (includeGlobal) {
-                for (const key in units) {
-                    this.del(key)
+            for (const key in units) {
+                const unit = units[key]
+                if (!includeGlobal && unit.global) {
+                    continue
                 }
-            } else {
-                let unGlobal = this.filter(unit => {
-                    return !unit.global
-                })
-                for (const key in unGlobal) {
-                    this.del(key)
-                }
+                this.del(key)
             }
         },
         // 查找
