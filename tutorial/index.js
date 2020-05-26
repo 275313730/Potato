@@ -81,7 +81,7 @@ const player = {
                 this.direction = 'left'
                 this.walk()
             }
-        }, true)
+        })
         this.userEvent.watch('keyup', key => {
             if ((key === 'd' && this.direction === 'right') || (key === 'a' && this.direction === 'left')) {
                 this.stop()

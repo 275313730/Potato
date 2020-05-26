@@ -1,8 +1,8 @@
-import { Game } from "../Game/Game.js"
+import Game from "../Game/Game.js"
 
 export function execute(stage) {
-    const context = Game.canvas.getContext('2d')
-    let stop = false
+    var context = Game.canvas.getContext('2d')
+    var stop = false
 
     // 单位渲染和事件
     function unitExecute(unit, camera) {
@@ -13,8 +13,8 @@ export function execute(stage) {
         unit.relX = unit.x - camera.x * (1 - unit.fixed)
         unit.relY = unit.y - camera.y * (1 - unit.fixed)
 
-        // 计算音量
-        unit.audio.cal()
+        // 更新音频
+        unit.audio.update()
 
         // 绘制画面
         unit.graphics.render()
@@ -34,7 +34,7 @@ export function execute(stage) {
         stage.beforeUpdate && stage.beforeUpdate()
 
         // 获取镜头数据
-        let camera = stage.camera.get()
+        var camera = stage.camera.update()
 
         // 执行场景事件
         stage.event.execute()
@@ -43,7 +43,7 @@ export function execute(stage) {
         context.clearRect(0, 0, Game.width, Game.height)
 
         // 执行精灵渲染和事件
-        Game.unit.travel(unit => {
+        Game.unit.travel(function (unit) {
             unitExecute(unit, camera)
         })
 
