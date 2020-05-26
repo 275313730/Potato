@@ -42,7 +42,7 @@ export function execute(stage) {
         // 清除canvas
         context.clearRect(0, 0, Game.width, Game.height)
 
-        // 执行精灵渲染和事件
+        // 执行单位渲染和事件
         Game.unit.travel(function (unit) {
             unitExecute(unit, camera)
         })
@@ -62,7 +62,7 @@ export function execute(stage) {
             // 退出循环
             stop = true
 
-            // 清空场景精灵
+            // 清空场景单位
             Game.unit.clear()
 
             // 销毁后函数

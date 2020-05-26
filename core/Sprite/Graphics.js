@@ -1,6 +1,6 @@
 import Game from "../Game/Game.js"
 
-export function graphics(sprite) {
+export function graphics(unit) {
     var context = Game.canvas.getContext('2d')
     var floor = Math.floor
 
@@ -9,28 +9,28 @@ export function graphics(sprite) {
 
     // 设置尺寸
     var setSize = function (width, height, sameSize) {
-        // 设置精灵
-        sprite.drawWidth = width
-        sprite.drawHeight = height
+        // 设置单位绘制尺寸
+        unit.drawWidth = width
+        unit.drawHeight = height
 
         if (sameSize) {
-            sprite.width = width
-            sprite.height = height
+            unit.width = width
+            unit.height = height
         }
     }
 
     // 获取绘制数据
     var getData = function () {
         return {
-            relX: sprite.relX,
-            relY: sprite.relY,
-            offsetLeft: sprite.offsetLeft,
-            offsetTop: sprite.offsetTop,
-            width: sprite.width,
-            drawWidth: sprite.drawWidth,
-            drawHeight: sprite.drawHeight,
-            scale: sprite.scale,
-            direction: sprite.direction
+            relX: unit.relX,
+            relY: unit.relY,
+            offsetLeft: unit.offsetLeft,
+            offsetTop: unit.offsetTop,
+            width: unit.width,
+            drawWidth: unit.drawWidth,
+            drawHeight: unit.drawHeight,
+            scale: unit.scale,
+            direction: unit.direction
         }
     }
 
@@ -86,7 +86,7 @@ export function graphics(sprite) {
     // 测试
     function test() {
         context.strokeStyle = 'red'
-        context.strokeRect(sprite.relX, sprite.relY, sprite.width, sprite.height)
+        context.strokeRect(unit.relX, unit.relY, unit.width, unit.height)
     }
 
     // 初始化方法
@@ -156,7 +156,7 @@ export function graphics(sprite) {
         // 绘制
         draw(callback) {
             executor = function () {
-                callback.call(sprite, context)
+                callback.call(unit, context)
             }
         },
         // 图片
@@ -196,11 +196,11 @@ export function graphics(sprite) {
         particle(group, name, interval, alphaRange, scaleRange) {
             var image = Game.asset.get(group, name)
 
-            // 设置精灵尺寸(粒子精灵没有宽度和高度)
-            sprite.width = 0
-            sprite.height = 0
-            sprite.drawWidth = image.width
-            sprite.drawHeight = image.height
+            // 设置单位尺寸(粒子单位没有宽度和高度)
+            unit.width = 0
+            unit.height = 0
+            unit.drawWidth = image.width
+            unit.drawHeight = image.height
             
             // 设置粒子属性
             var nextAlpha, nextscale
@@ -213,24 +213,24 @@ export function graphics(sprite) {
             // 检查粒子是否有尺寸变化
             if (scaleRange) {
                 nextscale = (scaleRange[1] - scaleRange[0]) / interval
-                sprite.scale = scaleRange[1]
+                unit.scale = scaleRange[1]
             }
 
             executor = function () {
                 // 透明度变化
                 if (nextAlpha != null) {
-                    if (sprite.alpha + nextAlpha <= alphaRange[0] || sprite.alpha + nextAlpha >= alphaRange[1]) {
+                    if (unit.alpha + nextAlpha <= alphaRange[0] || unit.alpha + nextAlpha >= alphaRange[1]) {
                         nextAlpha = -nextAlpha
                     }
-                    sprite.alpha += nextAlpha
+                    unit.alpha += nextAlpha
                 }
 
                 // 尺寸变化
                 if (nextscale != null) {
-                    if (sprite.scale + nextscale <= scaleRange[0] || sprite.scale + nextscale >= scaleRange[1]) {
+                    if (unit.scale + nextscale <= scaleRange[0] || unit.scale + nextscale >= scaleRange[1]) {
                         nextscale = - nextscale
                     }
-                    sprite.scale += nextscale
+                    unit.scale += nextscale
                 }
 
                 drawImage(image)
@@ -240,15 +240,15 @@ export function graphics(sprite) {
         render() {
             var gw = Game.width
             var gh = Game.height
-            var ux = sprite.relX
-            var uy = sprite.relY
-            var uw = sprite.width
-            var uh = sprite.height
-            var scale = sprite.scale
+            var ux = unit.relX
+            var uy = unit.relY
+            var uw = unit.width
+            var uh = unit.height
+            var scale = unit.scale
             if (ux + uw * scale < 0 || ux > gw || uy + uh * scale < 0 || uy > gh) {
                 return
             }
-            context.globalAlpha = sprite.alpha
+            context.globalAlpha = unit.alpha
             executor && executor()
             Game.test && test()
         },

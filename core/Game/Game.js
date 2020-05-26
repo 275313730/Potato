@@ -32,7 +32,7 @@ Game.init = function (options) {
     this.userEvents = {};
     // 动画间隔帧(每隔n帧绘制下一个关键帧)
     this.animationInterval = options.animationInterval || 16;
-    // 测试(显示精灵外框)
+    // 测试(显示单位外框)
     this.test = false;
     // 是否移动端
     this.isMobile = isMobile();

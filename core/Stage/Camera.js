@@ -58,7 +58,7 @@ export function camera(stage) {
                 // 清空相机移动函数
                 camera.movement = null
 
-                // 启用精灵
+                // 启用单位
                 if (disable === true) {
                     Game.unit.travel(function (unit) {
                         unit.disabled = false
@@ -75,7 +75,7 @@ export function camera(stage) {
     // 计算镜头位置
     var cameraCal = function () {
         var follow = camera.follow
-        // 当相机跟随精灵时
+        // 当相机跟随单位时
         if (follow) {
             var position = borderCal(follow)
             camera.x = position.x
@@ -98,7 +98,7 @@ export function camera(stage) {
         var gh = Game.height
         var x, y
 
-        // 相机处于舞台宽度范围内才会跟随精灵x变化，否则固定值
+        // 相机处于舞台宽度范围内才会跟随单位x变化，否则固定值
         if (ux < (gw - uw) / 2) {
             x = 0
         } else if (ux > sw - (gw + uw) / 2) {
@@ -107,7 +107,7 @@ export function camera(stage) {
             x = ux - (gw - uw) / 2
         }
 
-        // 相机处于舞台高度范围内才会跟随精灵x变化，否则固定值
+        // 相机处于舞台高度范围内才会跟随单位x变化，否则固定值
         if (uy < (gh - uh) / 2) {
             y = 0
         } else if (uy > sh - (gh + uh) / 2) {

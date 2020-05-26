@@ -1,6 +1,6 @@
 import Game from "../Game/Game.js"
 
-export function audio(sprite) {
+export function audio(unit) {
     var music = { audio: null }
     var sounds = []
 
@@ -13,8 +13,8 @@ export function audio(sprite) {
             }
 
             // 计算相对距离
-            var relX = sprite.relX
-            var relY = sprite.relY
+            var relX = unit.relX
+            var relY = unit.relY
             var distance = Math.sqrt(relX ** 2 + relY ** 2)
 
             // 音乐

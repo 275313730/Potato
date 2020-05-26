@@ -96,9 +96,9 @@ function Sprite(options) {
 
     // 混入
     if (Sprite.mixins) {
-        var sprite = this
+        var unit = this
         Sprite.mixins.forEach(function (mixin) {
-            mixin.call(sprite)
+            mixin.call(unit)
         });
     }
 

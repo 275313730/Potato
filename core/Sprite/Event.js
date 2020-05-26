@@ -1,4 +1,4 @@
-export function event(sprite) {
+export function event(unit) {
     var events = {}
 
     return {
@@ -23,9 +23,9 @@ export function event(sprite) {
         // 执行
         execute() {
             // disabled时禁用事件
-            if (sprite.disabled) { return }
+            if (unit.disabled) { return }
             for (var key in events) {
-                events[key].call(sprite)
+                events[key].call(unit)
             }
         }
     }
