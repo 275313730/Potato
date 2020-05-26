@@ -25,7 +25,7 @@ Game.init = function (options) {
     // 高度
     this.height = options.height;
     // 缩放
-    this.scale = this.canvas.clientHeight / this.width;
+    this.scale = this.canvas.clientHeight / this.height;
     // 键盘状态
     this.key = null;
     // 用户事件

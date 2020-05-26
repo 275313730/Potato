@@ -66,7 +66,7 @@ export function unit(Game) {
             delete Game.userEvents[id]
 
             // 解绑单位音频
-            unit.audio.delAll()
+            unit.audio.clear()
 
             // 删除单位
             delete units[id]
@@ -75,7 +75,7 @@ export function unit(Game) {
             unit.destroyed && unit.destroyed()
         },
         // 删除所有
-        delAll(includeGlobal) {
+        clear(includeGlobal) {
             for (var key in units) {
                 var unit = units[key]
                 if (!includeGlobal && unit.global) {

@@ -63,7 +63,7 @@ export function execute(stage) {
             stop = true
 
             // 清空场景精灵
-            Game.unit.delAll()
+            Game.unit.clear()
 
             // 销毁后函数
             stage.destoryed && stage.destoryed()
