@@ -55,6 +55,11 @@ export function geometry() {
                     return 0;
                 }
             }
+            if (type === "o") {
+                var o1 = [x1 + w1 / 2, y1 + h1 / 2];
+                var o2 = [x2 + w2 / 2, y2 + h2 / 2];
+                return Math.sqrt((o1[0] - o2[0]) ** 2 + (o1[1] - o2[1]) ** 2);
+            }
         },
         // 相交
         intersect(unit1, unit2) {
