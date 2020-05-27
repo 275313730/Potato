@@ -11,7 +11,7 @@ export function camera(stage) {
     // 创建镜头移动函数
     var createMovement = function (x, y, time, callback, disable = true) {
         // 计算数据
-        var frames = time * Game.frames || 1;
+        var frames = time * 60 || 1;
         var perX = x / frames;
         var perY = y / frames;
 
@@ -22,19 +22,11 @@ export function camera(stage) {
         // 取消相机跟随
         camera.follow = null;
 
-        // 定义常量
-        var STAGE_WIDTH = stage.width;
-        var STAGE_HEIGHT = stage.height;
-        var GAME_WIDTH = Game.width;
-        var GAME_HEIGHT = Game.height;
-
-        // 调整相机位置
-        if (camera.x < 0) {
-            camera.x = 0;
-        }
-        if (camera.x > STAGE_WIDTH - GAME_WIDTH) {
-            camera.x = STAGE_WIDTH - GAME_WIDTH;
-        }
+        // 获取边界尺寸
+        var sw = stage.width;
+        var sh = stage.height;
+        var gw = Game.width;
+        var gh = Game.height;
 
         // 移动计数
         var count = 0;
@@ -57,8 +49,13 @@ export function camera(stage) {
 
             // 判断移动计数和相机位置
             if (count > frames ||
-                (camera.x <= 0 || camera.x >= STAGE_WIDTH - GAME_WIDTH) ||
-                (camera.y <= 0 || camera.y >= STAGE_HEIGHT - GAME_HEIGHT)) {
+                (camera.x < 0 || camera.x > sw - gw) ||
+                (camera.y < 0 || camera.y > sh - gh)) {
+                camera.x = Math.max(0, camera.x)
+                camera.x = Math.min(camera.x, sw - gw)
+                camera.y = Math.max(0, camera.y)
+                camera.y = Math.min(camera.y, sh - gh)
+
                 // 清空相机移动函数
                 camera.movement = null;
 
