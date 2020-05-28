@@ -5,7 +5,8 @@ const Sprite = Potato.Sprite
 Game.init({
     el: 'app',
     width: 272,
-    height: 160
+    height: 160,
+    mode: 0
 })
 
 const bgs = [
@@ -30,7 +31,7 @@ Game.asset.load({
     group: 'player',
     name: 'idle',
     url: './img/idle.png',
-    width: 40,
+    frame: 5,
     interval: 16
 })
 
@@ -39,7 +40,7 @@ Game.asset.load({
     group: 'player',
     name: 'walk',
     url: './img/walk.png',
-    width: 40,
+    frame: 6,
     interval: 16
 })
 
