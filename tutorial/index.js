@@ -5,8 +5,7 @@ const Sprite = Potato.Sprite
 Game.init({
     el: 'app',
     width: 272,
-    height: 160,
-    mode: 0
+    height: 160
 })
 
 const bgs = [
