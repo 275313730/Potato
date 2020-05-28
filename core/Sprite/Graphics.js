@@ -194,7 +194,11 @@ export function graphics(unit) {
                 }
             }
 
+            // 赋值
             unit.animation = options;
+
+            // 返回数据
+            return options;
         },
         // 清除
         clear() {
