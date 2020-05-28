@@ -195,9 +195,6 @@ export function graphics(unit) {
             }
 
             unit.animation = options;
-
-            // 返回数据
-            return options;
         },
         // 清除
         clear() {
