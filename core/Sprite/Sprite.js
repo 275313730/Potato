@@ -1,42 +1,54 @@
 "use strict"
 import Game from "../Game/Game.js";
-import { graphics } from "./Graphics.js";
-import { audio } from "./Audio.js";
-import { event } from "./Event.js";
-import { userEvent } from "./UserEvent.js";
+import graphics from "./Graphics.js";
+import audio from "./Audio.js";
+import event from "../Common/Event.js";
+import input from "./Input.js";
 
-function Sprite(options) {
+/**
+ * 精灵构造函数
+ * @param {Object} options
+ */
+class Sprite {
+  constructor(options) {
+    // 备份options
+    this.$options = options
+
     // 初始化生命周期函数
-    this.beforeCreate = options.beforeCreate;
-    this.created = options.created;
-    this.beforeUpdate = options.beforeUpdate;
-    this.updated = options.updated;
-    this.beforeDestroy = options.beforeDestroy;
-    this.destroyed = options.destroyed;
+    this.beforeCreate = options.beforeCreate || null;
+    this.created = options.created || null;
+    this.beforeUpdate = options.beforeUpdate || null;
+    this.updated = options.updated || null;
+    this.beforeDestroy = options.beforeDestroy || null;
+    this.destroyed = options.destroyed || null;
 
     this.beforeCreate && this.beforeCreate();
 
     // 设置参数
-    var config = options.config;
+    let config = options.config;
 
-    // 没有id时
-    if (!config.id) {
-        throw Error(`Sprite need an id.`);
+    // 检查id是否填写
+    if (config.id == null) {
+      throw new Error('Sprite needs an id.');
+    }
+    // 检查id是否为纯数字
+    if (!isNaN(Number(config.id))) {
+      throw new Error('Sprite must start with a letter.');
     }
 
     // id 为单位主键
     this.id = config.id;
 
     // x 为单位横坐标
-    this.x = config.x || 0;
+    this.x = this.relX = config.x || 0;
 
     // y 为单位纵坐标
-    this.y = config.y || 0;
+    this.y = this.relY = config.y || 0;
 
-    // width 为单位宽度
+    // width 为单位真实宽度
     this.width = config.width || 0;
 
-    // height 为单位高度
+    // height 为单位真实高度
     this.height = config.height || 0;
 
     // offsetLeft 为单位横向偏移量
@@ -49,13 +61,16 @@ function Sprite(options) {
     this.global = config.global || false;
 
     // alpha 决定绘制透明度
-    this.alpha = config.alpha == null ? 1 : config.alpha;
+    this.alpha = config.alpha || 1;
 
-    // scale 决定实际绘制尺寸
-    this.scale = config.scale == null ? 1 : config.scale;
+    // scale 决定绘制尺寸
+    this.scale = config.scale || 1;
 
-    // direction 决定图片的方向
-    this.direction = config.direction || 'right';
+    /**
+     * flip 决定精灵是否翻转
+     * 默认为false，朝右
+     */
+    this.flip = config.flip || false;
 
     // layer 决定图片上下关系，layer越大，单位越晚渲染
     this.layer = config.layer || 0;
@@ -69,44 +84,35 @@ function Sprite(options) {
     // 在0~1之间会出现分层移动效果
     this.fixed = config.fixed || 0;
 
-    // 检查id是否填写
-    if (this.id == null) {
-        throw new Error('Sprite needs an id.');
-    }
-    // 检查id是否为纯数字
-    if (this.id instanceof Number || !isNaN(Number(this.id))) {
-        throw new Error('Sprite must start with a letter.');
-    }
+    this.graphics = graphics(this);
+    this.audio = audio(this);
+    this.event = event(this);
+    this.input = input(this);
 
     // 暴露实例数据到this中
     for (var key in options.data) {
-        this[key] = options.data[key];
+      this[key] = options.data[key];
     }
 
     // 暴露实例事件到this中
     for (var key in options.methods) {
-        this[key] = options.methods[key];
+      this[key] = options.methods[key];
     }
-
-    // 初始化实例方法
-    this.graphics = graphics(this);
-    this.audio = audio(this);
-    this.event = event(this);
-    this.userEvent = userEvent(this);
 
     // 混入
     if (Sprite.mixins) {
-        var unit = this;
-        Sprite.mixins.forEach(function (mixin) {
-            mixin.call(unit);
-        });
+      var sprite = this;
+      Sprite.mixins.forEach(function (mixin) {
+        mixin.call(sprite);
+      });
     }
 
     // 添加到游戏单位中
-    Game.unit.add(this);
+    Game.stage.sprite.add(this);
 
     // 单位创建后
     options.created && options.created.call(this);
+  }
 }
 
 export default Sprite
