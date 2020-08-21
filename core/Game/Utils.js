@@ -14,6 +14,21 @@ export function isMobile() {
 }
 
 /**
+ * 初始化页面样式
+ */
+export function initStyle() {
+  let body = document.body;
+  body.style.margin = 0;
+  body.style.padding = 0;
+  body.style.width = "100vw";
+  body.style.height = "100vh";
+  body.style.overflow = "hidden";
+  body.style.display = "flex";
+  body.style.alignItems = "center";
+  body.style.justifyContent = "center";
+}
+
+/**
  * 监听用户事件
  * @param {Object} Game 游戏对象
  */
@@ -129,8 +144,16 @@ function fullScreen() {
  */
 export function autoResizeCanvas(Game) {
   window.onresize = window.onload = function () {
-    Game.width = document.body.clientWidth;
-    Game.height = document.body.clientHeight;
+    const ratio = Game.ratio;
+    let width = document.body.clientWidth;
+    let height = document.body.clientHeight;
+    if (width / height > ratio) {
+      Game.height = height;
+      Game.width = ratio * height;
+    } else {
+      Game.width = width;
+      Game.height = width / ratio;
+    }
     // 设置canvas宽高
     Game.canvas.setAttribute("width", Game.width);
     Game.canvas.setAttribute("height", Game.height);
