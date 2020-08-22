@@ -1,4 +1,4 @@
-import { Game, Stage, Sprite } from "../core/Potato.js";
+import { Game, Stage, Sprite } from "../src/index.js";
 
 Game.init({ test: true, width: 1920, height: 1080 });
 
