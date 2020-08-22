@@ -1,4 +1,4 @@
-import Game from "../Game/Game.js"
+import Game from "../Game/index.js"
 
 export default function audio(sprite) {
   let music = {};

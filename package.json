@@ -1,11 +1,11 @@
 {
-  "name": "potato",
+  "name": "potato-game",
   "version": "1.0.0",
-  "description": "* Potato是一个用js和canvas来制作游戏的渐进式框架，包含源码(core)，示例游戏(examples)，制作工具(tools)和库文件(libs)。",
-  "main": "index.js",
-  "directories": {
-    "example": "examples"
-  },
+  "description": "* Potato是一个基于canvas和js的渐进式游戏框架。",
+  "main": "./src/index.js",
+  "files": [
+    "src"
+  ],
   "scripts": {
     "build": "webpack -p --config webpack.prod.js",
     "dev": "webpack -p --config webpack.dev.js"
@@ -14,9 +14,14 @@
     "type": "git",
     "url": "git+https://github.com/275313730/Potato.git"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "game",
+    "framework",
+    "canvas",
+    "javascript"
+  ],
+  "author": "Roanne",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/275313730/Potato/issues"
   },

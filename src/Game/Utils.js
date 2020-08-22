@@ -33,26 +33,25 @@ export function initStyle() {
  * @param {Object} Game 游戏对象
  */
 export function listenInputEvent(Game) {
-  const listen = window.addEventListener;
 
   // 触屏事件
   if (Game.isMobile) {
     ["touchstart", "touchmove", "touchend"].forEach(function (eventType) {
-      listen(eventType, function (e) {
+      Game.canvas.addEventListener(eventType, function (e) {
         executeInputEvents(eventType, calTouch(e));
       });
     });
   } else {
     // 鼠标事件
     ["mousedown", "mouseup"].forEach(function (eventType) {
-      listen(eventType, function (e) {
+      Game.canvas.addEventListener(eventType, function (e) {
         e.stopPropagation();
         e.preventDefault();
         executeInputEvents(eventType, calMouse(e));
       });
     });
     // 键盘事件
-    listen("keydown", function (e) {
+    window.addEventListener("keydown", function (e) {
       e.stopPropagation();
       e.preventDefault();
       const keyCode = e.keyCode;
@@ -62,7 +61,7 @@ export function listenInputEvent(Game) {
       Game.keyCode = keyCode;
       executeInputEvents("keydown", keyCode);
     });
-    listen("keyup", function (e) {
+    window.addEventListener("keyup", function (e) {
       e.stopPropagation();
       e.preventDefault();
       const keyCode = e.keyCode;
@@ -148,14 +147,15 @@ export function autoResizeCanvas(Game) {
     let width = document.body.clientWidth;
     let height = document.body.clientHeight;
     if (width / height > ratio) {
-      Game.height = height;
-      Game.width = ratio * height;
+      Game.viewHeight = height;
+      Game.viewWidth = ratio * height;
     } else {
-      Game.width = width;
-      Game.height = width / ratio;
+      Game.viewWidth = width;
+      Game.viewHeight = width / ratio;
     }
+    Game.scale = Game.viewHeight / Game.height;
     // 设置canvas宽高
-    Game.canvas.setAttribute("width", Game.width);
-    Game.canvas.setAttribute("height", Game.height);
+    Game.canvas.setAttribute("width", Game.viewWidth);
+    Game.canvas.setAttribute("height", Game.viewHeight);
   }
 }

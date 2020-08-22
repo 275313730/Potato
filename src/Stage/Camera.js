@@ -1,5 +1,5 @@
-import Game from "../Game/Game.js"
-import Sprite from "../Sprite/Sprite.js";
+import Game from "../Game/index.js"
+import Sprite from "../Sprite/index.js";
 
 export default function camera(stage) {
   /**

@@ -1,5 +1,5 @@
 "use strict"
-import Game from "../Game/Game.js";
+import Game from "../Game/index.js";
 import sprite from "./Sprite.js";
 import camera from "./Camera.js";
 import event from "../Common/Event.js";

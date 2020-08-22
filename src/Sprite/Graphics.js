@@ -1,13 +1,13 @@
-import Game from "../Game/Game.js"
+import Game from "../Game/index.js"
 
 export default function graphics(sprite) {
-  var context = Game.canvas.getContext('2d');
-  var floor = Math.floor;
+  const ctx = Game.canvas.getContext('2d');
+  const floor = Math.floor;
 
   /**
    * 绘制执行函数
    */
-  var executor = null;
+  let executor = null;
 
   /**
    * 设置尺寸
@@ -15,7 +15,7 @@ export default function graphics(sprite) {
    * @param {number} height 高度
    * @param {boolean} sameSize 是否与图片相同尺寸
    */
-  var setSize = function (width, height, sameSize) {
+  function setSize(width, height, sameSize) {
     // 设置单位绘制尺寸
     sprite.drawWidth = width;
     sprite.drawHeight = height;
@@ -29,7 +29,7 @@ export default function graphics(sprite) {
   /**
    * 获取精灵数据
    */
-  var getData = function () {
+  function getData() {
     return {
       relX: sprite.relX,
       relY: sprite.relY,
@@ -48,19 +48,19 @@ export default function graphics(sprite) {
    * 绘制图片
    * @param {Image} image 图片
    */
-  var drawImage = function (image) {
+  function drawImage(image) {
     var { relX, relY, offsetLeft, offsetTop, width, drawWidth, drawHeight, scale, flip } = getData();
     if (!flip) {
       var tranlateX = floor(relX + offsetLeft);
       var tranlateY = floor(relY + offsetTop);
-      context.drawImage(image, 0, 0, drawWidth, drawHeight, tranlateX, tranlateY, drawWidth * scale, drawHeight * scale);
+      ctx.drawImage(image, 0, 0, drawWidth, drawHeight, tranlateX, tranlateY, drawWidth * scale, drawHeight * scale);
     } else {
       var tranlateX = floor(Game.width - width * scale - relX + offsetLeft);
       var tranlateY = floor(relY + offsetTop);
 
       // 水平翻转绘制
       drawFlip(Game.width, function () {
-        context.drawImage(image, 0, 0, drawWidth, drawHeight, tranlateX, tranlateY, drawWidth * scale, drawHeight * scale);
+        ctx.drawImage(image, 0, 0, drawWidth, drawHeight, tranlateX, tranlateY, drawWidth * scale, drawHeight * scale);
       })
     }
   }
@@ -71,21 +71,21 @@ export default function graphics(sprite) {
    * @param {number} currFrame 当前帧
    * @param {boolean} imageFlip 是否翻转
    */
-  var drawAnimation = function (image, currFrame, imageFlip) {
+  function drawAnimation(image, currFrame, imageFlip) {
     var { relX, relY, offsetLeft, offsetTop, width, drawWidth, drawHeight, scale, flip } = getData();
 
     // 图片方向
     if (!imageFlip && !flip || imageFlip && flip) {
       var tranlateX = floor(relX + offsetLeft);
       var tranlateY = floor(relY + offsetTop);
-      context.drawImage(image, currFrame * drawWidth, 0, drawWidth, drawHeight, tranlateX, tranlateY, drawWidth * scale, drawHeight * scale);
+      ctx.drawImage(image, currFrame * drawWidth, 0, drawWidth, drawHeight, tranlateX, tranlateY, drawWidth * scale, drawHeight * scale);
     } else {
       var tranlateX = floor(Game.width - width * scale - relX + offsetLeft);
       var tranlateY = floor(relY + offsetTop);
 
       // 水平翻转绘制
       drawFlip(Game.width, function () {
-        context.drawImage(image, currFrame * drawWidth, 0, drawWidth, drawHeight, tranlateX, tranlateY, drawWidth * scale, drawHeight * scale);
+        ctx.drawImage(image, currFrame * drawWidth, 0, drawWidth, drawHeight, tranlateX, tranlateY, drawWidth * scale, drawHeight * scale);
       })
     }
   }
@@ -96,19 +96,19 @@ export default function graphics(sprite) {
    * @param {Function} drawCb 绘制函数
    */
   function drawFlip(width, drawCb) {
-    context.translate(width, 0);
-    context.scale(-1, 1);
+    ctx.translate(width, 0);
+    ctx.scale(-1, 1);
     drawCb();
-    context.translate(width, 0);
-    context.scale(-1, 1);
+    ctx.translate(width, 0);
+    ctx.scale(-1, 1);
   }
 
   /**
    * 测试开启时调用
    */
   function test() {
-    context.strokeStyle = 'red';
-    context.strokeRect(sprite.relX, sprite.relY, sprite.width, sprite.height);
+    ctx.strokeStyle = 'red';
+    ctx.strokeRect(sprite.relX, sprite.relY, sprite.width, sprite.height);
   }
 
   return {
@@ -185,7 +185,7 @@ export default function graphics(sprite) {
      */
     draw(drawCb) {
       executor = function () {
-        drawCb.call(sprite, context);
+        drawCb.call(sprite, ctx);
       }
     },
     /**
@@ -219,14 +219,14 @@ export default function graphics(sprite) {
         drawCb(ctx);
         mixImage.src = mixCanvas.toDataURL("image/png");
         executor = function () {
-          context.drawImage(mixImage, 0, 0);
+          ctx.drawImage(mixImage, 0, 0);
         }
       } else if (type === 'dynamic') {
         executor = function () {
           ctx.clearRect(0, 0, Game.width, Game.height);
           drawCb(ctx);
           mixImage.src = mixCanvas.toDataURL("image/png");
-          context.drawImage(mixImage, 0, 0);
+          ctx.drawImage(mixImage, 0, 0);
         }
       }
     },
@@ -294,7 +294,7 @@ export default function graphics(sprite) {
         relX > Game.width ||
         relY + height * scale < 0 ||
         relY > Game.height) return;
-      context.globalAlpha = alpha;
+      ctx.globalAlpha = alpha;
       executor && executor();
       Game.test && test();
     }

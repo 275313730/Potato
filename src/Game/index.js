@@ -20,27 +20,32 @@ Game.init = function (options) {
   let bodyHeight = document.body.clientHeight;
   let defaultRatio = bodyWidth / bodyHeight;
   if (options.width && options.height) {
+    this.width = this.viewWidth = options.width;
+    this.height = this.viewHeight = options.height;
     this.ratio = options.width / options.height;
   } else {
+    this.width = this.viewWidth = bodyWidth;
+    this.height = this.viewHeight = bodyHeight;
     this.ratio = bodyWidth / bodyHeight;
   }
+
   if (this.ratio > defaultRatio) {
-    this.width = bodyWidth;
-    this.height = bodyWidth / this.ratio;
+    this.viewWidth = bodyWidth;
+    this.viewHeight = bodyWidth / this.ratio;
   } else {
-    this.height = bodyHeight;
-    this.width = bodyHeight * this.ratio;
+    this.viewHeight = bodyHeight;
+    this.viewWidth = bodyHeight * this.ratio;
   }
 
   // 设置canvas宽高
-  this.canvas.setAttribute("width", this.width + "px");
-  this.canvas.setAttribute("height", this.height + "px");
+  this.canvas.setAttribute("width", this.viewWidth);
+  this.canvas.setAttribute("height", this.viewHeight);
 
   // canvas黑色背景
   this.canvas.style.backgroundColor = "black";
 
   // 缩放
-  this.scale = this.canvas.clientHeight / this.height;
+  this.scale = this.viewHeight / this.height;
 
   // 键盘状态
   this.key = null;

@@ -1,6 +1,4 @@
-import Game from "../Game/Game.js"
-
-export default function input(sprite) {
+export default function input(Game, sprite) {
   let inputEvents = Game.inputEvents;
 
   return {

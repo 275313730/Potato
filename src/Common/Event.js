@@ -1,6 +1,6 @@
 /**
  * 通用事件系统
- * @param {Object} obj 
+ * @param {Object} obj Game/Stage/Sprite对象 
  */
 export default function event(obj) {
   let events = {};
