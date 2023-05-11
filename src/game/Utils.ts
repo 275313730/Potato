@@ -1,4 +1,4 @@
-import Game from "./Game.js";
+import Game from "./Game";
 
 /**
  * 检测是否为移动端
@@ -42,14 +42,18 @@ export function listenInputEvent() {
     });
   } else {
     // 鼠标事件
-    ["mousedown", "mouseup","mousemove"].forEach(function (eventType) {
+    ["mousedown", "mouseup", "mousemove"].forEach(function (eventType) {
       Game.canvas.addEventListener(eventType, function (e: MouseEvent) {
         e.stopPropagation();
         e.preventDefault();
-        Game.inputMouseButton.emit(e)
+        if (e.type === "mousemove") {
+          Game.inputMouseMotion.emit(e)
+        } else {
+          Game.inputMouseButton.emit(e)
+        }
       });
     });
-    
+
     // 键盘事件
     window.addEventListener("keydown", function (e) {
       e.stopPropagation();
@@ -125,20 +129,24 @@ function fullScreen() {
  * 自适应画布
  */
 export function autoResizeCanvas() {
+  resize()
   window.onresize = window.onload = function () {
-    const ratio = Game.ratio;
-    let width = document.body.clientWidth;
-    let height = document.body.clientHeight;
-    if (width / height > ratio) {
-      Game.viewSize.y = height;
-      Game.viewSize.x = ratio * height;
-    } else {
-      Game.viewSize.x = width;
-      Game.viewSize.y = width / ratio;
-    }
-    Game.scale = Game.viewSize.y / Game.size.y;
-    // 设置canvas宽高
-    Game.canvas.setAttribute("width", Game.viewSize.x.toString());
-    Game.canvas.setAttribute("height", Game.viewSize.y.toString());
+    resize()
   }
+}
+
+function resize() {
+  const ratio = Game.ratio;
+  let width = document.body.clientWidth;
+  let height = document.body.clientHeight;
+  if (width / height > ratio) {
+    Game.viewSize.y = height;
+    Game.viewSize.x = ratio * height;
+  } else {
+    Game.viewSize.x = width;
+    Game.viewSize.y = width / ratio;
+  }
+  Game.scale = Game.viewSize.y / Game.resolution.y;
+  Game.canvas.setAttribute("width", Game.viewSize.x.toString());
+  Game.canvas.setAttribute("height", Game.viewSize.y.toString());
 }

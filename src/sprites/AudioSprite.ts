@@ -12,10 +12,10 @@ class AudioSprite extends Sprite {
    * 播放音乐
    * @param {Object} options 
    */
-  play(options?: { volume?: number, loop?: boolean }) {
+  play(volume: number, loop: boolean) {
 
-    this.audio.volume = options?.volume || 1;
-    this.audio.loop = options.loop;
+    this.audio.volume = volume;
+    this.audio.loop = loop;
     this.audio.play();
   }
 
@@ -28,7 +28,7 @@ class AudioSprite extends Sprite {
   }
 
   _render(): void {
-    
+
   }
 }
 

@@ -1,7 +1,7 @@
 {
   "name": "potato-game",
   "version": "1.0.1",
-  "description": "* Potato是一个基于canvas和js的渐进式游戏框架。",
+  "description": "* Potato is a game framework based on canvas and typescript.",
   "main": "./src/index.js",
   "files": [
     "src"
@@ -18,7 +18,7 @@
     "game",
     "framework",
     "canvas",
-    "javascript"
+    "typescript"
   ],
   "author": "Roanne",
   "license": "MIT",
@@ -29,5 +29,8 @@
   "devDependencies": {
     "webpack": "^4.43.0",
     "webpack-cli": "^3.3.11"
+  },
+  "dependencies": {
+    "typescript": "^5.0.4"
   }
 }

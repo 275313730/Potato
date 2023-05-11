@@ -12,13 +12,14 @@
     ],
     "target": "ES5",
     "outDir": "dist/",
-    "rootDir": "src/",
+    "watch": true
   },
   "include": [
-    "src/**/*"
+    "*.ts"
   ],
   "exclude": [
     "node_modules",
-    "**/*.spec.ts"
+    "**/*.spec.ts",
+    "unhandle"
   ]
 }

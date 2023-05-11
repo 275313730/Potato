@@ -2,6 +2,8 @@
  * 资源系统，用于操作图像音频等资源
  */
 
+import Game from "../game/Game";
+
 let assets: any = {}
 
 // promise集合
@@ -10,10 +12,10 @@ let loadings: Promise<boolean>[] = [];
 /**
  * 判断资源是否加载完成，
  * new Stage()时会自动调用该函数
- * @param {Function} callback 回调函数
+ * @param {Function} fn 回调函数
  */
-function AssetReady(fn: Function) {
-  Promise.all(this.loadings).then(res => fn())
+async function AssetReady() {
+  await Promise.all(this.loadings)
 }
 
 function assetExist(group: string, name: string): boolean {
@@ -58,18 +60,10 @@ class AssetSystem {
     image.src = this.publicPath + options.path;
   }
 
-  static loadImage(options: { group: string, name: string, path: string }) {
-    if (assetExist(options.group, options.name)) return;
-    if (!assets[options.group]) assets[options.group] = {};
-
+  static loadImage(path: string): HTMLImageElement {
     let image = new Image();
-    loadings.push(new Promise((resolve) => {
-      image.onload = () => {
-        assets[options.group][options.name] = image;
-        resolve(true);
-      }
-    }))
-    image.src = this.publicPath + options.path;
+    image.src = this.publicPath + path;
+    return image
   }
 
   static loadAudio(options: { group: string, name: string, path: string }): void {

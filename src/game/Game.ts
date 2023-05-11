@@ -1,17 +1,17 @@
-"use strict"
-import Stage from "../stage/Stage.js";
-import Vector2 from "../variant_types/Vector2.js";
-import AssetSystem from "../systems/AssetSystem.js";
-import { initStyle, isMobile, autoResizeCanvas, listenInputEvent } from "./Utils.js";
-import Update from "../signals/Update.js";
-import InputMouseButton from "../signals/InputMouseButton.js";
-import InputMouseMotion from "../signals/InputMouseMotion.js";
+import InputMouseButton from "../signals/InputMouseButton"
+import InputMouseMotion from "../signals/InputMouseMotion"
+import Update from "../signals/Update"
+import Sprite from "../sprites/Sprite"
 
+import Vector2 from "../variant_types/Vector2"
+import { initStyle, isMobile, autoResizeCanvas, listenInputEvent } from "./Utils"
+
+let sprites: Sprite[] = []
 
 class Game {
-  static canvas: HTMLCanvasElement = document.createElement("canvas")
-  static context: CanvasRenderingContext2D = this.canvas.getContext("2d")
-  static size: Vector2 = { x: document.body.clientWidth, y: document.body.clientHeight }
+  static canvas: HTMLCanvasElement
+  static context: CanvasRenderingContext2D
+  static resolution: Vector2 = { x: 1920, y: 1080 }
   static viewSize: Vector2
   static ratio: number
   static scale: number
@@ -26,62 +26,50 @@ class Game {
   static inputMouseButton: InputMouseButton = new InputMouseButton()
   static inputMouseMotion: InputMouseMotion = new InputMouseMotion()
 
-  static stage: Stage = null;
-
-  /**
-   *
-   */
-  static init(options: { size?: Vector2, animationInterval: number, isTestMode: boolean, publicPath: string }) {
+  static init(document: Document) {
     initStyle();
 
-    // 初始化宽度和高度
-    let defaultRatio = this.size.x / this.size.y;
+    this.canvas = document.getElementById("potato") as HTMLCanvasElement
+    this.context = this.canvas.getContext("2d")
 
-    if (options.size) {
-      this.size = this.viewSize = options.size
-    } else {
-      this.viewSize = this.size
-    }
-    this.ratio = this.size.x / this.size.y;
+    this.viewSize = { x: this.canvas.clientWidth, y: this.canvas.clientWidth }
 
-    if (this.ratio > defaultRatio) {
-      this.viewSize.x = this.size.x;
-      this.viewSize.y = this.size.y / this.ratio;
-    } else {
-      this.viewSize.x = this.size.x;
-      this.viewSize.y = this.size.y * this.ratio;
-    }
-
-    // 设置canvas宽高
-    this.canvas.setAttribute("width", this.viewSize.x.toString());
-    this.canvas.setAttribute("height", this.viewSize.y.toString());
+    // 原始比例
+    this.ratio = this.resolution.x / this.resolution.y
 
     // canvas黑色背景
-    this.canvas.style.backgroundColor = "black";
+    this.canvas.style.backgroundColor = "#0b7e87";
 
     // 缩放
-    this.scale = this.viewSize.y / this.size.y;
-
-    // 动画间隔帧(每隔n帧绘制下一个关键帧)
-    if (options.animationInterval) {
-      this.animationInterval = options.animationInterval
-    }
-
-    // 测试模式
-    this.isTestMode = options.isTestMode;
+    this.scale = this.viewSize.y / this.resolution.y;
 
     // 是否移动端
     this.isMobile = isMobile();
 
-    // 资源路径
-    AssetSystem.setPath(options.publicPath);
-
     autoResizeCanvas();
     listenInputEvent();
+
+    loop();
 
     // 禁用右键菜单
     if (!this.isTestMode) window.oncontextmenu = () => { return false }
   }
+}
+
+function loop() {
+  const startTime = new Date().getTime()
+
+  // 刷新画布
+  window.requestAnimationFrame(() => {
+    // 清除canvas
+    Game.context.clearRect(0, 0, Game.viewSize.x, Game.viewSize.y);
+
+    const endTime = new Date().getTime()
+    Game.update.emit((endTime - startTime) / 1000)
+    loop()
+  });
+
+
 }
 
 export default Game

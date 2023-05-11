@@ -2,7 +2,7 @@ const path = require('path');
 
 module.exports = {
   entry: {
-    Potato: './main.js'
+    Potato: './dist/Demo.js'
   },
   output: {
     filename: '[name].min.js',

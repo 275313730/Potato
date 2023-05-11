@@ -6,7 +6,7 @@ abstract class Signal {
   }
 
   disconnect(targetFn: Function) {
-    for (let i = 0; i < this.fns.length - 1; i++) {
+    for (let i = 0; i < this.fns.length; i++) {
       let fn = this.fns[i]
       if (fn === targetFn) {
         this.fns.splice(i, 1)
