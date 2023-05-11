@@ -1,10 +1,11 @@
 import Game from "../game/Game";
+import UserInputEvent from "../variant_types/UserInputEvent";
 import Sprite from "./Sprite";
 
 class ImageSprite extends Sprite {
   protected onReady(): void { }
   protected onUpdate(delta: number): void { }
-  protected onInput(event: MouseEvent | KeyboardEvent | TouchEvent): void { }
+  protected onInput(event: UserInputEvent): void { }
   protected onDestroy(): void { }
 
   private _image: HTMLImageElement
@@ -22,7 +23,7 @@ class ImageSprite extends Sprite {
 
   _render(): void {
     if (!this.image) return
-    Game.context.drawImage(this.image, this.position.x, this.position.y, this.size.x, this.size.y);
+    Game.canvas.rendering.drawImage(this.image, this.position.x, this.position.y, this.size.x, this.size.y);
   }
 }
 

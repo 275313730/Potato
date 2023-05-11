@@ -2,10 +2,13 @@ import Appearance from "../interfaces/Appearance"
 import Transfrom from "../interfaces/Transfrom"
 import Game from "../game/Game"
 import Pressed from "../signals/Pressed"
+import MouseIn from "../signals/MouseIn"
+import MouseOut from "../signals/MouseOut"
 import SpriteSystem from "../systems/SpriteSystem"
 import Color from "../interfaces/Color"
 import Vector2 from "../interfaces/Vector2"
 import UserInputEvent from "../variant_types/UserInputEvent"
+import Canvas from "../canvas/Canvas";
 
 /**
  * 精灵构造函数
@@ -33,8 +36,8 @@ abstract class Sprite {
 
   public get position() {
     let realativePosition: Vector2 = {
-      x: this.transform.position.x * this.scale.x * Game.scale,
-      y: this.transform.position.y * this.scale.y * Game.scale
+      x: this.transform.position.x * this.scale.x * Game.canvas.scale,
+      y: this.transform.position.y * this.scale.y * Game.canvas.scale
     }
     return realativePosition
   }
@@ -45,8 +48,8 @@ abstract class Sprite {
 
   public get size() {
     let realativeSize: Vector2 = {
-      x: this.transform.size.x * this.scale.x * Game.scale,
-      y: this.transform.size.y * this.scale.y * Game.scale
+      x: this.transform.size.x * this.scale.x * Game.canvas.scale,
+      y: this.transform.size.y * this.scale.y * Game.canvas.scale
     }
     return realativeSize
   }
@@ -83,54 +86,69 @@ abstract class Sprite {
     return this.appearance.modulate
   }
 
+  // 信号
   protected readonly pressed: Pressed = new Pressed()
+  protected readonly mouseIn: MouseIn = new MouseIn()
+  protected readonly mouseOut: MouseOut = new MouseOut()
   protected readonly _updateFn: Function = this._update.bind(this)
   protected readonly _inputFn: Function = this._input.bind(this)
 
+  // 鼠标状态
   protected mouseStatus: string = "mouseup"
+  protected isMouseIn: boolean = false
 
   constructor() {
     this._ready()
   }
 
   protected _ready(): void {
-    Game.update.connect(this._updateFn)
-    Game.userInput.connect(this._inputFn)
+    Game.canvas.update.connect(this._updateFn)
+    Game.canvas.userInput.connect(this._inputFn)
   }
 
   protected _input(event: UserInputEvent): void {
     if (event instanceof MouseEvent) {
+      const point: Vector2 = { x: event.clientX, y: event.clientY }
       switch (event.type) {
         case "mousedown":
-          if (this.has_point({ x: event.clientX, y: event.clientY })) this.mouseStatus = event.type
+          if (this.has_point(point)) this.mouseStatus = event.type
           break;
         case "mouseup":
-          if (this.mouseStatus == "mousedown" && this.has_point({ x: event.clientX, y: event.clientY })) this.pressed.emit()
+          if (this.mouseStatus == "mousedown" && this.has_point(point)) this.pressed.emit()
           this.mouseStatus = event.type
           break;
         case "mousemove":
+          const has_point = this.has_point(point)
+          if (has_point && !this.isMouseIn) {
+            this.mouseIn.emit(event)
+          }
+          if (!has_point && this.isMouseIn) {
+            this.mouseOut.emit(event)
+          }
+          this.isMouseIn = has_point
           break;
       }
     }
+    this.onInput(event)
   }
 
   protected _update(delta: number): void {
-    if (this.appearance.visible) this._render()
+    if (this.visible) this._render()
     this.onUpdate(delta)
   }
 
   protected abstract _render(): void
 
   protected _destroy(): void {
-    Game.update.disconnect(this._updateFn)
-    Game.userInput.disconnect(this._inputFn)
+    Game.canvas.update.disconnect(this._updateFn)
+    Game.canvas.userInput.disconnect(this._inputFn)
   }
 
   protected abstract onReady(): void
 
   protected abstract onUpdate(delta: number): void
 
-  protected abstract onInput(event: MouseEvent | KeyboardEvent | TouchEvent): void
+  protected abstract onInput(event: UserInputEvent): void
 
   protected abstract onDestroy(): void
 
