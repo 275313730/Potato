@@ -1,50 +1,31 @@
-import InputMouseButton from "../signals/InputMouseButton"
-import InputMouseMotion from "../signals/InputMouseMotion"
 import Update from "../signals/Update"
-import Sprite from "../sprites/Sprite"
-
-import Vector2 from "../variant_types/Vector2"
 import { initStyle, isMobile, autoResizeCanvas, listenInputEvent } from "./Utils"
-
-let sprites: Sprite[] = []
+import UserInput from "../signals/UserInput"
+import Vector2 from "../interfaces/Vector2"
 
 class Game {
-  static canvas: HTMLCanvasElement
-  static context: CanvasRenderingContext2D
+  static readonly canvas: HTMLCanvasElement = document.getElementById("potato") as HTMLCanvasElement
+  static readonly context: CanvasRenderingContext2D = this.canvas.getContext("2d")
   static resolution: Vector2 = { x: 1920, y: 1080 }
-  static viewSize: Vector2
+  static viewSize: Vector2 = { x: this.canvas.clientWidth, y: this.canvas.clientWidth }
   static ratio: number
   static scale: number
-  static keycode: number = null
-  static inputEvents: any = {}
   static animationInterval: number = 16
   static isTestMode: boolean = false
-  static isMobile: boolean = false
+  static readonly isMobile: boolean = isMobile()
 
   // signals
-  static update: Update = new Update()
-  static inputMouseButton: InputMouseButton = new InputMouseButton()
-  static inputMouseMotion: InputMouseMotion = new InputMouseMotion()
+  static readonly update: Update = new Update()
+  static readonly userInput: UserInput = new UserInput()
 
-  static init(document: Document) {
+  static init() {
     initStyle();
-
-    this.canvas = document.getElementById("potato") as HTMLCanvasElement
-    this.context = this.canvas.getContext("2d")
-
-    this.viewSize = { x: this.canvas.clientWidth, y: this.canvas.clientWidth }
 
     // 原始比例
     this.ratio = this.resolution.x / this.resolution.y
 
     // canvas黑色背景
     this.canvas.style.backgroundColor = "#0b7e87";
-
-    // 缩放
-    this.scale = this.viewSize.y / this.resolution.y;
-
-    // 是否移动端
-    this.isMobile = isMobile();
 
     autoResizeCanvas();
     listenInputEvent();

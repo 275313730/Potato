@@ -1,16 +1,19 @@
 abstract class Signal {
   fns: Function[] = []
 
-  connect(fn: Function) {
-    this.fns.push(fn)
+  connect(targetFn: Function) {
+    for (let fn of this.fns) {
+      if (fn === targetFn) return
+    }
+    this.fns.push(targetFn)
   }
 
   disconnect(targetFn: Function) {
     for (let i = 0; i < this.fns.length; i++) {
       let fn = this.fns[i]
-      if (fn === targetFn) {
-        this.fns.splice(i, 1)
-      }
+      if (fn !== targetFn) continue
+      this.fns.splice(i, 1)
+      return
     }
   }
 

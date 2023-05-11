@@ -36,42 +36,34 @@ export function initStyle() {
 export function listenInputEvent() {
   // 触屏事件
   if (Game.isMobile) {
-    ["touchstart", "touchmove", "touchend"].forEach(function (eventType) {
+    ["touchstart", "touchmove", "touchend"].forEach(function (eventType: string) {
       Game.canvas.addEventListener(eventType, function (e: TouchEvent) {
+        e.stopPropagation();
+        e.preventDefault();
+        Game.userInput.emit(e)
       });
     });
   } else {
     // 鼠标事件
-    ["mousedown", "mouseup", "mousemove"].forEach(function (eventType) {
+    ["mousedown", "mouseup", "mousemove"].forEach(function (eventType: string) {
       Game.canvas.addEventListener(eventType, function (e: MouseEvent) {
         e.stopPropagation();
         e.preventDefault();
-        if (e.type === "mousemove") {
-          Game.inputMouseMotion.emit(e)
-        } else {
-          Game.inputMouseButton.emit(e)
-        }
+        Game.userInput.emit(e)
       });
     });
 
     // 键盘事件
-    window.addEventListener("keydown", function (e) {
-      e.stopPropagation();
-      e.preventDefault();
-      const keyCode = e.keyCode;
-      // F11默认为全屏键，无法修改
-      if (keyCode === 122) return fullScreen();
-      if (Game.keycode === keyCode) return;
-      Game.keycode = keyCode;
-    });
-    window.addEventListener("keyup", function (e) {
-      e.stopPropagation();
-      e.preventDefault();
-      const keyCode = e.keyCode;
-      if (Game.keycode === keyCode) {
-        Game.keycode = null;
-      }
-    });
+    ["keydown", "keyup"].forEach(function (eventType: string) {
+      window.addEventListener(eventType, function (e: KeyboardEvent) {
+        e.stopPropagation();
+        e.preventDefault();
+        // F11默认为全屏键，无法使用
+        if (e.key === "F11") return
+        Game.userInput.emit(e)
+      });
+    })
+
   }
 
   /**
@@ -147,6 +139,7 @@ function resize() {
     Game.viewSize.y = width / ratio;
   }
   Game.scale = Game.viewSize.y / Game.resolution.y;
+  
   Game.canvas.setAttribute("width", Game.viewSize.x.toString());
   Game.canvas.setAttribute("height", Game.viewSize.y.toString());
 }

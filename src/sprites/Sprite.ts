@@ -1,34 +1,54 @@
-import Appearance from "../components/Appearance"
-import Transfrom from "../components/Transfrom"
+import Appearance from "../interfaces/Appearance"
+import Transfrom from "../interfaces/Transfrom"
 import Game from "../game/Game"
 import Pressed from "../signals/Pressed"
 import SpriteSystem from "../systems/SpriteSystem"
-import Color from "../variant_types/Color"
-import Vector2 from "../variant_types/Vector2"
+import Color from "../interfaces/Color"
+import Vector2 from "../interfaces/Vector2"
+import UserInputEvent from "../variant_types/UserInputEvent"
 
 /**
  * 精灵构造函数
  * @param {Object} options
  */
-class Sprite {
+abstract class Sprite {
   readonly id: number = SpriteSystem.generateId()
 
-  pressed: Pressed = new Pressed(this)
+  protected transform: Transfrom = {
+    size: { x: 0, y: 0 },
+    position: { x: 0, y: 0 },
+    rotation: 0,
+    scale: { x: 1, y: 1 },
+    flip: false
+  }
+
+  protected appearance: Appearance = {
+    visible: true,
+    modulate: { r: 1, g: 1, b: 1, a: 1 }
+  }
 
   public set position(value: Vector2) {
     this.transform.position = value
   }
 
   public get position() {
-    return this.transform.position
+    let realativePosition: Vector2 = {
+      x: this.transform.position.x * this.scale.x * Game.scale,
+      y: this.transform.position.y * this.scale.y * Game.scale
+    }
+    return realativePosition
   }
 
   public set size(value: Vector2) {
-    this.transform.position = value
+    this.transform.size = value
   }
 
   public get size() {
-    return this.transform.size
+    let realativeSize: Vector2 = {
+      x: this.transform.size.x * this.scale.x * Game.scale,
+      y: this.transform.size.y * this.scale.y * Game.scale
+    }
+    return realativeSize
   }
 
   public set rotation(value: number) {
@@ -63,32 +83,34 @@ class Sprite {
     return this.appearance.modulate
   }
 
-  protected transform: Transfrom = {
-    size: { x: 0, y: 0 },
-    position: { x: 0, y: 0 },
-    rotation: 0,
-    scale: { x: 1, y: 1 },
-    flip: false
-  }
+  protected readonly pressed: Pressed = new Pressed()
+  protected readonly _updateFn: Function = this._update.bind(this)
+  protected readonly _inputFn: Function = this._input.bind(this)
 
-  protected appearance: Appearance = {
-    visible: true,
-    modulate: { r: 1, g: 1, b: 1, a: 1 }
-  }
-
-  protected updateFn: Function = this._update.bind(this)
+  protected mouseStatus: string = "mouseup"
 
   constructor() {
     this._ready()
   }
 
-  protected _ready() {
-    Game.update.connect(this.updateFn)
+  protected _ready(): void {
+    Game.update.connect(this._updateFn)
+    Game.userInput.connect(this._inputFn)
   }
 
-  protected _input(event: Event): void {
+  protected _input(event: UserInputEvent): void {
     if (event instanceof MouseEvent) {
-      this.pressed.emit(event)
+      switch (event.type) {
+        case "mousedown":
+          if (this.has_point({ x: event.clientX, y: event.clientY })) this.mouseStatus = event.type
+          break;
+        case "mouseup":
+          if (this.mouseStatus == "mousedown" && this.has_point({ x: event.clientX, y: event.clientY })) this.pressed.emit()
+          this.mouseStatus = event.type
+          break;
+        case "mousemove":
+          break;
+      }
     }
   }
 
@@ -97,27 +119,26 @@ class Sprite {
     this.onUpdate(delta)
   }
 
-  protected _render(): void {
+  protected abstract _render(): void
 
+  protected _destroy(): void {
+    Game.update.disconnect(this._updateFn)
+    Game.userInput.disconnect(this._inputFn)
   }
 
-  protected _destroy() {
-    Game.update.disconnect(this._update.bind(this))
-  }
+  protected abstract onReady(): void
 
-  public onReady() {
-    //do somethin
-  }
+  protected abstract onUpdate(delta: number): void
 
-  public onUpdate(delta: number) {
-    // do something
-  }
+  protected abstract onInput(event: MouseEvent | KeyboardEvent | TouchEvent): void
 
-  public onDestroy() {
-    // do somethin
-  }
+  protected abstract onDestroy(): void
 
   public has_point(point: Vector2): boolean {
+    if (point.x < this.position.x) return false
+    if (point.x > this.position.x + this.size.x) return false
+    if (point.y < this.position.y) return false
+    if (point.y > this.position.y + this.size.x) return false
     return true
   }
 }

@@ -2,6 +2,12 @@ import AssetSystem from "../systems/AssetSystem";
 import Sprite from "./Sprite";
 
 class AudioSprite extends Sprite {
+  protected _render(): void { }
+  protected onReady(): void { }
+  protected onUpdate(delta: number): void { }
+  protected onInput(event: MouseEvent | KeyboardEvent | TouchEvent): void { }
+  protected onDestroy(): void { }
+
   audio: HTMLAudioElement
 
   setAudio(group: string, name: string) {
@@ -10,7 +16,8 @@ class AudioSprite extends Sprite {
 
   /**
    * 播放音乐
-   * @param {Object} options 
+   * @param {number} volume
+   * @param {boolean} loop
    */
   play(volume: number, loop: boolean) {
 
@@ -25,10 +32,6 @@ class AudioSprite extends Sprite {
   stop() {
     this.audio.pause();
     this.audio.currentTime = 0;
-  }
-
-  _render(): void {
-
   }
 }
 

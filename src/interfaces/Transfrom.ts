@@ -1,4 +1,4 @@
-import Vector2 from "../variant_types/Vector2"
+import Vector2 from "./Vector2"
 
 interface Transfrom {
   size: Vector2;

@@ -1,4 +1,4 @@
-import Color from "../variant_types/Color";
+import Color from "./Color";
 
 interface Appearance {
   visible: boolean;

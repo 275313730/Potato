@@ -1,4 +1,4 @@
-import Signal from "../variant_types/Signal";
+import Signal from "./Signal";
 
 class Update extends Signal{
   emit(delta:number): void {
