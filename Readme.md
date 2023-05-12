@@ -4,6 +4,6 @@
 
    * 当前版本：v1.0.1
 
-   * [教程](https://www.yuque.com/roanne/potatotutorial)
+   * [教程](https://www.yuque.com/roanne/potatotutorial)(已失效)
 
-   * [API文档](https://www.yuque.com/roanne/potatoapi)
+   * [API文档](https://www.yuque.com/roanne/potatoapi)(已失效)

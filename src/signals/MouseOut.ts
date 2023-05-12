@@ -1,11 +1,5 @@
 import Signal from "./Signal";
 
-class MouseOut extends Signal {
-  emit(mouseEvent: MouseEvent): void {
-    for (let fn of this.fns) {
-      fn(mouseEvent)
-    }
-  }
-}
+class MouseOut extends Signal { }
 
 export default MouseOut

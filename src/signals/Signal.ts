@@ -17,7 +17,11 @@ abstract class Signal {
     }
   }
 
-  abstract emit(...args: any): void
+  emit(...args: any): void {
+    for (let fn of this.fns) {
+      fn(...args)
+    }
+  }
 }
 
 export default Signal

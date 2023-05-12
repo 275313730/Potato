@@ -1,5 +1,5 @@
 import Appearance from "../variant_types/Appearance"
-import Transfrom from "../variant_types/Transfrom"
+import Transform from "../variant_types/Transform"
 import Game from "../game/Game"
 import Pressed from "../signals/Pressed"
 import MouseIn from "../signals/MouseIn"
@@ -8,6 +8,10 @@ import SpriteSystem from "../systems/SpriteSystem"
 import Color from "../variant_types/Color"
 import Vector2 from "../variant_types/Vector2"
 import MouseFilter from "../enums/MouseFilter";
+import UserInputEvent from "../variant_types/UserInputEvent"
+import MouseMotion from "../variant_types/MouseMotion"
+import MouseButton from "../variant_types/MouseButton"
+import EventType from "../enums/EventType"
 
 /**
  * 精灵构造函数
@@ -16,13 +20,7 @@ import MouseFilter from "../enums/MouseFilter";
 class Sprite {
   readonly id: number = SpriteSystem.generateId()
 
-  protected transform: Transfrom = {
-    size: { x: 0, y: 0 },
-    position: { x: 0, y: 0 },
-    rotation: 0,
-    scale: { x: 1, y: 1 },
-    flip: false
-  }
+  protected transform = new Transform()
 
   protected appearance: Appearance = {
     visible: true,
@@ -34,11 +32,7 @@ class Sprite {
   }
 
   public get position() {
-    let realativePosition: Vector2 = {
-      x: this.transform.position.x * this.scale.x * Game.canvas.scale,
-      y: this.transform.position.y * this.scale.y * Game.canvas.scale
-    }
-    return realativePosition
+    return this.transform.position
   }
 
   public set size(value: Vector2) {
@@ -46,11 +40,7 @@ class Sprite {
   }
 
   public get size() {
-    let realativeSize: Vector2 = {
-      x: this.transform.size.x * this.scale.x * Game.canvas.scale,
-      y: this.transform.size.y * this.scale.y * Game.canvas.scale
-    }
-    return realativeSize
+    return this.transform.size
   }
 
   public set rotation(value: number) {
@@ -111,28 +101,26 @@ class Sprite {
     this.onReady()
   }
 
-  protected _input(event: Event): void {
-    if (event instanceof MouseEvent) {
-      const point: Vector2 = { x: event.clientX - Game.canvas.canvasElement.offsetLeft, y: event.clientY - Game.canvas.canvasElement.offsetTop }
-      switch (event.type) {
-        case "mousedown":
-          if (this.has_point(point)) this.mouseStatus = event.type
-          break;
-        case "mouseup":
-          if (this.mouseStatus == "mousedown" && this.has_point(point)) this.pressed.emit()
-          this.mouseStatus = event.type
-          break;
-        case "mousemove":
-          const has_point = this.has_point(point)
-          if (has_point && !this.isMouseIn) {
-            this.mouseIn.emit(event)
-          }
-          if (!has_point && this.isMouseIn) {
-            this.mouseOut.emit(event)
-          }
-          this.isMouseIn = has_point
-          break;
+  protected _input(event: UserInputEvent): void {
+    if (event.type === EventType.MOUSE_BUTTON) {
+      const mouseButton = event as MouseButton
+      if (mouseButton.status == "mousedown" && this.isMouseIn) this.mouseStatus = mouseButton.status
+      if (mouseButton.status == "mouseup") {
+        if (this.mouseStatus === "mousedown" && this.isMouseIn) this.pressed.emit()
+        this.mouseStatus = mouseButton.status
       }
+    } else if (event.type === EventType.MOUSE_MOTION) {
+      const mouseMotion = event as MouseMotion
+      const has_point = this.has_point(mouseMotion.position)
+      if (has_point && !this.isMouseIn) {
+        console.log("mousein")
+        this.mouseIn.emit()
+      }
+      if (!has_point && this.isMouseIn) {
+        console.log("mouseout")
+        this.mouseOut.emit()
+      }
+      this.isMouseIn = has_point
     }
     this.onInput(event)
   }
@@ -143,9 +131,7 @@ class Sprite {
     this.onUpdate(delta)
   }
 
-  protected _render(): void {
-
-  }
+  protected _render(): void { }
 
   public destroy(): void {
     this.beforeDestroy()
@@ -163,15 +149,15 @@ class Sprite {
 
   protected onUpdate(delta: number): void { }
 
-  protected onInput(event: Event): void { }
+  protected onInput(event: UserInputEvent): void { }
 
   protected beforeDestroy(): void { }
 
   public has_point(point: Vector2): boolean {
     if (point.x < this.position.x) return false
-    if (point.x > this.position.x + this.size.x) return false
+    if (point.x > this.position.x + this.size.x * this.scale.x) return false
     if (point.y < this.position.y) return false
-    if (point.y > this.position.y + this.size.x) return false
+    if (point.y > this.position.y + this.size.y * this.scale.y) return false
     return true
   }
 }

@@ -1,36 +1,34 @@
 import Canvas from "../canvas/Canvas"
+import { listenInputEvent, initStyle } from "../Utils"
 
 class Game {
   static canvas: Canvas
+  static canvasElement: HTMLCanvasElement
+  static rendering: CanvasRenderingContext2D
 
   static init(canvasId: string) {
-    this.initStyle()
+    initStyle()
     this.canvas = new Canvas(canvasId)
+    this.canvasElement = this.canvas.canvasElement
+    this.rendering = this.canvas.rendering
+    listenInputEvent(this.canvas)
+    this.rendering.fillStyle = "black"
+    this.loop()
   }
 
-  static initStyle(): void {
-    let body = document.body;
-    body.style.margin = "0";
-    body.style.padding = "0";
-    body.style.width = "100vw";
-    body.style.height = "100vh";
-    body.style.overflow = "hidden";
-    body.style.display = "flex";
-    body.style.alignItems = "center";
-    body.style.justifyContent = "center";
+  private static loop() {
+    const startTime = new Date().getTime()
+    // 刷新画布
+    window.requestAnimationFrame(() => {
+      // 清除canvas
+      const endTime = new Date().getTime()
+      this.rendering.fillRect(0, 0, this.canvasElement.width, this.canvasElement.height)
+      this.canvas.update.emit((endTime - startTime) / 1000)
+      this.loop()
+    });
   }
 
-  static isMobile(): boolean {
-    const inBrowser = typeof window !== "undefined";
-    const UA = inBrowser && window.navigator.userAgent.toLowerCase();
-    const isAndroid = (UA && UA.indexOf("android") > 0);
-    const isIOS = (UA && /iphone|ipad|ipod|ios/.test(UA));
-    if (isAndroid || isIOS) {
-      return true;
-    } else {
-      return false;
-    }
-  }
+
 }
 
 export default Game

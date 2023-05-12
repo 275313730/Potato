@@ -1,7 +1,9 @@
 import Update from "../signals/Update"
 import UserInput from "../signals/UserInput"
+import Sprite from "../sprites/Sprite"
+import TextureRect from "../variant_types/TextureRect"
 import Vector2 from "../variant_types/Vector2"
-import Game from "../game/Game"
+import Rect from "../variant_types/Rect"
 
 class Canvas {
   readonly canvasElement: HTMLCanvasElement
@@ -25,7 +27,7 @@ class Canvas {
 
   constructor(elementId: string = "") {
     if (elementId === "") {
-      this.canvasElement = Game.canvas.canvasElement.cloneNode() as HTMLCanvasElement
+      this.canvasElement = document.createElement("canvas")
     } else {
       this.canvasElement = document.getElementById(elementId) as HTMLCanvasElement
     }
@@ -36,23 +38,60 @@ class Canvas {
     }
 
     this.resize()
-    this.listenInputEvent();
-    this.loop();
   }
 
-  protected loop() {
-    const startTime = new Date().getTime()
+  public drawImage(sprite: Sprite, textureRect: TextureRect) {
+    let finalX = sprite.position.x * this.scale
+    let finalY = sprite.position.y * this.scale
+    const finalWidth = sprite.size.x * sprite.scale.x * this.scale
+    const finalHeight = sprite.size.y * sprite.scale.y * this.scale
+    let scale: Vector2 = { x: 1, y: 1 }
+    let trans: Vector2 = { x: 0, y: 0 }
+    if (textureRect.flipH) {
+      trans.x = finalWidth + finalX * 2
+      scale.x = -1
+    }
+    if (textureRect.flipV) {
+      trans.y = finalHeight + finalY * 2
+      scale.y = -1
+    }
+    if (textureRect.flipH || textureRect.flipV) {
+      this.rendering.translate(trans.x, trans.y)
+      this.rendering.scale(scale.x, scale.y)
+    }
+    this.rendering.drawImage(textureRect.texture, finalX, finalY, finalWidth, finalHeight);
+    if (textureRect.flipH || textureRect.flipV) {
+      this.rendering.translate(trans.x, trans.y)
+      this.rendering.scale(scale.x, scale.y)
+    }
+  }
 
-    // 刷新画布
-    window.requestAnimationFrame(() => {
-      // 清除canvas
-      this.rendering.clearRect(0, 0, this.viewSize.x, this.viewSize.y);
+  public drawClipImage(sprite: Sprite, textureRect: TextureRect, clipRect: Rect) {
+    let finalX = sprite.position.x * this.scale
+    let finalY = sprite.position.y * this.scale
+    const finalWidth = sprite.size.x * sprite.scale.x * this.scale
+    const finalHeight = sprite.size.y * sprite.scale.y * this.scale
 
-      const endTime = new Date().getTime()
-      this.update.emit((endTime - startTime) / 1000)
-      
-      this.loop()
-    });
+    let scale: Vector2 = { x: 1, y: 1 }
+    let trans: Vector2 = { x: 0, y: 0 }
+    if (textureRect.flipH) {
+      trans.x = finalWidth + finalX * 2
+      scale.x = -1
+    }
+    if (textureRect.flipV) {
+      trans.y = finalHeight + finalY * 2
+      scale.y = -1
+    }
+    if (textureRect.flipH || textureRect.flipV) {
+      this.rendering.translate(trans.x, trans.y)
+      this.rendering.scale(scale.x, scale.y)
+    }
+    this.rendering.drawImage(textureRect.texture, clipRect.x, clipRect.y, clipRect.width, clipRect.height, finalX, finalY, finalWidth, finalHeight);
+
+    if (textureRect.flipH || textureRect.flipV) {
+      this.rendering.translate(trans.x, trans.y)
+      this.rendering.scale(scale.x, scale.y)
+    }
   }
 
   protected resize() {
@@ -69,56 +108,6 @@ class Canvas {
     this.canvasElement.setAttribute("height", this.viewSize.y.toString());
   }
 
-  protected listenInputEvent() {
-    // 触屏事件
-    if (Game.isMobile()) {
-      this.canvasElement.addEventListener("touchstart", (e: TouchEvent) => {
-        e.stopPropagation();
-        e.preventDefault();
-        this.userInput.emit(e)
-      })
-      this.canvasElement.addEventListener("touchmove", (e: TouchEvent) => {
-        e.stopPropagation();
-        e.preventDefault();
-        this.userInput.emit(e)
-      })
-      this.canvasElement.addEventListener("touchend", (e: TouchEvent) => {
-        e.stopPropagation();
-        e.preventDefault();
-        this.userInput.emit(e)
-      })
-    } else {
-      this.canvasElement.addEventListener("mousedown", (e: MouseEvent) => {
-        e.stopPropagation();
-        e.preventDefault();
-        this.userInput.emit(e)
-      });
-      this.canvasElement.addEventListener("mouseup", (e: MouseEvent) => {
-        e.stopPropagation();
-        e.preventDefault();
-        this.userInput.emit(e)
-      });
-      this.canvasElement.addEventListener("mousemove", (e: MouseEvent) => {
-        e.stopPropagation();
-        e.preventDefault();
-        this.userInput.emit(e)
-      });
-      this.canvasElement.addEventListener("keydown", (e: KeyboardEvent) => {
-        e.stopPropagation();
-        e.preventDefault();
-        // F11默认为全屏键，无法使用
-        if (e.key === "F11") return
-        this.userInput.emit(e)
-      });
-      this.canvasElement.addEventListener("keyup", (e: KeyboardEvent) => {
-        e.stopPropagation();
-        e.preventDefault();
-        // F11默认为全屏键，无法使用
-        if (e.key === "F11") return
-        this.userInput.emit(e)
-      });
-    }
-  }
 }
 
 export default Canvas
