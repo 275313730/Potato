@@ -1,77 +1,57 @@
 import Game from "../src/game/Game.js"
 import Sprite from "../src/sprites/Sprite.js";
+import Vector2 from "../src/variant_types/Vector2.js";
 
-export default function camera(stage) {
+export default class Camera {
   /**
    * 初始化相机对象
    */
-  var camera = {
-    x: 0,
-    y: 0,
-    follow: null,
-    movement: null
-  };
+  protected position: Vector2 = { x: 0, y: 0 }
+
+  protected targetSprite: Sprite | null
+
+  protected movement: any
 
   /**
    * 创建相机移动函数
-   * @param {number} x 
-   * @param {number} y
+   * @param {Vector2} position
    * @param {number} time
-   * @param {Function} callback 
-   * @param {boolean} disable 
+   * @param {Vector2} border
+   * @param {Function} callback
+   * @param {boolean} disable
    */
-  function createMovement(x, y, time, callback, disable = true) {
+  createMovement(position: Vector2, time: number, border: Vector2, callback: Function, disable: boolean = false) {
     // 计算数据
     const frames = time * 60 || 1;
-    const perX = x / frames;
-    const perY = y / frames;
+    const perX = Math.abs(this.position.x - position.x) / frames;
+    const perY = Math.abs(this.position.y - position.y) / frames;
 
     if (perX === 0 && perY === 0) return;
 
     // 取消相机跟随
-    camera.follow = null;
-
-    // 获取边界尺寸
-    const { width: sw, height: sh } = stage;
-    const { width: gw, height: gh } = Game.width;
+    this.targetSprite = null;
 
     // 移动计数
     var count = 0;
 
-    // 禁用单位
-    if (disable === true) {
-      Game.sprite.travel(function (sprite) {
-        sprite.disabled = true;
-      })
-    }
-
     // 修改镜头移动函数
-    camera.movement = function () {
+    this.movement = () => {
       // 相机移动
-      camera.x += perX;
-      camera.y += perY;
+      this.position.x += perX;
+      this.position.y += perY;
 
       // 移动计数增加
       count++;
 
       // 判断移动计数和相机位置
-      if (count > frames ||
-        (camera.x < 0 || camera.x > sw - gw) ||
-        (camera.y < 0 || camera.y > sh - gh)) {
-        camera.x = Math.max(0, camera.x)
-        camera.x = Math.min(camera.x, sw - gw)
-        camera.y = Math.max(0, camera.y)
-        camera.y = Math.min(camera.y, sh - gh)
+      if (count > frames || (this.position.x < 0 || this.position.x > border.x) || (this.position.y < 0 || this.position.y > border.y)) {
+        this.position.x = Math.max(0, this.position.x)
+        this.position.x = Math.min(this.position.x, border.x)
+        this.position.y = Math.max(0, this.position.y)
+        this.position.y = Math.min(this.position.y, border.y)
 
         // 清空相机移动函数
-        camera.movement = null;
-
-        // 启用单位
-        if (disable === true) {
-          Game.sprite.travel(function (sprite) {
-            sprite.disabled = false;
-          });
-        }
+        this.movement = null;
 
         // 执行回调函数
         callback && callback();
@@ -82,16 +62,15 @@ export default function camera(stage) {
   /**
    * 计算镜头位置
    */
-  function cameraCal() {
-    let follow = camera.follow;
+  cameraCal() {
     // 当相机跟随单位时
-    if (follow) {
-      const position = borderCal(follow);
-      camera.x = position.x;
-      camera.y = position.y;
+    if (this.targetSprite) {
+      const position = this.borderCal();
+      this.position.x = position.x;
+      this.position.y = position.y;
     } else {
       // 执行相机移动函数
-      camera.movement && camera.movement();
+      this.movement && this.movement();
     }
   }
 
@@ -99,8 +78,8 @@ export default function camera(stage) {
    * 计算边界问题
    * @param {Sprite} sprite 
    */
-  function borderCal(sprite) {
-    const { x: ux, y: uy, width: uw, height: uh } = sprite;
+  borderCal(): Vector2 {
+    const { x: ux, y: uy, width: uw, height: uh } = this.followSprite;
     const { width: sw, height: sh } = stage;
     const { width: gw, height: gh } = Game;
     let x, y;
@@ -126,51 +105,41 @@ export default function camera(stage) {
     return { x, y };
   }
 
-  return {
-    /**
-     * 镜头跟随
-     * @param {Sprite} sprite 
-     */
-    follow(sprite) {
-      if (sprite === camera.follow) return;
-      camera.follow = sprite;
-    },
-    /**
-     * 更新镜头数据
-     */
-    update() {
-      // 计算镜头数据
-      cameraCal();
-      // 返回镜头数据
-      return camera;
-    },
-    /**
-     * 镜头移动
-     * @param {number} x 
-     * @param {number} y 
-     * @param {number} time 
-     * @param {Function} callback 
-     */
-    move(x, y, time, callback) {
-      createMovement(x, y, time, callback);
-    },
-    /**
-     * 镜头移动到单位
-     * @param {Sprite} sprite 
-     * @param {number} time 
-     * @param {Function} callback 
-     */
-    moveTo(sprite, time, callback) {
-      // 边界计算
-      let { x, y } = borderCal(sprite);
+  /**
+   * 镜头跟随
+   * @param {Sprite} sprite 
+   */
+  followSprite(sprite: Sprite) {
+    if (sprite === this.targetSprite) return;
+    this.targetSprite = sprite;
+  }
 
-      createMovement((x - camera.x), (y - camera.y), time, callback);
-    },
-    /**
-     * 解除跟随
-     */
-    unFollow() {
-      camera.follow = null;
-    }
-  };
-}
+  /**
+   * 镜头移动
+   * @param {number} x 
+   * @param {number} y 
+   * @param {number} time 
+   * @param {Function} callback 
+   */
+  move(x: number, y: number, time: number, callback: Function) {
+    this.createMovement(x, y, time, callback);
+  }
+  /**
+   * 镜头移动到单位
+   * @param {Sprite} sprite 
+   * @param {number} time 
+   * @param {Function} callback 
+   */
+  moveTo(sprite: Sprite, time: number, callback: Function) {
+    // 边界计算
+    let { x, y } = this.borderCal();
+
+    this.createMovement({ x: (x - this.position.x), y: (y - this.position.y) }, time, callback);
+  }
+  /**
+   * 解除跟随
+   */
+  unFollow() {
+    this.targetSprite = null;
+  }
+};
