@@ -1,13 +1,13 @@
 import Update from "../signals/Update"
 import UserInput from "../signals/UserInput"
-import Vector2 from "../interfaces/Vector2"
+import Vector2 from "../variant_types/Vector2"
 import Game from "../game/Game"
 
 class Canvas {
   readonly canvasElement: HTMLCanvasElement
   readonly rendering: CanvasRenderingContext2D
   public resolution: Vector2 = { x: 1920, y: 1080 }
-  public viewSize: Vector2 = { x: document.body.clientWidth, y: document.body.clientHeight }
+  public viewSize: Vector2 = { x: 0, y: 0 }
   public animationInterval: number = 16
   public isTestMode: boolean = false
 
@@ -23,9 +23,12 @@ class Canvas {
   public readonly update: Update = new Update()
   public readonly userInput: UserInput = new UserInput()
 
-
-  constructor(elementId: string) {
-    this.canvasElement = document.getElementById(elementId) as HTMLCanvasElement
+  constructor(elementId: string = "") {
+    if (elementId === "") {
+      this.canvasElement = Game.canvas.canvasElement.cloneNode() as HTMLCanvasElement
+    } else {
+      this.canvasElement = document.getElementById(elementId) as HTMLCanvasElement
+    }
     this.rendering = this.canvasElement.getContext("2d")
 
     window.onresize = window.onload = () => {
@@ -37,7 +40,7 @@ class Canvas {
     this.loop();
   }
 
-  loop() {
+  protected loop() {
     const startTime = new Date().getTime()
 
     // 刷新画布
@@ -47,26 +50,26 @@ class Canvas {
 
       const endTime = new Date().getTime()
       this.update.emit((endTime - startTime) / 1000)
+      
       this.loop()
     });
   }
 
-  resize() {
-    let width = document.body.clientWidth;
-    let height = document.body.clientHeight;
+  protected resize() {
+    let width = document.body.clientWidth
+    let height = document.body.clientHeight
     if (width / height > this.ratio) {
-      this.viewSize.y = height;
       this.viewSize.x = this.ratio * height;
+      this.viewSize.y = height;
     } else {
       this.viewSize.x = width;
       this.viewSize.y = width / this.ratio;
     }
-
     this.canvasElement.setAttribute("width", this.viewSize.x.toString());
     this.canvasElement.setAttribute("height", this.viewSize.y.toString());
   }
 
-  listenInputEvent() {
+  protected listenInputEvent() {
     // 触屏事件
     if (Game.isMobile()) {
       this.canvasElement.addEventListener("touchstart", (e: TouchEvent) => {

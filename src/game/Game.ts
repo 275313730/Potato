@@ -3,9 +3,9 @@ import Canvas from "../canvas/Canvas"
 class Game {
   static canvas: Canvas
 
-  static init() {
+  static init(canvasId: string) {
     this.initStyle()
-    this.canvas = new Canvas("potato")
+    this.canvas = new Canvas(canvasId)
   }
 
   static initStyle(): void {

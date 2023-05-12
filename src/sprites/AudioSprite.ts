@@ -1,14 +1,7 @@
 import AssetSystem from "../systems/AssetSystem";
-import UserInputEvent from "../variant_types/UserInputEvent";
 import Sprite from "./Sprite";
 
 class AudioSprite extends Sprite {
-  protected _render(): void { }
-  protected onReady(): void { }
-  protected onUpdate(delta: number): void { }
-  protected onInput(event: UserInputEvent): void { }
-  protected onDestroy(): void { }
-
   audio: HTMLAudioElement
 
   setAudio(group: string, name: string) {

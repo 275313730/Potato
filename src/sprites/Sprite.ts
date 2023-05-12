@@ -1,20 +1,19 @@
-import Appearance from "../interfaces/Appearance"
-import Transfrom from "../interfaces/Transfrom"
+import Appearance from "../variant_types/Appearance"
+import Transfrom from "../variant_types/Transfrom"
 import Game from "../game/Game"
 import Pressed from "../signals/Pressed"
 import MouseIn from "../signals/MouseIn"
 import MouseOut from "../signals/MouseOut"
 import SpriteSystem from "../systems/SpriteSystem"
-import Color from "../interfaces/Color"
-import Vector2 from "../interfaces/Vector2"
-import UserInputEvent from "../variant_types/UserInputEvent"
-import Canvas from "../canvas/Canvas";
+import Color from "../variant_types/Color"
+import Vector2 from "../variant_types/Vector2"
+import MouseFilter from "../enums/MouseFilter";
 
 /**
  * 精灵构造函数
  * @param {Object} options
  */
-abstract class Sprite {
+class Sprite {
   readonly id: number = SpriteSystem.generateId()
 
   protected transform: Transfrom = {
@@ -86,6 +85,11 @@ abstract class Sprite {
     return this.appearance.modulate
   }
 
+  /**
+   * 鼠标穿透属性
+   */
+  public mouseFilter: MouseFilter = MouseFilter.STOP
+
   // 信号
   protected readonly pressed: Pressed = new Pressed()
   protected readonly mouseIn: MouseIn = new MouseIn()
@@ -104,11 +108,12 @@ abstract class Sprite {
   protected _ready(): void {
     Game.canvas.update.connect(this._updateFn)
     Game.canvas.userInput.connect(this._inputFn)
+    this.onReady()
   }
 
-  protected _input(event: UserInputEvent): void {
+  protected _input(event: Event): void {
     if (event instanceof MouseEvent) {
-      const point: Vector2 = { x: event.clientX, y: event.clientY }
+      const point: Vector2 = { x: event.clientX - Game.canvas.canvasElement.offsetLeft, y: event.clientY - Game.canvas.canvasElement.offsetTop }
       switch (event.type) {
         case "mousedown":
           if (this.has_point(point)) this.mouseStatus = event.type
@@ -133,24 +138,34 @@ abstract class Sprite {
   }
 
   protected _update(delta: number): void {
+    this.beforeRender()
     if (this.visible) this._render()
     this.onUpdate(delta)
   }
 
-  protected abstract _render(): void
+  protected _render(): void {
+
+  }
+
+  public destroy(): void {
+    this.beforeDestroy()
+    this._destroy()
+  }
 
   protected _destroy(): void {
     Game.canvas.update.disconnect(this._updateFn)
     Game.canvas.userInput.disconnect(this._inputFn)
   }
 
-  protected abstract onReady(): void
+  protected onReady(): void { }
 
-  protected abstract onUpdate(delta: number): void
+  protected beforeRender(): void { }
 
-  protected abstract onInput(event: UserInputEvent): void
+  protected onUpdate(delta: number): void { }
 
-  protected abstract onDestroy(): void
+  protected onInput(event: Event): void { }
+
+  protected beforeDestroy(): void { }
 
   public has_point(point: Vector2): boolean {
     if (point.x < this.position.x) return false
