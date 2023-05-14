@@ -29,8 +29,8 @@ export default class AnimationSprite extends TextureSprite {
     this.row = row
     this.column = column
     this.frames = this.row * this.column
-    if (this.expandMode === ExpandMode.KEEP_SIZE) {
-      value.onload = () => {
+    value.onload = () => {
+      if (this.expandMode === ExpandMode.KEEP_SIZE) {
         this.size = { x: value.width / column, y: value.height / row }
       }
     }
@@ -41,7 +41,8 @@ export default class AnimationSprite extends TextureSprite {
     if (!this.texture) return
     let startX = this.currentFrame % this.column * this.frameWidth
     let startY = Math.floor(this.currentFrame / this.column) * this.frameHeight
-    Game.canvas.drawClipImage(this, this.textureRect, { x: startX, y: startY, width: this.frameWidth, height: this.frameHeight })
+    console.log(this.size.x)
+    Game.canvas.drawClipImage(this, { x: startX, y: startY, width: this.frameWidth, height: this.frameHeight })
     this.currentInterval += 1
     if (this.currentInterval < this.interval) return
     this.currentInterval = 0

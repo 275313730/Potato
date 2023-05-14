@@ -25,7 +25,7 @@ export default class Sprite {
 
   protected appearance: Appearance = {
     visible: true,
-    modulate: { r: 1, g: 1, b: 1, a: 1 }
+    modulate: { r: 255, g: 255, b: 255, a: 1 }
   }
 
   public set position(value: Vector2) {

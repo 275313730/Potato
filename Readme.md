@@ -11,5 +11,5 @@
      - [x] TextureSprite
      - [x] AnimationSprite
      - [ ] AudioSprite
-     - [ ] LabelSprite
+     - [x] LabelSprite
      - [ ] RichTextLabelSprite   

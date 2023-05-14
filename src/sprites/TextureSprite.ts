@@ -4,17 +4,21 @@ import TextureRect from "../variant_types/TextureRect";
 import ExpandMode from "../enums/ExpandMode";
 
 export default class TextureSprite extends Sprite {
-  protected textureRect: TextureRect = {
+  protected _textureRect: TextureRect = {
     texture: new Image(),
     expandMode: ExpandMode.KEEP_SIZE,
     flipH: false,
     flipV: false
   }
 
+  public get textureRect() {
+    return this._textureRect
+  }
+
   public setTexture(value: HTMLImageElement): boolean {
-    this.textureRect.texture = value
-    if (this.textureRect.expandMode === ExpandMode.KEEP_SIZE) {
-      value.onload = () => {
+    this._textureRect.texture = value
+    value.onload = () => {
+      if (this._textureRect.expandMode === ExpandMode.KEEP_SIZE) {
         this.size = { x: value.width, y: value.height }
       }
     }
@@ -22,35 +26,35 @@ export default class TextureSprite extends Sprite {
   }
 
   public get texture() {
-    return this.textureRect.texture
+    return this._textureRect.texture
   }
 
   public set expandMode(value: ExpandMode) {
-    this.textureRect.expandMode = value
+    this._textureRect.expandMode = value
   }
 
   public get expandMode() {
-    return this.textureRect.expandMode
+    return this._textureRect.expandMode
   }
 
   public set flipH(value: boolean) {
-    this.textureRect.flipH = value
+    this._textureRect.flipH = value
   }
 
   public get flipH() {
-    return this.textureRect.flipH
+    return this._textureRect.flipH
   }
 
   public set flipV(value: boolean) {
-    this.textureRect.flipV = value
+    this._textureRect.flipV = value
   }
 
   public get flipV() {
-    return this.textureRect.flipV
+    return this._textureRect.flipV
   }
 
   _render(): void {
     if (!this.texture) return
-    Game.canvas.drawImage(this, this.textureRect)
+    Game.canvas.drawImage(this)
   }
 }

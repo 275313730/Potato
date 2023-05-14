@@ -1,12 +1,14 @@
 import Update from "../signals/Update"
 import UserInput from "../signals/UserInput"
 import Sprite from "../sprites/Sprite"
-import TextureRect from "../variant_types/TextureRect"
+import LabelSprite from "../sprites/LabelSprite"
 import Vector2 from "../variant_types/Vector2"
 import Rect from "../variant_types/Rect"
 import Camera from "./Camera"
 import LocateMode from "../enums/LocateMode"
-import Game from "../game/Game"
+import TextureSprite from "../sprites/TextureSprite"
+import AnimationSprite from "../sprites/AnimationSprite"
+import Color from "../variant_types/Color"
 
 class Canvas {
   readonly canvasElement: HTMLCanvasElement
@@ -16,6 +18,7 @@ class Canvas {
   public viewSize: Vector2 = { x: 0, y: 0 }
   public animationInterval: number = 16
   public isTestMode: boolean = false
+  readonly backgroundColor: Color = { r: 15, g: 15, b: 15, a: 1 }
 
   public get ratio(): number {
     return this.resolution.x / this.resolution.y
@@ -64,42 +67,46 @@ class Canvas {
     }
   }
 
-  public draw(textureRect: TextureRect, finalRect: Rect, drawFn: Function) {
+  public drawTexture(sprite: TextureSprite | AnimationSprite, drawFn: Function) {
+    const finalRect = this.getFinalRect(sprite)
     let scale: Vector2 = { x: 1, y: 1 }
     let trans: Vector2 = { x: 0, y: 0 }
-    if (textureRect.flipH) {
+    if (sprite.flipH) {
       trans.x = finalRect.width + finalRect.x * 2
       scale.x = -1
     }
-    if (textureRect.flipV) {
+    if (sprite.flipV) {
       trans.y = finalRect.height + finalRect.y * 2
       scale.y = -1
     }
-    if (textureRect.flipH || textureRect.flipV) {
+    if (sprite.flipH || sprite.flipV) {
       this.rendering.translate(trans.x, trans.y)
       this.rendering.scale(scale.x, scale.y)
     }
-    drawFn()
-    if (textureRect.flipH || textureRect.flipV) {
+    drawFn(finalRect)
+    if (sprite.flipH || sprite.flipV) {
       this.rendering.translate(trans.x, trans.y)
       this.rendering.scale(scale.x, scale.y)
     }
   }
 
-  public drawImage(sprite: Sprite, textureRect: TextureRect) {
+  public drawLabel(sprite: LabelSprite) {
     const finalRect = this.getFinalRect(sprite)
-    this.draw(textureRect, finalRect, () => {
-      this.rendering.drawImage(textureRect.texture, finalRect.x, finalRect.y, finalRect.width, finalRect.height)
-      if (Game.isTestMode) {
+    this.rendering.font = sprite.fontStyle + " " + sprite.fontSize + "px" + " " + sprite.font
+    this.rendering.fillStyle = this.rgba2hex(sprite.color)
+    this.rendering.fillText(sprite.content, finalRect.x, finalRect.y)
+    this.rendering.fillStyle = this.rgba2hex(this.backgroundColor)
+  }
 
-      }
+  public drawImage(sprite: TextureSprite) {
+    this.drawTexture(sprite, (finalRect: Rect) => {
+      this.rendering.drawImage(sprite.texture, finalRect.x, finalRect.y, finalRect.width, finalRect.height)
     })
   }
 
-  public drawClipImage(sprite: Sprite, textureRect: TextureRect, clipRect: Rect) {
-    const finalRect = this.getFinalRect(sprite)
-    this.draw(textureRect, finalRect, () => {
-      this.rendering.drawImage(textureRect.texture, clipRect.x, clipRect.y, clipRect.width, clipRect.height, finalRect.x, finalRect.y, finalRect.width, finalRect.height);
+  public drawClipImage(sprite: AnimationSprite, clipRect: Rect) {
+    this.drawTexture(sprite, (finalRect: Rect) => {
+      this.rendering.drawImage(sprite.texture, clipRect.x, clipRect.y, clipRect.width, clipRect.height, finalRect.x, finalRect.y, finalRect.width, finalRect.height);
     })
   }
 
@@ -117,6 +124,16 @@ class Canvas {
     this.canvasElement.setAttribute("height", this.viewSize.y.toString());
   }
 
+  protected rgba2hex(color: Color) {
+    let hex = "#" +
+      (color.r | 1 << 8).toString(16).slice(1) +
+      (color.g | 1 << 8).toString(16).slice(1) +
+      (color.b | 1 << 8).toString(16).slice(1);
+
+    let alpha = ((color.a * 255) | 1 << 8).toString(16).slice(1)
+    hex = hex + alpha;
+    return hex;
+  }
 }
 
 export default Canvas
