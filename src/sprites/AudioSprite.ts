@@ -1,7 +1,7 @@
 import AssetSystem from "../systems/AssetSystem";
 import Sprite from "./Sprite";
 
-class AudioSprite extends Sprite {
+export default class AudioSprite extends Sprite {
   audio: HTMLAudioElement
 
   setAudio(group: string, name: string) {
@@ -28,5 +28,3 @@ class AudioSprite extends Sprite {
     this.audio.currentTime = 0;
   }
 }
-
-export default AudioSprite

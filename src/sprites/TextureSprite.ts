@@ -3,7 +3,7 @@ import Sprite from "./Sprite";
 import TextureRect from "../variant_types/TextureRect";
 import ExpandMode from "../enums/ExpandMode";
 
-class TextureSprite extends Sprite {
+export default class TextureSprite extends Sprite {
   protected textureRect: TextureRect = {
     texture: new Image(),
     expandMode: ExpandMode.KEEP_SIZE,
@@ -54,5 +54,3 @@ class TextureSprite extends Sprite {
     Game.canvas.drawImage(this, this.textureRect)
   }
 }
-
-export default TextureSprite

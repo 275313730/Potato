@@ -4,10 +4,14 @@ import Sprite from "../sprites/Sprite"
 import TextureRect from "../variant_types/TextureRect"
 import Vector2 from "../variant_types/Vector2"
 import Rect from "../variant_types/Rect"
+import Camera from "./Camera"
+import LocateMode from "../enums/LocateMode"
+import Game from "../game/Game"
 
 class Canvas {
   readonly canvasElement: HTMLCanvasElement
   readonly rendering: CanvasRenderingContext2D
+  readonly camera: Camera
   public resolution: Vector2 = { x: 1920, y: 1080 }
   public viewSize: Vector2 = { x: 0, y: 0 }
   public animationInterval: number = 16
@@ -32,6 +36,7 @@ class Canvas {
       this.canvasElement = document.getElementById(elementId) as HTMLCanvasElement
     }
     this.rendering = this.canvasElement.getContext("2d")
+    this.camera = new Camera(this)
 
     window.onresize = window.onload = () => {
       this.resize()
@@ -40,58 +45,62 @@ class Canvas {
     this.resize()
   }
 
-  public drawImage(sprite: Sprite, textureRect: TextureRect) {
-    let finalX = sprite.position.x * this.scale
-    let finalY = sprite.position.y * this.scale
-    const finalWidth = sprite.size.x * sprite.scale.x * this.scale
-    const finalHeight = sprite.size.y * sprite.scale.y * this.scale
+  protected getFinalRect(sprite: Sprite): Rect {
+    switch (sprite.locateMode) {
+      case LocateMode.ABSOLUTE:
+        return {
+          x: sprite.position.x * this.scale,
+          y: sprite.position.y * this.scale,
+          width: sprite.size.x * sprite.scale.x * this.scale,
+          height: sprite.size.y * sprite.scale.y * this.scale
+        }
+      case LocateMode.REALATIVE:
+        return {
+          x: (sprite.position.x - this.camera.position.x) * this.scale,
+          y: (sprite.position.y - this.camera.position.y) * this.scale,
+          width: sprite.size.x * sprite.scale.x * this.scale,
+          height: sprite.size.y * sprite.scale.y * this.scale
+        }
+    }
+  }
+
+  public draw(textureRect: TextureRect, finalRect: Rect, drawFn: Function) {
     let scale: Vector2 = { x: 1, y: 1 }
     let trans: Vector2 = { x: 0, y: 0 }
     if (textureRect.flipH) {
-      trans.x = finalWidth + finalX * 2
+      trans.x = finalRect.width + finalRect.x * 2
       scale.x = -1
     }
     if (textureRect.flipV) {
-      trans.y = finalHeight + finalY * 2
+      trans.y = finalRect.height + finalRect.y * 2
       scale.y = -1
     }
     if (textureRect.flipH || textureRect.flipV) {
       this.rendering.translate(trans.x, trans.y)
       this.rendering.scale(scale.x, scale.y)
     }
-    this.rendering.drawImage(textureRect.texture, finalX, finalY, finalWidth, finalHeight);
+    drawFn()
     if (textureRect.flipH || textureRect.flipV) {
       this.rendering.translate(trans.x, trans.y)
       this.rendering.scale(scale.x, scale.y)
     }
   }
 
+  public drawImage(sprite: Sprite, textureRect: TextureRect) {
+    const finalRect = this.getFinalRect(sprite)
+    this.draw(textureRect, finalRect, () => {
+      this.rendering.drawImage(textureRect.texture, finalRect.x, finalRect.y, finalRect.width, finalRect.height)
+      if (Game.isTestMode) {
+
+      }
+    })
+  }
+
   public drawClipImage(sprite: Sprite, textureRect: TextureRect, clipRect: Rect) {
-    let finalX = sprite.position.x * this.scale
-    let finalY = sprite.position.y * this.scale
-    const finalWidth = sprite.size.x * sprite.scale.x * this.scale
-    const finalHeight = sprite.size.y * sprite.scale.y * this.scale
-
-    let scale: Vector2 = { x: 1, y: 1 }
-    let trans: Vector2 = { x: 0, y: 0 }
-    if (textureRect.flipH) {
-      trans.x = finalWidth + finalX * 2
-      scale.x = -1
-    }
-    if (textureRect.flipV) {
-      trans.y = finalHeight + finalY * 2
-      scale.y = -1
-    }
-    if (textureRect.flipH || textureRect.flipV) {
-      this.rendering.translate(trans.x, trans.y)
-      this.rendering.scale(scale.x, scale.y)
-    }
-    this.rendering.drawImage(textureRect.texture, clipRect.x, clipRect.y, clipRect.width, clipRect.height, finalX, finalY, finalWidth, finalHeight);
-
-    if (textureRect.flipH || textureRect.flipV) {
-      this.rendering.translate(trans.x, trans.y)
-      this.rendering.scale(scale.x, scale.y)
-    }
+    const finalRect = this.getFinalRect(sprite)
+    this.draw(textureRect, finalRect, () => {
+      this.rendering.drawImage(textureRect.texture, clipRect.x, clipRect.y, clipRect.width, clipRect.height, finalRect.x, finalRect.y, finalRect.width, finalRect.height);
+    })
   }
 
   protected resize() {

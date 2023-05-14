@@ -2,7 +2,7 @@ import Game from "../game/Game";
 import TextureSprite from "./TextureSprite";
 import ExpandMode from "../enums/ExpandMode";
 
-class AnimationSprite extends TextureSprite {
+export default class AnimationSprite extends TextureSprite {
   protected row: number
 
   protected column: number
@@ -49,5 +49,3 @@ class AnimationSprite extends TextureSprite {
     if (this.currentFrame >= this.frames) this.currentFrame = 0
   }
 }
-
-export default AnimationSprite

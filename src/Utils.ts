@@ -36,7 +36,7 @@ export function listenInputEvent(canvas: Canvas) {
           canvas.userInput.emit(e)
         }) */
   } else {
-    canvas.canvasElement.addEventListener("mousedown", (e: MouseEvent) => {
+    window.addEventListener("mousedown", (e: MouseEvent) => {
       e.stopPropagation();
       e.preventDefault();
       const finalPosition = getFinalPosition(canvas, { x: e.clientX, y: e.clientY })
@@ -55,7 +55,7 @@ export function listenInputEvent(canvas: Canvas) {
       }
       canvas.userInput.emit(mouseButton)
     });
-    canvas.canvasElement.addEventListener("mouseup", (e: MouseEvent) => {
+    window.addEventListener("mouseup", (e: MouseEvent) => {
       e.stopPropagation();
       e.preventDefault();
       const finalPosition = getFinalPosition(canvas, { x: e.clientX, y: e.clientY })
@@ -74,7 +74,7 @@ export function listenInputEvent(canvas: Canvas) {
       }
       canvas.userInput.emit(mouseButton)
     });
-    canvas.canvasElement.addEventListener("mousemove", (e: MouseEvent) => {
+    window.addEventListener("mousemove", (e: MouseEvent) => {
       e.stopPropagation();
       e.preventDefault();
       const finalPosition = getFinalPosition(canvas, { x: e.clientX, y: e.clientY })
@@ -88,7 +88,7 @@ export function listenInputEvent(canvas: Canvas) {
       }
       canvas.userInput.emit(mouseMotion)
     });
-    canvas.canvasElement.addEventListener("keydown", (e: KeyboardEvent) => {
+    window.addEventListener("keydown", (e: KeyboardEvent) => {
       e.stopPropagation();
       e.preventDefault();
       // F11默认为全屏键，无法使用
@@ -108,7 +108,7 @@ export function listenInputEvent(canvas: Canvas) {
       }
       canvas.userInput.emit(keyboardInput)
     });
-    canvas.canvasElement.addEventListener("keyup", (e: KeyboardEvent) => {
+    window.addEventListener("keyup", (e: KeyboardEvent) => {
       e.stopPropagation();
       e.preventDefault();
       // F11默认为全屏键，无法使用
@@ -133,11 +133,7 @@ export function listenInputEvent(canvas: Canvas) {
 
 function getFinalPosition(canvas: Canvas, position: Vector2): Vector2 {
   let finalX = (position.x - canvas.canvasElement.offsetLeft) / canvas.scale
-  if (finalX < 0) finalX = 0
-  if (finalX > canvas.resolution.x) finalX = -1
   let finalY = (position.y - canvas.canvasElement.offsetTop) / canvas.scale
-  if (finalY < 0) finalY = 0
-  if (finalY > canvas.resolution.y) finalY = -1
   return { x: finalX, y: finalY }
 }
 

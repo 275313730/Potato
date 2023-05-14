@@ -12,12 +12,13 @@ import UserInputEvent from "../variant_types/UserInputEvent"
 import MouseMotion from "../variant_types/MouseMotion"
 import MouseButton from "../variant_types/MouseButton"
 import EventType from "../enums/EventType"
+import LocateMode from "../enums/LocateMode"
 
 /**
  * 精灵构造函数
  * @param {Object} options
  */
-class Sprite {
+export default class Sprite {
   readonly id: number = SpriteSystem.generateId()
 
   protected transform = new Transform()
@@ -57,6 +58,14 @@ class Sprite {
 
   public get scale() {
     return this.transform.scale
+  }
+
+  public get locateMode() {
+    return this.transform.locateMode
+  }
+
+  public set locateMode(value: LocateMode) {
+    this.transform.locateMode = value
   }
 
   public set visible(value: boolean) {
@@ -113,11 +122,9 @@ class Sprite {
       const mouseMotion = event as MouseMotion
       const has_point = this.has_point(mouseMotion.position)
       if (has_point && !this.isMouseIn) {
-        console.log("mousein")
         this.mouseIn.emit()
       }
       if (!has_point && this.isMouseIn) {
-        console.log("mouseout")
         this.mouseOut.emit()
       }
       this.isMouseIn = has_point
@@ -154,12 +161,19 @@ class Sprite {
   protected beforeDestroy(): void { }
 
   public has_point(point: Vector2): boolean {
-    if (point.x < this.position.x) return false
-    if (point.x > this.position.x + this.size.x * this.scale.x) return false
-    if (point.y < this.position.y) return false
-    if (point.y > this.position.y + this.size.y * this.scale.y) return false
-    return true
+    switch (this.locateMode) {
+      case LocateMode.ABSOLUTE:
+        if (point.x < this.position.x) return false
+        if (point.x > this.position.x + this.size.x * this.scale.x) return false
+        if (point.y < this.position.y) return false
+        if (point.y > this.position.y + this.size.y * this.scale.y) return false
+        return true
+      case LocateMode.REALATIVE:
+        if (point.x + Game.camera.position.x < this.position.x) return false
+        if (point.x + Game.camera.position.x > this.position.x + this.size.x * this.scale.x) return false
+        if (point.y + Game.camera.position.y < this.position.y) return false
+        if (point.y + Game.camera.position.y > this.position.y + this.size.y * this.scale.y) return false
+        return true
+    }
   }
 }
-
-export default Sprite
