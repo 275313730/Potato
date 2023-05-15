@@ -13,6 +13,7 @@ import MouseMotion from "../variant_types/MouseMotion"
 import MouseButton from "../variant_types/MouseButton"
 import EventType from "../enums/EventType"
 import LocateMode from "../enums/LocateMode"
+import Component from "../components/Component"
 
 /**
  * 精灵构造函数
@@ -20,6 +21,8 @@ import LocateMode from "../enums/LocateMode"
  */
 export default class Sprite {
   readonly id: number = SpriteSystem.generateId()
+
+  protected components: Component[] = []
 
   protected transform = new Transform()
 
@@ -93,8 +96,9 @@ export default class Sprite {
   protected readonly pressed: Pressed = new Pressed()
   protected readonly mouseIn: MouseIn = new MouseIn()
   protected readonly mouseOut: MouseOut = new MouseOut()
-  protected readonly _updateFn: Function = this._update.bind(this)
-  protected readonly _inputFn: Function = this._input.bind(this)
+
+  protected readonly updateFn: Function = this._update.bind(this)
+  protected readonly inputFn: Function = this._input.bind(this)
 
   // 鼠标状态
   protected mouseStatus: string = "mouseup"
@@ -105,8 +109,8 @@ export default class Sprite {
   }
 
   protected _ready(): void {
-    Game.canvas.update.connect(this._updateFn)
-    Game.canvas.userInput.connect(this._inputFn)
+    Game.canvas.update.connect(this.updateFn)
+    Game.canvas.userInput.connect(this.inputFn)
     this.onReady()
   }
 
@@ -135,6 +139,9 @@ export default class Sprite {
   protected _update(delta: number): void {
     this.beforeRender()
     if (this.visible) this._render()
+    for (let component of this.components) {
+      component.update()
+    }
     this.onUpdate(delta)
   }
 
@@ -146,8 +153,11 @@ export default class Sprite {
   }
 
   protected _destroy(): void {
-    Game.canvas.update.disconnect(this._updateFn)
-    Game.canvas.userInput.disconnect(this._inputFn)
+    Game.canvas.update.disconnect(this.updateFn)
+    Game.canvas.userInput.disconnect(this.inputFn)
+    for(let component of this.components){
+      component.unregister()
+    }
   }
 
   protected onReady(): void { }
@@ -159,6 +169,21 @@ export default class Sprite {
   protected onInput(event: UserInputEvent): void { }
 
   protected beforeDestroy(): void { }
+
+  protected registerComponent(component: Component) {
+    component.register(this)
+    this.components.push(component)
+  }
+
+  protected unregisterComponent(targetComponent: Component) {
+    for (let i = 0; i < this.components.length; i++) {
+      const component = this.components[i];
+      if (component === targetComponent) {
+        this.components.splice(i, 1)
+        return
+      }
+    }
+  }
 
   public has_point(point: Vector2): boolean {
     switch (this.locateMode) {

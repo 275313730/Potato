@@ -4,6 +4,8 @@ import MouseButton from "./variant_types/MouseButton";
 import KeyboardInput from "./variant_types/KeyboardInput";
 import EventType from "./enums/EventType";
 import Vector2 from "./variant_types/Vector2";
+import { AnchorPoint } from "./enums";
+import { Rect, Transform } from "./variant_types";
 
 function isMobile(): boolean {
   const inBrowser = typeof window !== "undefined";

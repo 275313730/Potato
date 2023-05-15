@@ -1,4 +1,4 @@
-abstract class Signal {
+class Signal {
   fns: Function[] = []
 
   connect(targetFn: Function) {
