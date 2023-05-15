@@ -1,6 +1,7 @@
-import MouseMotion from "./MouseMotion";
+import MouseMotionEvent from "./MouseMotionEvent";
 
-export default interface MouseButton extends MouseMotion {
+
+export default interface MouseButtonEvent extends MouseMotionEvent {
   readonly altKey: boolean;
   readonly button: number;
   readonly ctrlKey: boolean;

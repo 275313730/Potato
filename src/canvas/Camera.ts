@@ -4,69 +4,58 @@ import Canvas from "./Canvas";
 import AnchorPoint from "../enums/AnchorPoint";
 
 export default class Camera {
-  protected canvas: Canvas
+  public position: Vector2 = { x: 0, y: 0 }
 
-  protected _position: Vector2 = { x: 0, y: 0 }
-
-  public get position() {
-    return this._position
-  }
-
-  protected _anchorPoint: AnchorPoint = AnchorPoint.CENTER
-
-  public get anchorPoint() {
-    return this._anchorPoint
-  }
+  public anchorPoint: AnchorPoint = AnchorPoint.CENTER
 
   protected sacle: number = 1
 
   protected targetSprite: Sprite | null = null
 
   constructor(canvas: Canvas) {
-    this.canvas = canvas
-    canvas.update.connect(this.update.bind(this))
+    canvas.update.connect(this.update.bind(this, canvas))
   }
 
-  protected update() {
+  protected update(canvas: Canvas) {
     if (this.targetSprite === null) return
     let finalX = this.targetSprite.position.x
     let finalY = this.targetSprite.position.y
-    switch (this._anchorPoint) {
+    switch (this.anchorPoint) {
       case AnchorPoint.TOP_CENTER:
-        finalX -= (this.canvas.resolution.x / 2)
+        finalX -= (canvas.resolution.x / 2)
         break
       case AnchorPoint.TOP_RIGHT:
-        finalX -= (this.canvas.resolution.x)
+        finalX -= (canvas.resolution.x)
         break
       case AnchorPoint.CENTER_LEFT:
-        finalY -= (this.canvas.resolution.y / 2)
+        finalY -= (canvas.resolution.y / 2)
         break
       case AnchorPoint.CENTER:
-        finalX -= (this.canvas.resolution.x / 2)
-        finalY -= (this.canvas.resolution.y / 2)
+        finalX -= (canvas.resolution.x / 2)
+        finalY -= (canvas.resolution.y / 2)
         break
       case AnchorPoint.CENTER_RIGHT:
-        finalX -= this.canvas.resolution.x
-        finalY -= this.canvas.resolution.y / 2
+        finalX -= canvas.resolution.x
+        finalY -= canvas.resolution.y / 2
         break
       case AnchorPoint.BOTTOM_LEFT:
-        finalY -= this.canvas.resolution.y
+        finalY -= canvas.resolution.y
         break
       case AnchorPoint.BOTTOM_CENTER:
-        finalX -= this.canvas.resolution.x / 2
-        finalY -= this.canvas.resolution.y
+        finalX -= canvas.resolution.x / 2
+        finalY -= canvas.resolution.y
         break
       case AnchorPoint.BOTTOM_RIGHT:
-        finalX -= this.canvas.resolution.x
-        finalY -= this.canvas.resolution.y
+        finalX -= canvas.resolution.x
+        finalY -= canvas.resolution.y
         break
     }
-    this._position = { x: finalX, y: finalY }
+    this.position = { x: finalX, y: finalY }
   }
 
   followSprite(sprite: Sprite, anchorPoint: AnchorPoint) {
     this.targetSprite = sprite
-    this._anchorPoint = anchorPoint
+    this.anchorPoint = anchorPoint
   }
 
   moveTo(value: Vector2) {

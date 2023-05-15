@@ -10,6 +10,9 @@ import TextureSprite from "../sprites/TextureSprite"
 import AnimationSprite from "../sprites/AnimationSprite"
 import Color from "../variant_types/Color"
 
+/**
+ * 画布
+ */
 class Canvas {
   readonly canvasElement: HTMLCanvasElement
   readonly rendering: CanvasRenderingContext2D

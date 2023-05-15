@@ -9,121 +9,63 @@ import Color from "../variant_types/Color"
 import Vector2 from "../variant_types/Vector2"
 import MouseFilter from "../enums/MouseFilter";
 import UserInputEvent from "../variant_types/UserInputEvent"
-import MouseMotion from "../variant_types/MouseMotion"
-import MouseButton from "../variant_types/MouseButton"
+import MouseMotionEvent from "../variant_types/MouseMotionEvent"
+import MouseButtonEvent from "../variant_types/MouseButtonEvent"
 import EventType from "../enums/EventType"
 import LocateMode from "../enums/LocateMode"
 import Component from "../components/Component"
+import Camera from "../canvas/Camera"
+import Canvas from "../canvas/Canvas"
 
 /**
  * 精灵构造函数
  * @param {Object} options
  */
-export default class Sprite {
+export default class Sprite implements Transform, Appearance {
   readonly id: number = SpriteSystem.generateId()
 
+  public canvas: Canvas
+  public camera: Camera
+
+  public parent: Sprite
+  public children: Sprite[] = []
   protected components: Component[] = []
 
-  protected transform = new Transform()
-
-  protected appearance: Appearance = {
-    visible: true,
-    modulate: { r: 255, g: 255, b: 255, a: 1 }
-  }
-
-  public set position(value: Vector2) {
-    this.transform.position = value
-  }
-
-  public get position() {
-    return this.transform.position
-  }
-
-  public set size(value: Vector2) {
-    this.transform.size = value
-  }
-
-  public get size() {
-    return this.transform.size
-  }
-
-  public set rotation(value: number) {
-    this.transform.rotation = value
-  }
-
-  public get rotation() {
-    return this.transform.rotation
-  }
-
-  public set scale(value: Vector2) {
-    this.transform.scale = value
-  }
-
-  public get scale() {
-    return this.transform.scale
-  }
-
-  public get locateMode() {
-    return this.transform.locateMode
-  }
-
-  public set locateMode(value: LocateMode) {
-    this.transform.locateMode = value
-  }
-
-  public set visible(value: boolean) {
-    this.appearance.visible = value
-  }
-
-  public get visible() {
-    return this.appearance.visible
-  }
-
-  public set modulate(value: Color) {
-    this.appearance.modulate = value
-  }
-
-  public get modulate() {
-    return this.appearance.modulate
-  }
-
-  /**
-   * 鼠标穿透属性
-   */
+  public position: Vector2 = { x: 0, y: 0 }
+  public size: Vector2 = { x: 0, y: 0 }
+  public rotation: number = 0
+  public scale: Vector2 = { x: 0, y: 0 }
+  public locateMode: LocateMode = LocateMode.REALATIVE
+  public visible: boolean = true
+  public modulate: Color = { r: 255, g: 255, b: 255, a: 1 }
   public mouseFilter: MouseFilter = MouseFilter.STOP
 
   // 信号
-  protected readonly pressed: Pressed = new Pressed()
-  protected readonly mouseIn: MouseIn = new MouseIn()
-  protected readonly mouseOut: MouseOut = new MouseOut()
+  public readonly pressed: Pressed = new Pressed()
+  public readonly mouseIn: MouseIn = new MouseIn()
+  public readonly mouseOut: MouseOut = new MouseOut()
 
-  protected readonly updateFn: Function = this._update.bind(this)
-  protected readonly inputFn: Function = this._input.bind(this)
+  public readonly updateFn: Function = this.update.bind(this)
+  public readonly inputFn: Function = this.input.bind(this)
 
   // 鼠标状态
   protected mouseStatus: string = "mouseup"
   protected isMouseIn: boolean = false
 
-  constructor() {
-    this._ready()
-  }
-
-  protected _ready(): void {
-    Game.canvas.update.connect(this.updateFn)
-    Game.canvas.userInput.connect(this.inputFn)
+  public ready(): void {
     this.onReady()
   }
 
-  protected _input(event: UserInputEvent): void {
+  protected input(event: UserInputEvent): void {
     if (event.type === EventType.MOUSE_BUTTON) {
-      const mouseButton = event as MouseButton
+      const mouseButton = event as MouseButtonEvent
       if (mouseButton.status == "mousedown" && this.isMouseIn) this.mouseStatus = mouseButton.status
       if (mouseButton.status == "mouseup") {
         if (this.mouseStatus === "mousedown" && this.isMouseIn) this.pressed.emit()
         this.mouseStatus = mouseButton.status
       }
     } else if (event.type === EventType.MOUSE_MOTION) {
-      const mouseMotion = event as MouseMotion
+      const mouseMotion = event as MouseMotionEvent
       const has_point = this.has_point(mouseMotion.position)
       if (has_point && !this.isMouseIn) {
         this.mouseIn.emit()
@@ -136,39 +78,51 @@ export default class Sprite {
     this.onInput(event)
   }
 
-  protected _update(delta: number): void {
-    this.beforeRender()
-    if (this.visible) this._render()
+  protected update(delta: number): void {
+    this.beforeUpdate()
+    if (this.visible) this.render()
     for (let component of this.components) {
       component.update()
     }
     this.onUpdate(delta)
   }
 
-  protected _render(): void { }
+  protected render(): void { }
 
   public destroy(): void {
     this.beforeDestroy()
-    this._destroy()
-  }
-
-  protected _destroy(): void {
-    Game.canvas.update.disconnect(this.updateFn)
-    Game.canvas.userInput.disconnect(this.inputFn)
-    for(let component of this.components){
+    for (let component of this.components) {
       component.unregister()
     }
+    this.onDestroy()
   }
 
-  protected onReady(): void { }
+  public onReady(): void { }
 
-  protected beforeRender(): void { }
+  public beforeUpdate(): void { }
 
-  protected onUpdate(delta: number): void { }
+  public onUpdate(delta: number): void { }
 
-  protected onInput(event: UserInputEvent): void { }
+  public onInput(event: UserInputEvent): void { }
 
-  protected beforeDestroy(): void { }
+  public beforeDestroy(): void { }
+
+  public onDestroy(): void { }
+
+  public addChild(sprite: Sprite) {
+    sprite.parent = this
+    this.children.push(sprite)
+  }
+
+  public removeChild(sprite: Sprite) {
+    for (let i = 0; i < this.children.length; i++) {
+      const child = this.children[i];
+      if (child === sprite) {
+        this.children.splice(i, 1)
+        break
+      }
+    }
+  }
 
   protected registerComponent(component: Component) {
     component.register(this)
@@ -194,10 +148,10 @@ export default class Sprite {
         if (point.y > this.position.y + this.size.y * this.scale.y) return false
         return true
       case LocateMode.REALATIVE:
-        if (point.x + Game.camera.position.x < this.position.x) return false
-        if (point.x + Game.camera.position.x > this.position.x + this.size.x * this.scale.x) return false
-        if (point.y + Game.camera.position.y < this.position.y) return false
-        if (point.y + Game.camera.position.y > this.position.y + this.size.y * this.scale.y) return false
+        if (point.x + this.camera.position.x < this.position.x) return false
+        if (point.x + this.camera.position.x > this.position.x + this.size.x * this.scale.x) return false
+        if (point.y + this.camera.position.y < this.position.y) return false
+        if (point.y + this.camera.position.y > this.position.y + this.size.y * this.scale.y) return false
         return true
     }
   }

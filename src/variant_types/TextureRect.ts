@@ -1,5 +1,8 @@
 import ExpandMode from "../enums/ExpandMode";
 
+/**
+ * 纹理
+ */
 interface TextureRect {
   /**
    * 图片节点

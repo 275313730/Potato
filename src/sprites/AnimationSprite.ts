@@ -1,4 +1,3 @@
-import Game from "../game/Game";
 import TextureSprite from "./TextureSprite";
 import ExpandMode from "../enums/ExpandMode";
 
@@ -16,16 +15,16 @@ export default class AnimationSprite extends TextureSprite {
   protected currentInterval: number = 0
 
   public get frameWidth() {
-    return this.textureRect.texture.width / this.column
+    return this.texture.width / this.column
   }
 
   public get frameHeight() {
-    return this.textureRect.texture.height / this.row
+    return this.texture.height / this.row
   }
 
   public override setTexture(value: HTMLImageElement, row?: number, column?: number): boolean {
     if (!row || !column || row <= 0 || column <= 0) return false
-    this.textureRect.texture = value
+    this.texture = value
     this.row = row
     this.column = column
     this.frames = this.row * this.column
@@ -37,11 +36,11 @@ export default class AnimationSprite extends TextureSprite {
     return true
   }
 
-  _render(): void {
+  render(): void {
     if (!this.texture) return
     let startX = this.currentFrame % this.column * this.frameWidth
     let startY = Math.floor(this.currentFrame / this.column) * this.frameHeight
-    Game.canvas.drawClipImage(this, { x: startX, y: startY, width: this.frameWidth, height: this.frameHeight })
+    this.canvas.drawClipImage(this, { x: startX, y: startY, width: this.frameWidth, height: this.frameHeight })
     this.currentInterval += 1
     if (this.currentInterval < this.interval) return
     this.currentInterval = 0

@@ -1,6 +1,9 @@
 import UserInputEvent from "./UserInputEvent";
 
-export default interface KeyboardInput extends UserInputEvent {
+/**
+ * 键盘输入事件
+ */
+export default interface KeyboardInputEvent extends UserInputEvent {
   readonly altKey: boolean;
   readonly code: string;
   readonly ctrlKey: boolean;
