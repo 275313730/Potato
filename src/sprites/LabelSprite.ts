@@ -1,8 +1,7 @@
 import Color from "../variant_types/Color";
 import FontStyle from "../enums/FontStyle";
 import Sprite from "./Sprite";
-import { LocateMode } from "../enums";
-import { Vector2 } from "../variant_types";
+import Game from "../Index";
 
 export default class LabelSprite extends Sprite {
   public content: string = ""
@@ -11,8 +10,8 @@ export default class LabelSprite extends Sprite {
   public fontSize: number = 14
   public fontStyle: FontStyle = FontStyle.NORMAL
 
-  protected render(): void {
+  protected _render(): void {
     if (this.content == "") return
-    this.canvas.drawLabel(this)
+    Game.canvas.drawLabel(this)
   }
 }

@@ -1,14 +1,9 @@
-import Update from "../signals/Update"
-import UserInput from "../signals/UserInput"
-import Sprite from "../sprites/Sprite"
-import LabelSprite from "../sprites/LabelSprite"
-import Vector2 from "../variant_types/Vector2"
-import Rect from "../variant_types/Rect"
 import Camera from "./Camera"
-import LocateMode from "../enums/LocateMode"
-import TextureSprite from "../sprites/TextureSprite"
-import AnimationSprite from "../sprites/AnimationSprite"
-import Color from "../variant_types/Color"
+
+import { Update, UserInput, Pause, Resume } from "../signals"
+import { Sprite, LabelSprite, TextureSprite, AnimationSprite } from "../sprites"
+import { Vector2, Rect, Color } from "../variant_types"
+import { LocateMode } from "../enums"
 
 /**
  * 画布
@@ -34,6 +29,8 @@ class Canvas {
   // signals
   public readonly update: Update = new Update()
   public readonly userInput: UserInput = new UserInput()
+  public readonly pause: Pause = new Pause()
+  public readonly resume: Resume = new Resume()
 
   constructor(elementId: string = "") {
     if (elementId === "") {

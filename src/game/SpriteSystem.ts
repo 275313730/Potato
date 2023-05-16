@@ -1,9 +1,8 @@
 let id = 100000
 
-class SpriteSystem {
+export default class SpriteSystem {
   static generateId(): number {
     return id++
   }
 }
 
-export default SpriteSystem

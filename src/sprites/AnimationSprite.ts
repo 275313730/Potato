@@ -1,5 +1,7 @@
 import TextureSprite from "./TextureSprite";
 import ExpandMode from "../enums/ExpandMode";
+import AssetSystem from "../game/AssetSystem";
+import Game from "../Index";
 
 export default class AnimationSprite extends TextureSprite {
   protected row: number
@@ -22,25 +24,25 @@ export default class AnimationSprite extends TextureSprite {
     return this.texture.height / this.row
   }
 
-  public override setTexture(value: HTMLImageElement, row?: number, column?: number): boolean {
+  public override setTexture(path: string, row?: number, column?: number): boolean {
     if (!row || !column || row <= 0 || column <= 0) return false
-    this.texture = value
+    this.texture = AssetSystem.loadImage(path)
     this.row = row
     this.column = column
     this.frames = this.row * this.column
-    value.onload = () => {
+    this.texture.onload = () => {
       if (this.expandMode === ExpandMode.KEEP_SIZE) {
-        this.size = { x: value.width / column, y: value.height / row }
+        this.size = { x: this.texture.width / column, y: this.texture.height / row }
       }
     }
     return true
   }
 
-  render(): void {
+  _render(): void {
     if (!this.texture) return
     let startX = this.currentFrame % this.column * this.frameWidth
     let startY = Math.floor(this.currentFrame / this.column) * this.frameHeight
-    this.canvas.drawClipImage(this, { x: startX, y: startY, width: this.frameWidth, height: this.frameHeight })
+    Game.canvas.drawClipImage(this, { x: startX, y: startY, width: this.frameWidth, height: this.frameHeight })
     this.currentInterval += 1
     if (this.currentInterval < this.interval) return
     this.currentInterval = 0

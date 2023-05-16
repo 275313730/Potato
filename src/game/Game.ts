@@ -3,35 +3,74 @@ import Canvas from "../canvas/Canvas"
 import { EventType } from "../enums"
 import { Sprite } from "../sprites"
 import { KeyboardInputEvent, MouseButtonEvent, MouseMotionEvent, Vector2 } from "../variant_types"
+import AssetSystem from "./AssetSystem"
+import SpriteSystem from "./SpriteSystem"
 
 class Game {
-  public readonly canvas: Canvas
+  private static _canvas: Canvas
 
-  public readonly canvasElement: HTMLCanvasElement
+  public static get canvas() {
+    return this._canvas
+  }
 
+  public static set resolution(value: Vector2) {
+    this._canvas.resolution = value
+  }
 
-  public readonly rendering: CanvasRenderingContext2D
+  private static _canvasElement: HTMLCanvasElement
 
-  public readonly camera: Camera
+  public static get canvasElement() {
+    return this._canvasElement
+  }
 
-  protected paused = false
-  protected pausedCushion = false
+  private static _rendering: CanvasRenderingContext2D
 
-  public isTestMode = false
+  public static get rendering() {
+    return this._rendering
+  }
 
+  private static _camera: Camera
 
-  constructor(canvasId: string) {
+  public static get camera() {
+    return this._camera
+  }
+
+  private static _start: boolean = false
+
+  public static get start() {
+    return this._start
+  }
+
+  private static _assetSystem = AssetSystem
+
+  public static get AssetSystem() {
+    return this._assetSystem
+  }
+
+  private static _spriteSystem = SpriteSystem
+
+  public static get SpriteSystem() {
+    return this._spriteSystem
+  }
+
+  public static isTestMode: boolean = false
+
+  protected static paused: boolean = false
+  protected static pausedCushion: boolean = false
+
+  public static generate(canvasId: string) {
     initStyle()
-    this.canvas = new Canvas(canvasId)
-    this.canvasElement = this.canvas.canvasElement
-    this.rendering = this.canvas.rendering
-    this.camera = this.canvas.camera
-    listenInputEvent(this.canvas)
+    this._canvas = new Canvas(canvasId)
+    this._canvasElement = this.canvas.canvasElement
+    this._rendering = this.canvas.rendering
+    this._camera = this.canvas.camera
+    this.listenInputEvent()
     this.pauseSetting()
     this.loop()
   }
 
-  protected pauseSetting() {
+
+  protected static pauseSetting() {
     window.onblur = () => {
       this.paused = true
       this.pausedCushion = true
@@ -41,15 +80,19 @@ class Game {
     }
   }
 
-  protected loop() {
+  protected static loop() {
     const startTime = new Date().getTime()
     // 刷新画布
     window.requestAnimationFrame(() => {
+      if (!this.start) return this.loop()
       let timePassed = (new Date().getTime() - startTime) / 1000
-      if (!this.paused) {
+      if (this.paused) {
+        this.canvas.pause.emit()
+      } else {
         if (this.pausedCushion) {
           timePassed = 0
           this.pausedCushion = false
+          this.canvas.resume.emit()
         }
         this.rendering.fillRect(0, 0, this.canvasElement.width, this.canvasElement.height)
         this.canvas.update.emit(timePassed)
@@ -58,111 +101,110 @@ class Game {
     });
   }
 
-  public addSprite(sprite: Sprite) {
-    sprite.canvas = this.canvas
-    sprite.camera = this.camera
+  public static addSprite(sprite: Sprite) {
     this.canvas.update.connect(sprite.updateFn)
     this.canvas.userInput.connect(sprite.inputFn)
+    this.canvas.pause.connect(sprite.pauseFn)
+    this.canvas.resume.connect(sprite.resumeFn)
     for (let child of sprite.children) {
       this.addSprite(child)
     }
-    sprite.ready()
+    sprite._ready()
   }
 
-  public addSprites(sprites: Sprite[]) {
+  public static addSprites(sprites: Sprite[]) {
     for (let sprite of sprites) {
       this.addSprite(sprite)
     }
   }
 
-  public removeSprite(sprite: Sprite) {
-    sprite.canvas = null
-    sprite.camera = null
+  public static removeSprite(sprite: Sprite) {
     this.canvas.update.disconnect(sprite.updateFn)
     this.canvas.userInput.disconnect(sprite.inputFn)
   }
-}
 
-/**
- * 监听输入事件
- * @param canvas 画布 
- */
-function listenInputEvent(canvas: Canvas) {
-  // 触屏事件
-  if (isMobile()) {
-    /*     canvas.canvasElement.addEventListener("touchstart", (e: TouchEvent) => {
+  /**
+   * 监听输入事件
+   * @param canvas 画布 
+   */
+  protected static listenInputEvent() {
+    // 触屏事件
+    if (isMobile()) {
+      /*     canvas.canvasElement.addEventListener("touchstart", (e: TouchEvent) => {
+            e.stopPropagation();
+            e.preventDefault();
+            canvas.userInput.emit(e)
+          })
+          canvas.canvasElement.addEventListener("touchmove", (e: TouchEvent) => {
+            e.stopPropagation();
+            e.preventDefault();
+            canvas.userInput.emit(e)
+          })
+          canvas.canvasElement.addEventListener("touchend", (e: TouchEvent) => {
+            e.stopPropagation();
+            e.preventDefault();
+            canvas.userInput.emit(e)
+          }) */
+    } else {
+      ["mousedown", "mouseup"].forEach((eventType: string) => {
+        window.addEventListener(eventType, (e: MouseEvent) => {
+          this._start = true
           e.stopPropagation();
           e.preventDefault();
-          canvas.userInput.emit(e)
-        })
-        canvas.canvasElement.addEventListener("touchmove", (e: TouchEvent) => {
-          e.stopPropagation();
-          e.preventDefault();
-          canvas.userInput.emit(e)
-        })
-        canvas.canvasElement.addEventListener("touchend", (e: TouchEvent) => {
-          e.stopPropagation();
-          e.preventDefault();
-          canvas.userInput.emit(e)
-        }) */
-  } else {
-    ["mousedown", "mouseup"].forEach((eventType: string) => {
-      window.addEventListener(eventType, (e: MouseEvent) => {
+          const finalPosition = getFinalPosition(this.canvas, { x: e.clientX, y: e.clientY })
+          if (finalPosition.x === -1 || finalPosition.y === -1) return
+          const mouseButton: MouseButtonEvent = {
+            altKey: e.altKey,
+            button: e.button,
+            ctrlKey: e.ctrlKey,
+            metaKey: e.metaKey,
+            type: EventType.MOUSE_BUTTON,
+            status: eventType,
+            position: {
+              x: finalPosition.x,
+              y: finalPosition.y
+            }
+          }
+          this.canvas.userInput.emit(mouseButton)
+        });
+      })
+      window.addEventListener("mousemove", (e: MouseEvent) => {
         e.stopPropagation();
         e.preventDefault();
-        const finalPosition = getFinalPosition(canvas, { x: e.clientX, y: e.clientY })
+        const finalPosition = getFinalPosition(this.canvas, { x: e.clientX, y: e.clientY })
         if (finalPosition.x === -1 || finalPosition.y === -1) return
-        const mouseButton: MouseButtonEvent = {
-          altKey: e.altKey,
-          button: e.button,
-          ctrlKey: e.ctrlKey,
-          metaKey: e.metaKey,
-          type: EventType.MOUSE_BUTTON,
-          status: eventType,
+        const mouseMotion: MouseMotionEvent = {
+          type: EventType.MOUSE_MOTION,
           position: {
             x: finalPosition.x,
             y: finalPosition.y
           }
         }
-        canvas.userInput.emit(mouseButton)
+        this.canvas.userInput.emit(mouseMotion)
       });
-    })
-    window.addEventListener("mousemove", (e: MouseEvent) => {
-      e.stopPropagation();
-      e.preventDefault();
-      const finalPosition = getFinalPosition(canvas, { x: e.clientX, y: e.clientY })
-      if (finalPosition.x === -1 || finalPosition.y === -1) return
-      const mouseMotion: MouseMotionEvent = {
-        type: EventType.MOUSE_MOTION,
-        position: {
-          x: finalPosition.x,
-          y: finalPosition.y
-        }
-      }
-      canvas.userInput.emit(mouseMotion)
-    });
-    ["keydown", "keyup"].forEach((eventType: string) => {
-      window.addEventListener(eventType, (e: KeyboardEvent) => {
-        e.stopPropagation();
-        e.preventDefault();
-        // F11默认为全屏键，无法使用
-        if (e.key === "F11") return
-        const keyboardInput: KeyboardInputEvent = {
-          altKey: e.altKey,
-          code: e.code,
-          ctrlKey: e.ctrlKey,
-          isComposing: e.isComposing,
-          key: e.key,
-          location: e.location,
-          metaKey: e.metaKey,
-          repeat: e.repeat,
-          shiftKey: e.shiftKey,
-          status: eventType,
-          type: EventType.KEYBOARD_INPUT
-        }
-        canvas.userInput.emit(keyboardInput)
-      });
-    })
+      ["keydown", "keyup"].forEach((eventType: string) => {
+        window.addEventListener(eventType, (e: KeyboardEvent) => {
+          e.stopPropagation();
+          e.preventDefault();
+          // F11默认为全屏键，无法使用
+          if (e.key === "F11") return
+          const keyboardInput: KeyboardInputEvent = {
+            altKey: e.altKey,
+            code: e.code,
+            ctrlKey: e.ctrlKey,
+            isComposing: e.isComposing,
+            key: e.key,
+            location: e.location,
+            metaKey: e.metaKey,
+            repeat: e.repeat,
+            shiftKey: e.shiftKey,
+            status: eventType,
+            type: EventType.KEYBOARD_INPUT
+          }
+          this.canvas.userInput.emit(keyboardInput)
+        });
+      })
+    }
   }
 }
 

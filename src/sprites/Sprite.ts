@@ -4,7 +4,7 @@ import Game from "../game/Game"
 import Pressed from "../signals/Pressed"
 import MouseIn from "../signals/MouseIn"
 import MouseOut from "../signals/MouseOut"
-import SpriteSystem from "../systems/SpriteSystem"
+import SpriteSystem from "../game/SpriteSystem"
 import Color from "../variant_types/Color"
 import Vector2 from "../variant_types/Vector2"
 import MouseFilter from "../enums/MouseFilter";
@@ -14,18 +14,13 @@ import MouseButtonEvent from "../variant_types/MouseButtonEvent"
 import EventType from "../enums/EventType"
 import LocateMode from "../enums/LocateMode"
 import Component from "../components/Component"
-import Camera from "../canvas/Camera"
-import Canvas from "../canvas/Canvas"
 
 /**
  * 精灵构造函数
  * @param {Object} options
  */
 export default class Sprite implements Transform, Appearance {
-  readonly id: number = SpriteSystem.generateId()
-
-  public canvas: Canvas
-  public camera: Camera
+  readonly id: number = Game.SpriteSystem.generateId()
 
   public parent: Sprite
   public children: Sprite[] = []
@@ -40,23 +35,35 @@ export default class Sprite implements Transform, Appearance {
   public modulate: Color = { r: 255, g: 255, b: 255, a: 1 }
   public mouseFilter: MouseFilter = MouseFilter.STOP
 
+  public paused: boolean = false
+
   // 信号
   public readonly pressed: Pressed = new Pressed()
   public readonly mouseIn: MouseIn = new MouseIn()
   public readonly mouseOut: MouseOut = new MouseOut()
 
-  public readonly updateFn: Function = this.update.bind(this)
-  public readonly inputFn: Function = this.input.bind(this)
+  public readonly updateFn: Function = this._update.bind(this)
+  public readonly inputFn: Function = this._input.bind(this)
+  public readonly pauseFn: Function = this._pause.bind(this)
+  public readonly resumeFn: Function = this._resume.bind(this)
 
   // 鼠标状态
   protected mouseStatus: string = "mouseup"
   protected isMouseIn: boolean = false
+  
+  constructor(){
+    this._ready()
+  }
 
-  public ready(): void {
+  public _ready(): void {
+    Game.canvas.update.connect(this.updateFn)
+    Game.canvas.userInput.connect(this.inputFn)
+    Game.canvas.pause.connect(this.pauseFn)
+    Game.canvas.resume.connect(this.resumeFn)
     this.onReady()
   }
 
-  protected input(event: UserInputEvent): void {
+  protected _input(event: UserInputEvent): void {
     if (event.type === EventType.MOUSE_BUTTON) {
       const mouseButton = event as MouseButtonEvent
       if (mouseButton.status == "mousedown" && this.isMouseIn) this.mouseStatus = mouseButton.status
@@ -78,22 +85,34 @@ export default class Sprite implements Transform, Appearance {
     this.onInput(event)
   }
 
-  protected update(delta: number): void {
+  protected _update(delta: number): void {
     this.beforeUpdate()
-    if (this.visible) this.render()
+    if (this.visible) this._render()
     for (let component of this.components) {
       component.update()
     }
     this.onUpdate(delta)
   }
 
-  protected render(): void { }
+  protected _pause() {
+    this.paused = true
+  }
 
-  public destroy(): void {
+  protected _resume() {
+    this.paused = false
+  }
+
+  protected _render(): void { }
+
+  public _destroy(): void {
     this.beforeDestroy()
     for (let component of this.components) {
       component.unregister()
     }
+    Game.canvas.update.disconnect(this.updateFn)
+    Game.canvas.userInput.disconnect(this.inputFn)
+    Game.canvas.pause.disconnect(this.pauseFn)
+    Game.canvas.resume.disconnect(this.resumeFn)
     this.onDestroy()
   }
 
@@ -148,10 +167,10 @@ export default class Sprite implements Transform, Appearance {
         if (point.y > this.position.y + this.size.y * this.scale.y) return false
         return true
       case LocateMode.REALATIVE:
-        if (point.x + this.camera.position.x < this.position.x) return false
-        if (point.x + this.camera.position.x > this.position.x + this.size.x * this.scale.x) return false
-        if (point.y + this.camera.position.y < this.position.y) return false
-        if (point.y + this.camera.position.y > this.position.y + this.size.y * this.scale.y) return false
+        if (point.x + Game.camera.position.x < this.position.x) return false
+        if (point.x + Game.camera.position.x > this.position.x + this.size.x * this.scale.x) return false
+        if (point.y + Game.camera.position.y < this.position.y) return false
+        if (point.y + Game.camera.position.y > this.position.y + this.size.y * this.scale.y) return false
         return true
     }
   }

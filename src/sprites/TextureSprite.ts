@@ -1,6 +1,7 @@
 import Sprite from "./Sprite";
 import TextureRect from "../variant_types/TextureRect";
 import ExpandMode from "../enums/ExpandMode";
+import Game from "../Index";
 
 export default class TextureSprite extends Sprite implements TextureRect {
   public texture: HTMLImageElement = new Image();
@@ -8,18 +9,23 @@ export default class TextureSprite extends Sprite implements TextureRect {
   public flipH: boolean = false;
   public flipV: boolean = false;
 
-  public setTexture(value: HTMLImageElement): boolean {
-    this.texture = value
-    value.onload = () => {
+  protected onTextureLoad() {
+
+  }
+
+  public setTexture(path: string): boolean {
+    this.texture = Game.AssetSystem.loadImage(path)
+    this.texture.onload = () => {
       if (this.expandMode === ExpandMode.KEEP_SIZE) {
-        this.size = { x: value.width, y: value.height }
+        this.size = { x: this.texture.width, y: this.texture.height }
       }
+      this.onTextureLoad()
     }
     return true
   }
 
-  render(): void {
+  _render(): void {
     if (!this.texture) return
-    this.canvas.drawImage(this)
+    Game.canvas.drawImage(this)
   }
 }
