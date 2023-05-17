@@ -1,27 +1,25 @@
-class Signal {
-  fns: Function[] = []
+export default class Signal {
+  connections: { index: number, fn: Function }[] = []
 
-  connect(targetFn: Function) {
-    for (let fn of this.fns) {
-      if (fn === targetFn) return
+  connect(index: number, fn: Function) {
+    for (let connection of this.connections) {
+      if (connection.index === index) return
     }
-    this.fns.push(targetFn)
+    this.connections.push({ index, fn })
   }
 
-  disconnect(targetFn: Function) {
-    for (let i = 0; i < this.fns.length; i++) {
-      let fn = this.fns[i]
-      if (fn !== targetFn) continue
-      this.fns.splice(i, 1)
+  disconnect(index: number) {
+    for (let i = 0; i < this.connections.length; i++) {
+      let connection = this.connections[i]
+      if (connection.index !== index) continue
+      this.connections.splice(i, 1)
       return
     }
   }
 
   emit(...args: any): void {
-    for (let fn of this.fns) {
-      fn(...args)
+    for (let connection of this.connections) {
+      connection.fn(...args)
     }
   }
 }
-
-export default Signal

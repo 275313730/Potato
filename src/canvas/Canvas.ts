@@ -1,14 +1,14 @@
 import Camera from "./Camera"
-import Rendering from "./Rendering"
+import Render from "./Rendering"
 import { Update, UserInput, Pause, Resume } from "../signals"
 import { Vector2 } from "../variant_types"
 
 /**
  * 画布
  */
-class Canvas {
+export default class Canvas {
   readonly canvasElement: HTMLCanvasElement
-  readonly rendering: Rendering
+  readonly rendering: Render
   readonly camera: Camera
   public resolution: Vector2 = { x: 1920, y: 1080 }
   public viewSize: Vector2 = { x: 0, y: 0 }
@@ -36,7 +36,7 @@ class Canvas {
       this.canvasElement = document.getElementById(elementId) as HTMLCanvasElement
     }
     this.camera = new Camera(this)
-    this.rendering = new Rendering(this)
+    this.rendering = new Render(this)
 
     window.onresize = window.onload = () => {
       this.resize()
@@ -59,5 +59,3 @@ class Canvas {
     this.canvasElement.setAttribute("height", this.viewSize.y.toString());
   }
 }
-
-export default Canvas

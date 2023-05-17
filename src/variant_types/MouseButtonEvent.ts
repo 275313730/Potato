@@ -1,6 +1,5 @@
 import MouseMotionEvent from "./MouseMotionEvent";
 
-
 export default interface MouseButtonEvent extends MouseMotionEvent {
   readonly altKey: boolean;
   readonly button: number;

@@ -1,13 +1,12 @@
 import Camera from "../canvas/Camera"
 import Canvas from "../canvas/Canvas"
-import Rendering from "../canvas/Rendering"
+import Render from "../canvas/Rendering"
 import { EventType } from "../enums"
-import { Sprite } from "../sprites"
 import { KeyboardInputEvent, MouseButtonEvent, MouseMotionEvent, Vector2 } from "../variant_types"
 import AssetSystem from "./AssetSystem"
 import SpriteSystem from "./SpriteSystem"
 
-class Game {
+export default class Game {
   private static _canvas: Canvas
 
   public static get canvas() {
@@ -24,10 +23,10 @@ class Game {
     return this._canvasElement
   }
 
-  private static _rendering: Rendering
+  private static _render: Render
 
-  public static get rendering() {
-    return this._rendering
+  public static get render() {
+    return this._render
   }
 
   private static _camera: Camera
@@ -63,7 +62,7 @@ class Game {
     initStyle()
     this._canvas = new Canvas(canvasId)
     this._canvasElement = this.canvas.canvasElement
-    this._rendering = this.canvas.rendering
+    this._render = this.canvas.rendering
     this._camera = this.canvas.camera
     this.listenInputEvent()
     this.pauseSetting()
@@ -93,33 +92,11 @@ class Game {
           this.pausedCushion = false
           this.canvas.resume.emit()
         }
-        this.rendering.clear({ x: this.canvas.viewSize.x, y: this.canvas.viewSize.y })
+        this.render.clear({ x: this.canvas.viewSize.x, y: this.canvas.viewSize.y })
         this.canvas.update.emit(timePassed)
       }
       this.loop()
     });
-  }
-
-  public static addSprite(sprite: Sprite) {
-    this.canvas.update.connect(sprite.updateFn)
-    this.canvas.userInput.connect(sprite.inputFn)
-    this.canvas.pause.connect(sprite.pauseFn)
-    this.canvas.resume.connect(sprite.resumeFn)
-    for (let child of sprite.children) {
-      this.addSprite(child)
-    }
-    sprite._ready()
-  }
-
-  public static addSprites(sprites: Sprite[]) {
-    for (let sprite of sprites) {
-      this.addSprite(sprite)
-    }
-  }
-
-  public static removeSprite(sprite: Sprite) {
-    this.canvas.update.disconnect(sprite.updateFn)
-    this.canvas.userInput.disconnect(sprite.inputFn)
   }
 
   /**
@@ -236,5 +213,3 @@ function initStyle(): void {
   body.style.alignItems = "center";
   body.style.justifyContent = "center";
 }
-
-export default Game

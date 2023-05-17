@@ -3,7 +3,7 @@ import ExpandMode from "../enums/ExpandMode";
 /**
  * 纹理
  */
-interface TextureRect {
+export default interface TextureRect {
   /**
    * 图片节点
    */
@@ -21,5 +21,3 @@ interface TextureRect {
    */
   flipV: boolean;
 }
-
-export default TextureRect

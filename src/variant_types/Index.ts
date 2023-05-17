@@ -8,5 +8,6 @@ import TextureRect from "./TextureRect"
 import Transform from "./Transform"
 import UserInputEvent from "./UserInputEvent"
 import Vector2 from "./Vector2"
+import Font from "./Font"
 
-export { Appearance, Color, KeyboardInputEvent, MouseButtonEvent, MouseMotionEvent, Rect, TextureRect, Transform, UserInputEvent, Vector2 }
+export { Appearance, Color, KeyboardInputEvent, MouseButtonEvent, MouseMotionEvent, Rect, TextureRect, Transform, UserInputEvent, Vector2, Font }

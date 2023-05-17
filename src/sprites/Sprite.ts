@@ -42,24 +42,19 @@ export default class Sprite implements Transform, Appearance {
   public readonly mouseIn: MouseIn = new MouseIn()
   public readonly mouseOut: MouseOut = new MouseOut()
 
-  public readonly updateFn: Function = this._update.bind(this)
-  public readonly inputFn: Function = this._input.bind(this)
-  public readonly pauseFn: Function = this._pause.bind(this)
-  public readonly resumeFn: Function = this._resume.bind(this)
-
   // 鼠标状态
   protected mouseStatus: string = "mouseup"
   protected isMouseIn: boolean = false
-  
-  constructor(){
+
+  constructor() {
     this._ready()
   }
 
   public _ready(): void {
-    Game.canvas.update.connect(this.updateFn)
-    Game.canvas.userInput.connect(this.inputFn)
-    Game.canvas.pause.connect(this.pauseFn)
-    Game.canvas.resume.connect(this.resumeFn)
+    Game.canvas.update.connect(this.id, this._update.bind(this))
+    Game.canvas.userInput.connect(this.id, this._input.bind(this))
+    Game.canvas.pause.connect(this.id, this._pause.bind(this))
+    Game.canvas.resume.connect(this.id, this._resume.bind(this))
     this.onReady()
   }
 
@@ -109,10 +104,10 @@ export default class Sprite implements Transform, Appearance {
     for (let component of this.components) {
       component.unregister()
     }
-    Game.canvas.update.disconnect(this.updateFn)
-    Game.canvas.userInput.disconnect(this.inputFn)
-    Game.canvas.pause.disconnect(this.pauseFn)
-    Game.canvas.resume.disconnect(this.resumeFn)
+    Game.canvas.update.disconnect(this.id)
+    Game.canvas.userInput.disconnect(this.id)
+    Game.canvas.pause.disconnect(this.id)
+    Game.canvas.resume.disconnect(this.id)
     this.onDestroy()
   }
 

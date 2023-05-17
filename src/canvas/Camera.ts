@@ -13,7 +13,7 @@ export default class Camera {
   protected targetSprite: Sprite | null = null
 
   constructor(canvas: Canvas) {
-    canvas.update.connect(this.update.bind(this, canvas))
+    canvas.update.connect(-9999, this.update.bind(this, canvas))
   }
 
   protected update(canvas: Canvas) {

@@ -1,8 +1,6 @@
 import Color from "./Color";
 
-interface Appearance {
+export default interface Appearance {
   visible: boolean;
   modulate: Color;
 }
-
-export default Appearance

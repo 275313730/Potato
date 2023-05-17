@@ -1,5 +1,3 @@
 import Signal from "./Signal";
 
-class MouseIn extends Signal { }
-
-export default MouseIn
+export default class MouseIn extends Signal { }

@@ -1,12 +1,10 @@
 import Signal from "./Signal";
 import UserInputEvent from "../variant_types/UserInputEvent";
 
-class UserInput extends Signal {
+export default class UserInput extends Signal {
   emit(userInputEvent: UserInputEvent): void {
-    for (let fn of this.fns) {
-      fn(userInputEvent)
+    for (let connection of this.connections) {
+      connection.fn(userInputEvent)
     }
   }
 }
-
-export default UserInput
