@@ -1,5 +1,6 @@
 import Camera from "../canvas/Camera"
 import Canvas from "../canvas/Canvas"
+import Rendering from "../canvas/Rendering"
 import { EventType } from "../enums"
 import { Sprite } from "../sprites"
 import { KeyboardInputEvent, MouseButtonEvent, MouseMotionEvent, Vector2 } from "../variant_types"
@@ -23,7 +24,7 @@ class Game {
     return this._canvasElement
   }
 
-  private static _rendering: CanvasRenderingContext2D
+  private static _rendering: Rendering
 
   public static get rendering() {
     return this._rendering
@@ -69,11 +70,11 @@ class Game {
     this.loop()
   }
 
-
   protected static pauseSetting() {
     window.onblur = () => {
       this.paused = true
       this.pausedCushion = true
+      this.canvas.pause.emit()
     }
     window.onfocus = () => {
       this.paused = false
@@ -86,15 +87,13 @@ class Game {
     window.requestAnimationFrame(() => {
       if (!this.start) return this.loop()
       let timePassed = (new Date().getTime() - startTime) / 1000
-      if (this.paused) {
-        this.canvas.pause.emit()
-      } else {
+      if (!this.paused) {
         if (this.pausedCushion) {
           timePassed = 0
           this.pausedCushion = false
           this.canvas.resume.emit()
         }
-        this.rendering.fillRect(0, 0, this.canvasElement.width, this.canvasElement.height)
+        this.rendering.clear({ x: this.canvas.viewSize.x, y: this.canvas.viewSize.y })
         this.canvas.update.emit(timePassed)
       }
       this.loop()

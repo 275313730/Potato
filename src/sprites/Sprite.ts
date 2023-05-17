@@ -29,7 +29,7 @@ export default class Sprite implements Transform, Appearance {
   public position: Vector2 = { x: 0, y: 0 }
   public size: Vector2 = { x: 0, y: 0 }
   public rotation: number = 0
-  public scale: Vector2 = { x: 0, y: 0 }
+  public scale: Vector2 = { x: 1, y: 1 }
   public locateMode: LocateMode = LocateMode.REALATIVE
   public visible: boolean = true
   public modulate: Color = { r: 255, g: 255, b: 255, a: 1 }

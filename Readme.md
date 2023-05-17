@@ -10,6 +10,6 @@
      - [x] Sprite
      - [x] TextureSprite
      - [x] AnimationSprite
-     - [ ] AudioSprite
+     - [x] AudioSprite
      - [x] LabelSprite
      - [ ] RichTextLabelSprite   

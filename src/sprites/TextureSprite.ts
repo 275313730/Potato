@@ -26,6 +26,6 @@ export default class TextureSprite extends Sprite implements TextureRect {
 
   _render(): void {
     if (!this.texture) return
-    Game.canvas.drawImage(this)
+    Game.rendering.drawImage(this)
   }
 }
