@@ -1,5 +1,4 @@
-import Game from "../Index";
-import AssetSystem from "../game/AssetSystem";
+import Game from "../game/Game";
 import Sprite from "./Sprite";
 
 export default class AudioSprite extends Sprite {
@@ -19,12 +18,12 @@ export default class AudioSprite extends Sprite {
   public range: number = 0
 
   setAudio(path: string) {
-    this.audio = AssetSystem.loadAudio(path)
+    this.audio.src = Game.assetPath + path
   }
 
   protected _update(delta: number): void {
-    if (this.waitPlay && Game.start) this.play()
     super._update(delta)
+    if (this.waitPlay && Game.start) this.play()
     if (this.range > 0) {
       const { x, y } = Game.camera.position
       const distance = Math.sqrt(x * x + y * y)

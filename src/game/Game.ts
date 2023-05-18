@@ -1,12 +1,13 @@
 import Camera from "../canvas/Camera"
 import Canvas from "../canvas/Canvas"
-import Render from "../canvas/Rendering"
+import Render from "../canvas/Render"
 import { EventType } from "../enums"
-import { KeyboardInputEvent, MouseButtonEvent, MouseMotionEvent, Vector2 } from "../variant_types"
-import AssetSystem from "./AssetSystem"
-import SpriteSystem from "./SpriteSystem"
+import { KeyboardInputEvent, MouseEventInput, Vector2 } from "../variant_types"
 
 export default class Game {
+  public static assetPath: string = "./assets/"
+  protected static spriteID: number = 10000
+
   private static _canvas: Canvas
 
   public static get canvas() {
@@ -41,18 +42,6 @@ export default class Game {
     return this._start
   }
 
-  private static _assetSystem = AssetSystem
-
-  public static get AssetSystem() {
-    return this._assetSystem
-  }
-
-  private static _spriteSystem = SpriteSystem
-
-  public static get SpriteSystem() {
-    return this._spriteSystem
-  }
-
   public static isTestMode: boolean = false
 
   protected static paused: boolean = false
@@ -67,6 +56,10 @@ export default class Game {
     this.listenInputEvent()
     this.pauseSetting()
     this.loop()
+  }
+
+  public static generateId(): number {
+    return this.spriteID++
   }
 
   protected static pauseSetting() {
@@ -122,14 +115,14 @@ export default class Game {
             canvas.userInput.emit(e)
           }) */
     } else {
-      ["mousedown", "mouseup"].forEach((eventType: string) => {
+      let mouseStatus: string = ""
+      Array("mousedown", "mouseup").forEach((eventType: string) => {
         window.addEventListener(eventType, (e: MouseEvent) => {
           this._start = true
-          e.stopPropagation();
-          e.preventDefault();
           const finalPosition = getFinalPosition(this.canvas, { x: e.clientX, y: e.clientY })
           if (finalPosition.x === -1 || finalPosition.y === -1) return
-          const mouseButton: MouseButtonEvent = {
+          mouseStatus = eventType
+          const mouseEventInput: MouseEventInput = {
             altKey: e.altKey,
             button: e.button,
             ctrlKey: e.ctrlKey,
@@ -141,29 +134,35 @@ export default class Game {
               y: finalPosition.y
             }
           }
-          this.canvas.userInput.emit(mouseButton)
+          this.canvas.userInput.emit(mouseEventInput)
         });
       })
       window.addEventListener("mousemove", (e: MouseEvent) => {
-        e.stopPropagation();
-        e.preventDefault();
         const finalPosition = getFinalPosition(this.canvas, { x: e.clientX, y: e.clientY })
         if (finalPosition.x === -1 || finalPosition.y === -1) return
-        const mouseMotion: MouseMotionEvent = {
+        const mouseEventInput: MouseEventInput = {
+          altKey: e.altKey,
+          button: e.button,
+          ctrlKey: e.ctrlKey,
+          metaKey: e.metaKey,
           type: EventType.MOUSE_MOTION,
+          status: mouseStatus,
           position: {
             x: finalPosition.x,
             y: finalPosition.y
           }
         }
-        this.canvas.userInput.emit(mouseMotion)
+        this.canvas.userInput.emit(mouseEventInput)
       });
       ["keydown", "keyup"].forEach((eventType: string) => {
         window.addEventListener(eventType, (e: KeyboardEvent) => {
-          e.stopPropagation();
-          e.preventDefault();
           // F11默认为全屏键，无法使用
           if (e.key === "F11") return
+          // 禁用保存
+          if (e.key === "s" && e.ctrlKey) {
+            e.stopPropagation();
+            e.preventDefault();
+          }
           const keyboardInput: KeyboardInputEvent = {
             altKey: e.altKey,
             code: e.code,
@@ -213,3 +212,4 @@ function initStyle(): void {
   body.style.alignItems = "center";
   body.style.justifyContent = "center";
 }
+

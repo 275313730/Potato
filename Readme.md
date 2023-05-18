@@ -20,7 +20,7 @@
      - [x] AnimationSprite
      - [x] AudioSprite
      - [x] LabelSprite
-     - [ ] LineEditSprite
-     - [ ] RichTextLabelSprite
+     - [x] LineEditSprite
+     - [x] RichTextLabelSprite
      - [x] SubViewSprite
      - [x] TextureSprite

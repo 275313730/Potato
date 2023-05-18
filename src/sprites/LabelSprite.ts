@@ -1,25 +1,69 @@
+import Game from "../game/Game";
 import Sprite from "./Sprite";
-import Game from "../Index";
 import { Font, Color } from "../variant_types";
 import { FontStyle, FontWeight } from "../enums";
 
-export default class LabelSprite extends Sprite implements Font {
+export default class LabelSprite extends Sprite {
   public content: string = ""
 
-  public fontType: string = "Arial"
-  public fontColor: Color = { r: 255, g: 255, b: 255, a: 1 }
-  public fontSize: number = 14
-  public fontStyle: string = FontStyle.NORMAL
-  public fontWeight: number = FontWeight.NORMAL
-  public lineHeight: number = 15
-
-  constructor(maxWidth?: number) {
-    super()
-    if (maxWidth) this.size.x = maxWidth
+  public font: Font = {
+    fontType: "Arial",
+    fontColor: { r: 255, g: 255, b: 255, a: 1 },
+    fontSize: 14,
+    fontStyle: FontStyle.NORMAL,
+    fontWeight: FontWeight.NORMAL,
+    lineHeight: 15
   }
 
+  public get fontType() {
+    return this.font.fontType
+  }
 
-  protected _render(): void {
-    Game.render.drawLabel(this)
+  public set fontType(value: string) {
+    this.font.fontType = value
+  }
+
+  public get fontColor() {
+    return this.font.fontColor
+  }
+
+  public set fontColor(value: Color) {
+    this.font.fontColor = value
+  }
+
+  public get fontSize() {
+    return this.font.fontSize
+  }
+
+  public set fontSize(value: number) {
+    this.font.fontSize = value
+  }
+
+  public get fontStyle() {
+    return this.font.fontStyle
+  }
+
+  public set fontStyle(value: string) {
+    this.font.fontStyle = value
+  }
+
+  public get fontWeight() {
+    return this.font.fontWeight
+  }
+
+  public set fontWeight(value: number) {
+    this.font.fontWeight = value
+  }
+
+  public get lineHeight() {
+    return this.font.lineHeight
+  }
+
+  public set lineHeight(value: number) {
+    this.font.lineHeight = value
+  }
+
+  protected _render(delta: number): void {
+    Game.render.drawLabel(this.transform, this.font, this.content)
   }
 }

@@ -1,5 +1,5 @@
 import Camera from "./Camera"
-import Render from "./Rendering"
+import Render from "./Render"
 import { Update, UserInput, Pause, Resume } from "../signals"
 import { Vector2 } from "../variant_types"
 

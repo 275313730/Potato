@@ -1,9 +1,6 @@
 import { Sprite } from "../sprites";
 
 export default abstract class Component {
-  /**
-   * 精灵单位
-   */
   protected sprite: Sprite
 
   /**
@@ -24,5 +21,5 @@ export default abstract class Component {
   /**
    * 更新组件
    */
-  public abstract update(): void
+  public abstract update(...args: any): void
 }

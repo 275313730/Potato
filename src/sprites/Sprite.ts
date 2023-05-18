@@ -1,38 +1,81 @@
-import Appearance from "../variant_types/Appearance"
-import Transform from "../variant_types/Transform"
 import Game from "../game/Game"
-import Pressed from "../signals/Pressed"
-import MouseIn from "../signals/MouseIn"
-import MouseOut from "../signals/MouseOut"
-import SpriteSystem from "../game/SpriteSystem"
-import Color from "../variant_types/Color"
-import Vector2 from "../variant_types/Vector2"
-import MouseFilter from "../enums/MouseFilter";
-import UserInputEvent from "../variant_types/UserInputEvent"
-import MouseMotionEvent from "../variant_types/MouseMotionEvent"
-import MouseButtonEvent from "../variant_types/MouseButtonEvent"
-import EventType from "../enums/EventType"
-import LocateMode from "../enums/LocateMode"
+import { Pressed, MouseIn, MouseOut } from "../signals"
+import { MouseFilter, EventType, LocateMode } from "../enums";
+import { Appearance, Transform, UserInputEvent, MouseEventInput, Vector2 } from "../variant_types"
 import Component from "../components/Component"
 
 /**
  * 精灵构造函数
  * @param {Object} options
  */
-export default class Sprite implements Transform, Appearance {
-  readonly id: number = Game.SpriteSystem.generateId()
+export default class Sprite {
+  readonly id: number = Game.generateId()
 
   public parent: Sprite
   public children: Sprite[] = []
   protected components: Component[] = []
 
-  public position: Vector2 = { x: 0, y: 0 }
-  public size: Vector2 = { x: 0, y: 0 }
-  public rotation: number = 0
-  public scale: Vector2 = { x: 1, y: 1 }
-  public locateMode: LocateMode = LocateMode.REALATIVE
-  public visible: boolean = true
-  public modulate: Color = { r: 255, g: 255, b: 255, a: 1 }
+  public transform: Transform = {
+    position: { x: 0, y: 0 },
+    size: { x: 0, y: 0 },
+    scale: { x: 1, y: 1 },
+    rotation: 0,
+    locateMode: LocateMode.REALATIVE
+  }
+
+  public get size() {
+    return this.transform.size
+  }
+
+  public set size(value: Vector2) {
+    this.transform.size = value
+  }
+
+  public get position() {
+    return this.transform.position
+  }
+
+  public set position(value: Vector2) {
+    this.transform.position = value
+  }
+
+  public get rotation() {
+    return this.transform.rotation
+  }
+
+  public set rotation(value: number) {
+    this.transform.rotation = value
+  }
+
+  public get scale() {
+    return this.transform.scale
+  }
+
+  public set scale(value: Vector2) {
+    this.transform.scale = value
+  }
+
+  public get locateMode() {
+    return this.transform.locateMode
+  }
+
+  public set locateMode(value: number) {
+    this.transform.locateMode = value
+  }
+
+  public appearance: Appearance = {
+    visible: true,
+    modulate: { r: 255, g: 255, b: 255, a: 1 },
+  }
+
+  public get visible() {
+    return this.appearance.visible
+  }
+
+  public set visible(value: boolean) {
+    this.appearance.visible = value
+  }
+
   public mouseFilter: MouseFilter = MouseFilter.STOP
 
   public paused: boolean = false
@@ -47,10 +90,12 @@ export default class Sprite implements Transform, Appearance {
   protected isMouseIn: boolean = false
 
   constructor() {
-    this._ready()
+    setTimeout(() => {
+      this._ready()
+    }, 0);
   }
 
-  public _ready(): void {
+  protected _ready(): void {
     Game.canvas.update.connect(this.id, this._update.bind(this))
     Game.canvas.userInput.connect(this.id, this._input.bind(this))
     Game.canvas.pause.connect(this.id, this._pause.bind(this))
@@ -60,14 +105,14 @@ export default class Sprite implements Transform, Appearance {
 
   protected _input(event: UserInputEvent): void {
     if (event.type === EventType.MOUSE_BUTTON) {
-      const mouseButton = event as MouseButtonEvent
+      const mouseButton = event as MouseEventInput
       if (mouseButton.status == "mousedown" && this.isMouseIn) this.mouseStatus = mouseButton.status
       if (mouseButton.status == "mouseup") {
         if (this.mouseStatus === "mousedown" && this.isMouseIn) this.pressed.emit()
         this.mouseStatus = mouseButton.status
       }
     } else if (event.type === EventType.MOUSE_MOTION) {
-      const mouseMotion = event as MouseMotionEvent
+      const mouseMotion = event as MouseEventInput
       const has_point = this.has_point(mouseMotion.position)
       if (has_point && !this.isMouseIn) {
         this.mouseIn.emit()
@@ -82,7 +127,7 @@ export default class Sprite implements Transform, Appearance {
 
   protected _update(delta: number): void {
     this.beforeUpdate()
-    if (this.visible) this._render()
+    if (this.visible) this._render(delta)
     for (let component of this.components) {
       component.update()
     }
@@ -97,7 +142,7 @@ export default class Sprite implements Transform, Appearance {
     this.paused = false
   }
 
-  protected _render(): void { }
+  protected _render(delta: number): void { }
 
   public _destroy(): void {
     this.beforeDestroy()

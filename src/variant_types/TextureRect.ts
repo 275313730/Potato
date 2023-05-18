@@ -1,4 +1,4 @@
-import ExpandMode from "../enums/ExpandMode";
+import { ExpandMode } from "../enums";
 
 /**
  * 纹理
@@ -9,7 +9,7 @@ export default interface TextureRect {
    */
   texture: HTMLImageElement;
   /**
-   * 图片模式
+   * 尺寸模式
    */
   expandMode: ExpandMode;
   /**

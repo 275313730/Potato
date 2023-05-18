@@ -1,5 +1,5 @@
 enum ExpandMode {
-  IGNORE_SIZE, KEEP_SIZE, FIT_WIDTH, FIT_HEIGHT
+  IGNORE_SIZE, KEEP_SIZE
 }
 
 export default ExpandMode

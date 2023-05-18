@@ -1,4 +1,5 @@
 import { AnchorPoint } from "../enums"
+import { Sprite } from "../sprites"
 import { Rect, Transform, Vector2 } from "../variant_types"
 import Component from "./Component"
 
@@ -25,16 +26,13 @@ export default class Collision extends Component {
     super()
     if (size) this.size = size
     if (anchorPoint) this.anchorPoint = anchorPoint
+  }
+
+  public register(sprite: Sprite): void {
+    super.register(sprite)
     Collision.collisions.push(this)
   }
 
-  public update() {
-    if (this.sprite) {
-      this.isCollide = false
-      this.collisions = []
-      this.checkCollide()
-    }
-  }
 
   public unregister() {
     super.unregister()
@@ -44,6 +42,14 @@ export default class Collision extends Component {
         Collision.collisions.splice(i, 1)
         break
       }
+    }
+  }
+
+  public update() {
+    if (this.sprite) {
+      this.isCollide = false
+      this.collisions = []
+      this.checkCollide()
     }
   }
 
