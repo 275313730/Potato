@@ -42,8 +42,6 @@ export default class Game {
     return this._start
   }
 
-  public static isTestMode: boolean = false
-
   protected static paused: boolean = false
   protected static pausedCushion: boolean = false
 
