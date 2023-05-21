@@ -46,7 +46,6 @@ export default class Game {
   protected static pausedCushion: boolean = false
 
   public static generate(canvasId: string) {
-    initStyle()
     this._canvas = new Canvas(canvasId)
     this._canvasElement = this.canvas.canvasElement
     this._render = this.canvas.rendering
@@ -198,16 +197,3 @@ function isMobile(): boolean {
     return false;
   }
 }
-
-function initStyle(): void {
-  let body = document.body;
-  body.style.margin = "0";
-  body.style.padding = "0";
-  body.style.width = "100vw";
-  body.style.height = "100vh";
-  body.style.overflow = "hidden";
-  body.style.display = "flex";
-  body.style.alignItems = "center";
-  body.style.justifyContent = "center";
-}
-

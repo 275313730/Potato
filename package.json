@@ -1,14 +1,15 @@
 {
-  "name": "potato-game",
-  "version": "1.0.1",
-  "description": "* Potato is a game framework based on canvas and typescript.",
-  "main": "./src/index.js",
+  "name": "@roanne/potato",
+  "version": "1.0.0",
+  "description": "Potato is a game framework based on canvas and typescript.",
+  "main": "./src/index.ts",
   "files": [
     "src"
   ],
   "scripts": {
     "build": "webpack -p --config webpack.prod.js",
-    "dev": "webpack -d --watch --config webpack.dev.js"
+    "dev": "webpack -d --watch --config webpack.dev.js",
+    "tsc": "tsc"
   },
   "repository": {
     "type": "git",
