@@ -18,7 +18,7 @@
     "watch": true
   },
   "include": [
-    "src",
+    "./src/**/*",
     "Demo.ts"
   ],
   "exclude": [

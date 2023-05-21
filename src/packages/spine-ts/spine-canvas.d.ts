@@ -1,3 +1,5 @@
+export default spine
+
 declare module spine {
 	class Animation {
 		name: string;
@@ -249,8 +251,7 @@ declare module spine {
 		static emptyAnimation: Animation;
 		static SUBSEQUENT: number;
 		static FIRST: number;
-		static HOLD_SUBSEQUENT: number;
-		static HOLD_FIRST: number;
+		static HOLD: number;
 		static HOLD_MIX: number;
 		static SETUP: number;
 		static CURRENT: number;
@@ -636,7 +637,7 @@ declare module spine {
 		private queueAsset;
 		loadText(clientId: string, path: string): void;
 		loadJson(clientId: string, path: string): void;
-		loadTexture(clientId: string, textureLoader: (image: HTMLImageElement | ImageBitmap) => any, path: string): void;
+		loadTexture(clientId: string, textureLoader: (image: HTMLImageElement) => any, path: string): void;
 		get(clientId: string, path: string): any;
 		private updateClientAssets;
 		isLoadingComplete(clientId: string): boolean;
@@ -881,9 +882,9 @@ declare module spine {
 }
 declare module spine {
 	abstract class Texture {
-		protected _image: HTMLImageElement | ImageBitmap;
-		constructor(image: HTMLImageElement | ImageBitmap);
-		getImage(): HTMLImageElement | ImageBitmap;
+		protected _image: HTMLImageElement;
+		constructor(image: HTMLImageElement);
+		getImage(): HTMLImageElement;
 		abstract setFilters(minFilter: TextureFilter, magFilter: TextureFilter): void;
 		abstract setWraps(uWrap: TextureWrap, vWrap: TextureWrap): void;
 		abstract dispose(): void;

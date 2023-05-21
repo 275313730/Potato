@@ -6,6 +6,7 @@ import AnimationSprite from './AnimationSprite';
 import SubViewSprite from './SubViewSprite';
 import LineEditSprite from './LineEditSprite';
 import RichTextLabelSprite from './RichTextLabelSprite';
+import SpineSprite from './SpineSprite';
 
 export {
   Sprite,
@@ -16,4 +17,5 @@ export {
   SubViewSprite,
   LineEditSprite,
   RichTextLabelSprite,
+  SpineSprite
 };
