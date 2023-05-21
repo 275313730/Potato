@@ -1,5 +1,6 @@
 enum FontStyle {
-  NORMAL = "", ITALY = "italic"
+  NORMAL = '',
+  ITALY = 'italic',
 }
 
-export default FontStyle
+export default FontStyle;

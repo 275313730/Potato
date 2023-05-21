@@ -1,4 +1,4 @@
-import UserInputEvent from "./UserInputEvent";
+import UserInputEvent from './UserInputEvent';
 
 /**
  * 键盘输入事件

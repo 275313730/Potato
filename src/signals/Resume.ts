@@ -1,3 +1,3 @@
-import Signal from "./Signal";
+import Signal from './Signal';
 
-export default class Resume extends Signal { }
+export default class Resume extends Signal {}

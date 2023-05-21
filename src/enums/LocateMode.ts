@@ -1,5 +1,7 @@
 enum LocateMode {
-  REALATIVE, ABSOLUTE, STICKY
+  REALATIVE,
+  ABSOLUTE,
+  STICKY,
 }
 
-export default LocateMode
+export default LocateMode;

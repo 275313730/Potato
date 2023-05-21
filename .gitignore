@@ -1,6 +1,4 @@
 /node_modules
 /dev
-/dist
+/lib
 Demo.ts
-demo/bundle.js
-/unhandle

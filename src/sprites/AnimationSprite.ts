@@ -1,51 +1,56 @@
-import Game from "../game/Game";
-import TextureSprite from "./TextureSprite";
-import { ExpandMode } from "../enums";
+import Game from '../Index';
+import ExpandMode from '../enums/ExpandMode';
+import TextureSprite from './TextureSprite';
 
 export default class AnimationSprite extends TextureSprite {
-  protected row: number
+  protected row: number = 0;
 
-  protected column: number
+  protected column: number = 0;
 
-  public currentFrame: number = 0
+  public currentFrame: number = 0;
 
-  protected frames: number
+  protected frames: number = 0;
 
-  public interval: number = 8
+  public interval: number = 8;
 
-  protected currentInterval: number = 0
+  protected currentInterval: number = 0;
 
   public get frameWidth() {
-    return this.texture.width / this.column
+    return this.texture.width / this.column;
   }
 
   public get frameHeight() {
-    return this.texture.height / this.row
+    return this.texture.height / this.row;
   }
 
   public override setTexture(path: string, row?: number, column?: number): boolean {
-    if (!row || !column || row <= 0 || column <= 0) return false
-    this.texture.src = Game.assetPath + path
-    this.row = row
-    this.column = column
-    this.frames = this.row * this.column
+    if (!row || !column || row <= 0 || column <= 0) return false;
+    this.texture.src = Game.assetPath + path;
+    this.row = row;
+    this.column = column;
+    this.frames = this.row * this.column;
     this.texture.onload = () => {
       if (this.expandMode === ExpandMode.KEEP_SIZE) {
-        this.size = { x: this.texture.width / column, y: this.texture.height / row }
+        this.size = { x: this.texture.width / column, y: this.texture.height / row };
       }
-    }
-    return true
+    };
+    return true;
   }
 
   protected _render(delta: number): void {
-    if (!this.texture) return
-    let startX = this.currentFrame % this.column * this.frameWidth
-    let startY = Math.floor(this.currentFrame / this.column) * this.frameHeight
-    Game.render.drawClipImage(this.transform, this.textureRect, { x: startX, y: startY, width: this.frameWidth, height: this.frameHeight })
-    this.currentInterval += 1
-    if (this.currentInterval < this.interval) return
-    this.currentInterval = 0
-    this.currentFrame += 1
-    if (this.currentFrame >= this.frames) this.currentFrame = 0
+    if (!this.texture) return;
+    const startX = (this.currentFrame % this.column) * this.frameWidth;
+    const startY = Math.floor(this.currentFrame / this.column) * this.frameHeight;
+    Game.render.drawClipImage(this.transform, this.textureRect, {
+      x: startX,
+      y: startY,
+      width: this.frameWidth,
+      height: this.frameHeight,
+    });
+    this.currentInterval += 1;
+    if (this.currentInterval < this.interval) return;
+    this.currentInterval = 0;
+    this.currentFrame += 1;
+    if (this.currentFrame >= this.frames) this.currentFrame = 0;
   }
 }

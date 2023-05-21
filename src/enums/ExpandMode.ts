@@ -1,5 +1,6 @@
 enum ExpandMode {
-  IGNORE_SIZE, KEEP_SIZE
+  IGNORE_SIZE,
+  KEEP_SIZE,
 }
 
-export default ExpandMode
+export default ExpandMode;
