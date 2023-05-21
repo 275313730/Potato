@@ -2,7 +2,7 @@ const path = require('path');
 
 module.exports = {
   entry: {
-    bundle: './dist/Demo.js'
+    bundle: './dev/Demo.js'
   },
   output: {
     filename: '[name].js',

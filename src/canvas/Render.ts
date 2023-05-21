@@ -2,7 +2,7 @@ import LocateMode from '../enums/LocateMode';
 import Sprite from '../sprites/Sprite';
 import SubViewSprite from '../sprites/SubViewSprite';
 import Color from '../variant_types/Color';
-import Font from '../variant_types/Font';
+import Font from "../variant_types/Font";
 import Rect from '../variant_types/Rect';
 import TextureRect from '../variant_types/TextureRect';
 import Transform from '../variant_types/Transform';
