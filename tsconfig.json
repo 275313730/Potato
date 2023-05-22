@@ -14,8 +14,7 @@
       "ES6"
     ],
     "target": "ES5",
-    "outDir": "./lib",
-    "watch": true
+    "outDir": "./lib"
   },
   "include": [
     "./src/**/*"
