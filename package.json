@@ -1,6 +1,6 @@
 {
   "name": "@roanne/potato",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Potato is a game framework based on canvas and typescript.",
   "main": "./lib/index.ts",
   "files": [
