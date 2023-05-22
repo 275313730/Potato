@@ -1,4 +1,4 @@
-import { ExpandMode } from '../enums/Index';
+import { ExpandMode } from '../enums';
 
 /**
  * 纹理

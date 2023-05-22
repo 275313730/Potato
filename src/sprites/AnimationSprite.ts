@@ -1,4 +1,4 @@
-import Game from '../Index';
+import Game from '../game/Game';
 import ExpandMode from '../enums/ExpandMode';
 import TextureSprite from './TextureSprite';
 
