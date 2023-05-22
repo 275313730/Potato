@@ -11,7 +11,9 @@ import Camera from './Camera';
 import Canvas from './Canvas';
 
 export default class Render {
-  public readonly context: CanvasRenderingContext2D;
+  public readonly ctx: CanvasRenderingContext2D;
+  public readonly gl: WebGLRenderingContext;
+  public readonly gl2: WebGL2RenderingContext;
   protected readonly canvas: Canvas;
   protected readonly camera: Camera;
   public readonly backgroundColor: Color = { r: 15, g: 15, b: 15, a: 1 };
@@ -21,13 +23,15 @@ export default class Render {
   }
 
   constructor(canvas: Canvas) {
-    this.context = canvas.canvasElement.getContext('2d') as CanvasRenderingContext2D;
     this.canvas = canvas;
+    this.ctx = canvas.canvasElement.getContext('2d') as CanvasRenderingContext2D;
+    this.gl = canvas.canvasElement.getContext("webgl") as WebGLRenderingContext;
+    this.gl2 = canvas.canvasElement.getContext("webgl2") as WebGL2RenderingContext;
     this.camera = canvas.camera;
   }
 
   public clear(viewSize: Vector2) {
-    this.context.clearRect(0, 0, viewSize.x, viewSize.y);
+    this.ctx.clearRect(0, 0, viewSize.x, viewSize.y);
   }
 
   public getFinalRect(transform: Transform): Rect {
@@ -58,8 +62,8 @@ export default class Render {
 
   public drawRect(sprite: Sprite, color: Color) {
     const finalRect = this.getFinalRect(sprite);
-    this.context.fillStyle = this.rgba2hex(color);
-    this.context.fillRect(finalRect.x, finalRect.y, finalRect.width, finalRect.height);
+    this.ctx.fillStyle = this.rgba2hex(color);
+    this.ctx.fillRect(finalRect.x, finalRect.y, finalRect.width, finalRect.height);
   }
 
   public drawTexture(transform: Transform, textureRect: TextureRect, drawFn: (rect: Rect) => void) {
@@ -75,13 +79,13 @@ export default class Render {
       scale.y = -1;
     }
     if (textureRect.flipH || textureRect.flipV) {
-      this.context.translate(trans.x, trans.y);
-      this.context.scale(scale.x, scale.y);
+      this.ctx.translate(trans.x, trans.y);
+      this.ctx.scale(scale.x, scale.y);
     }
     drawFn(finalRect);
     if (textureRect.flipH || textureRect.flipV) {
-      this.context.translate(trans.x, trans.y);
-      this.context.scale(scale.x, scale.y);
+      this.ctx.translate(trans.x, trans.y);
+      this.ctx.scale(scale.x, scale.y);
     }
   }
 
@@ -89,42 +93,42 @@ export default class Render {
     const finalRect = this.getFinalRect(transform);
     const finalFontSize = ((font.fontSize * font.fontSize) / 14) * this.scale;
 
-    this.context.font = `${font.fontStyle} ${font.fontWeight} ${finalFontSize}px ${font.fontType}`;
-    this.context.fillStyle = this.rgba2hex(font.fontColor);
+    this.ctx.font = `${font.fontStyle} ${font.fontWeight} ${finalFontSize}px ${font.fontType}`;
+    this.ctx.fillStyle = this.rgba2hex(font.fontColor);
 
     if (transform.size.x > 0) {
       let line = 1;
       let lineWidth = 0;
       let lineContent = '';
       for (const char of content) {
-        const charWidth = this.context.measureText(char);
+        const charWidth = this.ctx.measureText(char);
         if (lineWidth + charWidth.width <= finalRect.width) {
           lineWidth += charWidth.width;
           lineContent += char;
         } else {
-          this.context.fillText(lineContent, finalRect.x, finalRect.y + font.lineHeight * line);
+          this.ctx.fillText(lineContent, finalRect.x, finalRect.y + font.lineHeight * line);
           line += 1;
           lineWidth = charWidth.width;
           lineContent = char;
         }
       }
       if (lineWidth > 0) {
-        this.context.fillText(lineContent, finalRect.x, finalRect.y + font.lineHeight * line);
+        this.ctx.fillText(lineContent, finalRect.x, finalRect.y + font.lineHeight * line);
       }
     } else {
-      this.context.fillText(content, finalRect.x, finalRect.y);
+      this.ctx.fillText(content, finalRect.x, finalRect.y);
     }
   }
 
   public drawImage(transform: Transform, textureRect: TextureRect) {
     this.drawTexture(transform, textureRect, (finalRect: Rect) => {
-      this.context.drawImage(textureRect.texture, finalRect.x, finalRect.y, finalRect.width, finalRect.height);
+      this.ctx.drawImage(textureRect.texture, finalRect.x, finalRect.y, finalRect.width, finalRect.height);
     });
   }
 
   public drawClipImage(transform: Transform, textureRect: TextureRect, clipRect: Rect) {
     this.drawTexture(transform, textureRect, (finalRect: Rect) => {
-      this.context.drawImage(
+      this.ctx.drawImage(
         textureRect.texture,
         clipRect.x,
         clipRect.y,
@@ -140,7 +144,7 @@ export default class Render {
 
   public drawSubView(sprite: SubViewSprite) {
     const finalRect = this.getFinalRect(sprite.transform);
-    this.context.drawImage(sprite.canvasElement, finalRect.x, finalRect.y);
+    this.ctx.drawImage(sprite.canvasElement, finalRect.x, finalRect.y);
   }
 
   public rgba2hex(color: Color) {
