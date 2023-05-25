@@ -1,9 +1,10 @@
-import Game from './game/Game';
-
-export * as Sprites from './sprites';
-export * as Components from './components';
-export * as Enums from './enums';
-export * as Types from './variant_types';
-export * as Signals from './signals';
-
+import Game from './core/game';
 export default Game;
+
+export * as Plugin from "./plugin"
+export * as Sprites from './core/sprites';
+export * as Components from './core/components';
+export * as Enums from './core/enums';
+export * as Types from './core/variant_types';
+export * as Signals from './core/signals';
+

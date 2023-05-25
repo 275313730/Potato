@@ -1,5 +1,5 @@
 import ExpandMode from '../enums/ExpandMode';
-import Game from '../game/Game';
+import Game from '../game';
 import TextureRect from '../variant_types/TextureRect';
 import Sprite from './Sprite';
 

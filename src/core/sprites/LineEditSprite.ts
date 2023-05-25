@@ -1,4 +1,4 @@
-import Game from '../game/Game';
+import Game from '../game';
 import Color from '../variant_types/Color';
 import Sprite from './Sprite';
 

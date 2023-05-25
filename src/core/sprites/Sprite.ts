@@ -1,4 +1,4 @@
-import Game from '../game/Game';
+import Game from '../game';
 import Component from '../components/Component';
 import EventType from '../enums/EventType';
 import LocateMode from '../enums/LocateMode';

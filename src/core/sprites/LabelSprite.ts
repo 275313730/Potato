@@ -1,6 +1,6 @@
 import FontStyle from '../enums/FontStyle';
 import FontWeight from '../enums/FontWeight';
-import Game from '../game/Game';
+import Game from '../game';
 import Color from '../variant_types/Color';
 import Font from '../variant_types/Font';
 import Sprite from './Sprite';

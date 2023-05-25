@@ -1,4 +1,4 @@
-import Game from '../game/Game';
+import Game from '../game';
 import Sprite from './Sprite';
 import bbobHTML from '@bbob/html';
 import presetHTML5 from '@bbob/preset-html5';

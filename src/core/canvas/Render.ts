@@ -12,8 +12,6 @@ import Canvas from './Canvas';
 
 export default class Render {
   public readonly ctx: CanvasRenderingContext2D;
-  public readonly gl: WebGLRenderingContext;
-  public readonly gl2: WebGL2RenderingContext;
   protected readonly canvas: Canvas;
   protected readonly camera: Camera;
   public readonly backgroundColor: Color = { r: 15, g: 15, b: 15, a: 1 };
@@ -25,8 +23,6 @@ export default class Render {
   constructor(canvas: Canvas) {
     this.canvas = canvas;
     this.ctx = canvas.canvasElement.getContext('2d') as CanvasRenderingContext2D;
-    this.gl = canvas.canvasElement.getContext("webgl") as WebGLRenderingContext;
-    this.gl2 = canvas.canvasElement.getContext("webgl2") as WebGL2RenderingContext;
     this.camera = canvas.camera;
   }
 

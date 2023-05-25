@@ -1,4 +1,4 @@
-import Game from '../game/Game';
+import Game from '../game';
 import Sprite from './Sprite';
 
 export default class SubViewSprite extends Sprite {
