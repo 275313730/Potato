@@ -7,9 +7,8 @@
     "lib/**/*"
   ],
   "scripts": {
-    "tsc-demo": "tsc -p tsconfig.demo.json",
-    "webpack-demo": "webpack -d --watch --config webpack.dev.js",
-    "server-demo": "ts-node ./dev/Server.ts",
+    "webpack-demo": "webpack --watch",
+    "server-demo": "ts-node ./dist/Server.ts",
     "build": "tsc",
     "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
     "lint": "tslint -p tsconfig.json"
@@ -32,15 +31,16 @@
   "homepage": "https://github.com/275313730/Potato#readme",
   "devDependencies": {
     "@types/express": "^4.17.17",
-    "@types/node": "^20.2.1",
+    "@types/node": "^20.2.3",
     "express": "^4.18.2",
     "prettier": "^2.8.8",
+    "ts-loader": "^9.4.3",
     "ts-node": "^10.9.1",
     "tslint": "^6.1.3",
     "tslint-config-prettier": "^1.18.0",
     "typescript": "^5.0.4",
-    "webpack": "^4.43.0",
-    "webpack-cli": "^3.3.11"
+    "webpack": "^5.84.0",
+    "webpack-cli": "^5.1.1"
   },
   "dependencies": {
     "@bbob/html": "^2.9.0",
