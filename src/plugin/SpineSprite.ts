@@ -2,10 +2,17 @@ import Game from "../core/game";
 import Sprite from "../core/sprites/Sprite";
 import spine from "../lib/spine-ts/spine-webgl";
 
+interface AnimationData {
+  animationName: string;
+  times: number;
+  speed: number;
+}
+
 export default class SpineSprite extends Sprite {
   protected spineName: string
-  protected animationName: string
-  protected speed: number
+  protected playing: boolean = false
+  protected speed: number = 1
+  protected animationQueue: AnimationData[] = []
 
   protected canvas2D: HTMLCanvasElement
   protected ctx: CanvasRenderingContext2D
@@ -21,14 +28,12 @@ export default class SpineSprite extends Sprite {
 
   protected skeleton: spine.Skeleton | undefined
   protected state: spine.AnimationState | undefined;
-  protected premultipliedAlpha: boolean | undefined;
+  protected premultipliedAlpha: boolean;
   protected loadStatus = false;
 
-  constructor(spineName: string, animationName: string, speed: number = 1, premultipliedAlpha: boolean = false) {
+  constructor(spineName: string, premultipliedAlpha: boolean = false) {
     super()
     this.spineName = spineName
-    this.animationName = animationName
-    this.speed = speed
     this.premultipliedAlpha = premultipliedAlpha
 
     this.canvas2D = document.createElement("canvas")
@@ -57,9 +62,8 @@ export default class SpineSprite extends Sprite {
 
   protected _update(delta: number): void {
     super._update(delta)
-    if (this.loadStatus === true) return
+    if (this.skeleton) return
     if (this.assetManager.isLoadingComplete() === false) return
-    this.loadStatus = true
     this.loadSkeleton();
     this.onLoad()
   }
@@ -83,12 +87,26 @@ export default class SpineSprite extends Sprite {
 
     const animationStateData = new spine.AnimationStateData(this.skeleton.data);
     this.state = new spine.AnimationState(animationStateData);
-    this.state.setAnimation(0, this.animationName, true);
+
+    this.state.addListener({
+      start: (track: spine.TrackEntry) => { this.onAnimStart() },
+      interrupt: (track: spine.TrackEntry) => { this.onAnimInterrupt() },
+      end: (track: spine.TrackEntry) => { this.onAnimEnd() },
+      dispose: (track: spine.TrackEntry) => { },
+      complete: (track: spine.TrackEntry) => {
+        this.playNextAnimation()
+        this.onAnimComplete()
+      },
+      event: (track: spine.TrackEntry, event: spine.Event) => { this.onAnimEvent(event) }
+    })
+
+    this.playNextAnimation()
   }
 
   protected _render(delta: number): void {
     // Apply the animation state based on the delta time.
-    if (this.state === undefined || this.skeleton === undefined || this.premultipliedAlpha === undefined) return
+    if (this.state === undefined || this.skeleton === undefined) return
+    if (this.playing === false && this.animationQueue.length > 0) this.playNextAnimation()
     // 防抖
     delta = 1 / 120 * this.speed
 
@@ -119,25 +137,54 @@ export default class SpineSprite extends Sprite {
 
     this.shader.unbind();
 
-    const pixels = new Uint8ClampedArray(this.mangedGl.gl.drawingBufferWidth * this.mangedGl.gl.drawingBufferHeight * 4);
-    this.mangedGl.gl.readPixels(0, 0, this.mangedGl.gl.drawingBufferWidth, this.mangedGl.gl.drawingBufferHeight, this.mangedGl.gl.RGBA, this.mangedGl.gl.UNSIGNED_BYTE, pixels);
-    const imageData = new ImageData(this.mangedGl.gl.drawingBufferWidth, this.mangedGl.gl.drawingBufferHeight)
+    const { drawingBufferWidth, drawingBufferHeight, RGBA, UNSIGNED_BYTE } = this.mangedGl.gl
+    const pixels = new Uint8ClampedArray(drawingBufferWidth * drawingBufferHeight * 4);
+    this.mangedGl.gl.readPixels(0, 0, drawingBufferWidth, drawingBufferHeight, RGBA, UNSIGNED_BYTE, pixels);
+    const imageData = new ImageData(drawingBufferWidth, drawingBufferHeight)
     imageData.data.set(pixels);
 
     this.ctx.putImageData(imageData, 0, 0)
     Game.render.ctx.drawImage(this.canvas2D, 0, 0);
   }
 
+  protected playNextAnimation() {
+    if (this.animationQueue.length > 0 && this.state) {
+      const nextData = this.animationQueue[0]
+      this.speed = nextData.speed
+      this.playing = true
+      if (nextData.times === -1) {
+        this.state.setAnimation(0, nextData.animationName, true)
+        this.animationQueue.shift()
+      } else if (nextData.times > 0) {
+        nextData.times -= 1
+        this.state.setAnimation(0, nextData.animationName, false)
+        if (nextData.times === 0) {
+          this.animationQueue.shift()
+        }
+      }
+    } else {
+      this.playing = false
+    }
+  }
+
   protected onLoad() { }
 
-  public playAnimation(animationName: string, loop: boolean, speed: number = 1) {
-    this.speed = speed
-    if (this.state && this.skeleton) {
-      const animationStateData = new spine.AnimationStateData(this.skeleton.data);
-      animationStateData.animationToMixTime
-      this.state.setAnimation(0, animationName, loop)
-    } else {
-      this.animationName = animationName
-    }
+  protected onAnimStart() { }
+
+  protected onAnimInterrupt() { }
+
+  protected onAnimEnd() { }
+
+  protected onAnimComplete() { }
+
+  protected onAnimEvent(event: spine.Event) { }
+
+
+  public addAnimation(options: AnimationData) {
+    this.animationQueue.push({
+      animationName: options.animationName,
+      times: options.times,
+      speed: options.speed,
+    })
   }
 }

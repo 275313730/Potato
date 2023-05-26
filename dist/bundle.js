@@ -48,11 +48,14 @@ var index_1 = __webpack_require__(1);
     return __generator(this, function (_a) {
         index_1.default.generate("potato");
         index_1.default.resolution = { x: 1920, y: 1080 };
-        idleAmiya = new index_1.Plugin.SpineSprite("char_002_amiya", "Idle");
+        idleAmiya = new index_1.Plugin.SpineSprite("char_002_amiya");
         idleAmiya.scale = { x: 0.5, y: 0.5 };
-        attckAmiya = new index_1.Plugin.SpineSprite("char_002_amiya", "Attack", 8);
+        idleAmiya.addAnimation({ animationName: "Idle", speed: 1, times: -1 });
+        attckAmiya = new index_1.Plugin.SpineSprite("char_002_amiya");
         attckAmiya.scale = { x: 0.5, y: 0.5 };
         attckAmiya.position.x = 200;
+        attckAmiya.addAnimation({ animationName: "Attack", speed: 8, times: 8 });
+        attckAmiya.addAnimation({ animationName: "Idle", speed: 1, times: -1 });
         return [2];
     });
 }); })();
@@ -859,14 +862,14 @@ var Sprite_1 = __webpack_require__(16);
 var spine_webgl_1 = __webpack_require__(21);
 var SpineSprite = (function (_super) {
     __extends(SpineSprite, _super);
-    function SpineSprite(spineName, animationName, speed, premultipliedAlpha) {
-        if (speed === void 0) { speed = 1; }
+    function SpineSprite(spineName, premultipliedAlpha) {
         if (premultipliedAlpha === void 0) { premultipliedAlpha = false; }
         var _this = _super.call(this) || this;
+        _this.playing = false;
+        _this.speed = 1;
+        _this.animationQueue = [];
         _this.loadStatus = false;
         _this.spineName = spineName;
-        _this.animationName = animationName;
-        _this.speed = speed;
         _this.premultipliedAlpha = premultipliedAlpha;
         _this.canvas2D = document.createElement("canvas");
         _this.canvas2D.width = game_1.default.canvas.resolution.x;
@@ -889,15 +892,15 @@ var SpineSprite = (function (_super) {
     }
     SpineSprite.prototype._update = function (delta) {
         _super.prototype._update.call(this, delta);
-        if (this.loadStatus === true)
+        if (this.skeleton)
             return;
         if (this.assetManager.isLoadingComplete() === false)
             return;
-        this.loadStatus = true;
         this.loadSkeleton();
         this.onLoad();
     };
     SpineSprite.prototype.loadSkeleton = function (skin) {
+        var _this = this;
         if (skin === void 0) { skin = undefined; }
         if (skin === undefined)
             skin = "default";
@@ -914,11 +917,24 @@ var SpineSprite = (function (_super) {
         this.skeleton.y = this.skeleton.data.height;
         var animationStateData = new spine_webgl_1.default.AnimationStateData(this.skeleton.data);
         this.state = new spine_webgl_1.default.AnimationState(animationStateData);
-        this.state.setAnimation(0, this.animationName, true);
+        this.state.addListener({
+            start: function (track) { _this.onAnimStart(); },
+            interrupt: function (track) { _this.onAnimInterrupt(); },
+            end: function (track) { _this.onAnimEnd(); },
+            dispose: function (track) { },
+            complete: function (track) {
+                _this.playNextAnimation();
+                _this.onAnimComplete();
+            },
+            event: function (track, event) { _this.onAnimEvent(event); }
+        });
+        this.playNextAnimation();
     };
     SpineSprite.prototype._render = function (delta) {
-        if (this.state === undefined || this.skeleton === undefined || this.premultipliedAlpha === undefined)
+        if (this.state === undefined || this.skeleton === undefined)
             return;
+        if (this.playing === false && this.animationQueue.length > 0)
+            this.playNextAnimation();
         delta = 1 / 120 * this.speed;
         this.mangedGl.gl.clearColor(1, 1, 1, 0);
         this.mangedGl.gl.clear(this.mangedGl.gl.COLOR_BUFFER_BIT);
@@ -939,25 +955,47 @@ var SpineSprite = (function (_super) {
         this.skeletonRenderer.draw(this.batcher, this.skeleton);
         this.batcher.end();
         this.shader.unbind();
-        var pixels = new Uint8ClampedArray(this.mangedGl.gl.drawingBufferWidth * this.mangedGl.gl.drawingBufferHeight * 4);
-        this.mangedGl.gl.readPixels(0, 0, this.mangedGl.gl.drawingBufferWidth, this.mangedGl.gl.drawingBufferHeight, this.mangedGl.gl.RGBA, this.mangedGl.gl.UNSIGNED_BYTE, pixels);
-        var imageData = new ImageData(this.mangedGl.gl.drawingBufferWidth, this.mangedGl.gl.drawingBufferHeight);
+        var _a = this.mangedGl.gl, drawingBufferWidth = _a.drawingBufferWidth, drawingBufferHeight = _a.drawingBufferHeight, RGBA = _a.RGBA, UNSIGNED_BYTE = _a.UNSIGNED_BYTE;
+        var pixels = new Uint8ClampedArray(drawingBufferWidth * drawingBufferHeight * 4);
+        this.mangedGl.gl.readPixels(0, 0, drawingBufferWidth, drawingBufferHeight, RGBA, UNSIGNED_BYTE, pixels);
+        var imageData = new ImageData(drawingBufferWidth, drawingBufferHeight);
         imageData.data.set(pixels);
         this.ctx.putImageData(imageData, 0, 0);
         game_1.default.render.ctx.drawImage(this.canvas2D, 0, 0);
     };
-    SpineSprite.prototype.onLoad = function () { };
-    SpineSprite.prototype.playAnimation = function (animationName, loop, speed) {
-        if (speed === void 0) { speed = 1; }
-        this.speed = speed;
-        if (this.state && this.skeleton) {
-            var animationStateData = new spine_webgl_1.default.AnimationStateData(this.skeleton.data);
-            animationStateData.animationToMixTime;
-            this.state.setAnimation(0, animationName, loop);
+    SpineSprite.prototype.playNextAnimation = function () {
+        if (this.animationQueue.length > 0 && this.state) {
+            var nextData = this.animationQueue[0];
+            this.speed = nextData.speed;
+            this.playing = true;
+            if (nextData.times === -1) {
+                this.state.setAnimation(0, nextData.animationName, true);
+                this.animationQueue.shift();
+            }
+            else if (nextData.times > 0) {
+                nextData.times -= 1;
+                this.state.setAnimation(0, nextData.animationName, false);
+                if (nextData.times === 0) {
+                    this.animationQueue.shift();
+                }
+            }
         }
         else {
-            this.animationName = animationName;
+            this.playing = false;
         }
+    };
+    SpineSprite.prototype.onLoad = function () { };
+    SpineSprite.prototype.onAnimStart = function () { };
+    SpineSprite.prototype.onAnimInterrupt = function () { };
+    SpineSprite.prototype.onAnimEnd = function () { };
+    SpineSprite.prototype.onAnimComplete = function () { };
+    SpineSprite.prototype.onAnimEvent = function (event) { };
+    SpineSprite.prototype.addAnimation = function (options) {
+        this.animationQueue.push({
+            animationName: options.animationName,
+            times: options.times,
+            speed: options.speed,
+        });
     };
     return SpineSprite;
 }(Sprite_1.default));
