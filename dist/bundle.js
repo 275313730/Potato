@@ -50,12 +50,13 @@ var index_1 = __webpack_require__(1);
         index_1.default.resolution = { x: 1920, y: 1080 };
         idleAmiya = new index_1.Plugin.SpineSprite("char_002_amiya");
         idleAmiya.scale = { x: 0.5, y: 0.5 };
-        idleAmiya.addAnimation({ animationName: "Idle", speed: 1, times: -1 });
+        idleAmiya.addAnimation("Idle");
         attckAmiya = new index_1.Plugin.SpineSprite("char_002_amiya");
         attckAmiya.scale = { x: 0.5, y: 0.5 };
         attckAmiya.position.x = 200;
-        attckAmiya.addAnimation({ animationName: "Attack", speed: 8, times: 8 });
-        attckAmiya.addAnimation({ animationName: "Idle", speed: 1, times: -1 });
+        attckAmiya.addAnimation("Idle");
+        attckAmiya.addAnimation("Attack", { times: 5, speed: 8, delay: 3 });
+        attckAmiya.addAnimation("Idle");
         return [2];
     });
 }); })();
@@ -865,9 +866,11 @@ var SpineSprite = (function (_super) {
     function SpineSprite(spineName, premultipliedAlpha) {
         if (premultipliedAlpha === void 0) { premultipliedAlpha = false; }
         var _this = _super.call(this) || this;
-        _this.playing = false;
+        _this.playingQueue = false;
         _this.speed = 1;
         _this.animationQueue = [];
+        _this.animationCount = 0;
+        _this.currentDelay = 0;
         _this.loadStatus = false;
         _this.spineName = spineName;
         _this.premultipliedAlpha = premultipliedAlpha;
@@ -923,19 +926,66 @@ var SpineSprite = (function (_super) {
             end: function (track) { _this.onAnimEnd(); },
             dispose: function (track) { },
             complete: function (track) {
-                _this.playNextAnimation();
                 _this.onAnimComplete();
+                if (_this.playingQueue === false)
+                    return;
+                _this.playNextAnimation();
             },
             event: function (track, event) { _this.onAnimEvent(event); }
         });
         this.playNextAnimation();
     };
+    SpineSprite.prototype.playNextAnimation = function () {
+        if (this.state) {
+            this.playingQueue = true;
+            var animationData = this.animationQueue[this.animationCount];
+            if (this.currentAnimation !== animationData) {
+                this.currentAnimation = animationData;
+                if (animationData.delay > 0) {
+                    this.currentDelay = animationData.delay;
+                    return;
+                }
+            }
+            this.speed = animationData.speed;
+            if (animationData.times < 0) {
+                this.checkQueue();
+                this.state.setAnimation(0, animationData.animationName, true);
+            }
+            else {
+                animationData.times -= 1;
+                if (animationData.times === -1)
+                    this.checkQueue();
+                this.state.setAnimation(0, animationData.animationName, false);
+            }
+        }
+        else {
+            this.playingQueue = false;
+        }
+    };
+    SpineSprite.prototype.checkQueue = function () {
+        if (this.animationCount + 1 === this.animationQueue.length) {
+            this.playingQueue = false;
+        }
+        else {
+            this.animationCount += 1;
+        }
+    };
     SpineSprite.prototype._render = function (delta) {
+        delta = 1 / 120 * this.speed;
         if (this.state === undefined || this.skeleton === undefined)
             return;
-        if (this.playing === false && this.animationQueue.length > 0)
-            this.playNextAnimation();
-        delta = 1 / 120 * this.speed;
+        if (this.currentDelay > 0) {
+            this.currentDelay -= delta;
+            if (this.currentDelay < 0) {
+                this.currentDelay = 0;
+                this.playNextAnimation();
+            }
+        }
+        else {
+            if (this.playingQueue === false && this.animationCount + 1 < this.animationQueue.length) {
+                this.playNextAnimation();
+            }
+        }
         this.mangedGl.gl.clearColor(1, 1, 1, 0);
         this.mangedGl.gl.clear(this.mangedGl.gl.COLOR_BUFFER_BIT);
         this.canvas3D.width = game_1.default.canvas.viewSize.x;
@@ -963,39 +1013,17 @@ var SpineSprite = (function (_super) {
         this.ctx.putImageData(imageData, 0, 0);
         game_1.default.render.ctx.drawImage(this.canvas2D, 0, 0);
     };
-    SpineSprite.prototype.playNextAnimation = function () {
-        if (this.animationQueue.length > 0 && this.state) {
-            var nextData = this.animationQueue[0];
-            this.speed = nextData.speed;
-            this.playing = true;
-            if (nextData.times === -1) {
-                this.state.setAnimation(0, nextData.animationName, true);
-                this.animationQueue.shift();
-            }
-            else if (nextData.times > 0) {
-                nextData.times -= 1;
-                this.state.setAnimation(0, nextData.animationName, false);
-                if (nextData.times === 0) {
-                    this.animationQueue.shift();
-                }
-            }
-        }
-        else {
-            this.playing = false;
-        }
-    };
     SpineSprite.prototype.onLoad = function () { };
     SpineSprite.prototype.onAnimStart = function () { };
     SpineSprite.prototype.onAnimInterrupt = function () { };
     SpineSprite.prototype.onAnimEnd = function () { };
     SpineSprite.prototype.onAnimComplete = function () { };
     SpineSprite.prototype.onAnimEvent = function (event) { };
-    SpineSprite.prototype.addAnimation = function (options) {
-        this.animationQueue.push({
-            animationName: options.animationName,
-            times: options.times,
-            speed: options.speed,
-        });
+    SpineSprite.prototype.addAnimation = function (animationName, options) {
+        var speed = (options === null || options === void 0 ? void 0 : options.speed) || 1;
+        var times = (options === null || options === void 0 ? void 0 : options.times) || -1;
+        var delay = (options === null || options === void 0 ? void 0 : options.delay) || 0;
+        this.animationQueue.push({ animationName: animationName, times: times, speed: speed, delay: delay });
     };
     return SpineSprite;
 }(Sprite_1.default));

@@ -6,14 +6,15 @@ import Game, { Sprites, Components, Enums, Plugin } from "./src/index";
 
   const idleAmiya = new Plugin.SpineSprite("char_002_amiya")
   idleAmiya.scale = { x: 0.5, y: 0.5 }
-  idleAmiya.addAnimation({ animationName: "Idle", speed: 1, times: -1 })
+  idleAmiya.addAnimation("Idle")
 
   const attckAmiya = new Plugin.SpineSprite("char_002_amiya")
   attckAmiya.scale = { x: 0.5, y: 0.5 }
   attckAmiya.position.x = 200
 
-  attckAmiya.addAnimation({ animationName: "Attack", speed: 8, times: 8 })
-  attckAmiya.addAnimation({ animationName: "Idle", speed: 1, times: -1 })
+  attckAmiya.addAnimation("Idle")
+  attckAmiya.addAnimation("Attack", { times: 5, speed: 8, delay: 3 })
+  attckAmiya.addAnimation("Idle")
 
 
   //Game.camera.followSprite(girl, Enums.AnchorPoint.CENTER)

@@ -6,13 +6,18 @@ interface AnimationData {
   animationName: string;
   times: number;
   speed: number;
+  delay: number;
 }
 
 export default class SpineSprite extends Sprite {
   protected spineName: string
-  protected playing: boolean = false
+  protected playingQueue: boolean = false
+  protected currentAnimation: AnimationData | undefined
   protected speed: number = 1
   protected animationQueue: AnimationData[] = []
+  protected animationCount: number = 0
+
+  protected currentDelay: number = 0
 
   protected canvas2D: HTMLCanvasElement
   protected ctx: CanvasRenderingContext2D
@@ -94,8 +99,9 @@ export default class SpineSprite extends Sprite {
       end: (track: spine.TrackEntry) => { this.onAnimEnd() },
       dispose: (track: spine.TrackEntry) => { },
       complete: (track: spine.TrackEntry) => {
-        this.playNextAnimation()
         this.onAnimComplete()
+        if (this.playingQueue === false) return
+        this.playNextAnimation()
       },
       event: (track: spine.TrackEntry, event: spine.Event) => { this.onAnimEvent(event) }
     })
@@ -103,12 +109,61 @@ export default class SpineSprite extends Sprite {
     this.playNextAnimation()
   }
 
+  protected playNextAnimation() {
+    if (this.state) {
+      this.playingQueue = true
+
+      const animationData = this.animationQueue[this.animationCount]
+
+      if (this.currentAnimation !== animationData) {
+        // 播放下一组动画
+        this.currentAnimation = animationData
+        if (animationData.delay > 0) {
+          this.currentDelay = animationData.delay
+          return
+        }
+      }
+
+      this.speed = animationData.speed
+
+      if (animationData.times < 0) {
+        this.checkQueue()
+        this.state.setAnimation(0, animationData.animationName, true)
+      } else {
+        animationData.times -= 1
+        if (animationData.times === -1) this.checkQueue()
+        this.state.setAnimation(0, animationData.animationName, false)
+      }
+    } else {
+      this.playingQueue = false
+    }
+  }
+
+  protected checkQueue() {
+    if (this.animationCount + 1 === this.animationQueue.length) {
+      this.playingQueue = false
+    } else {
+      this.animationCount += 1
+    }
+  }
+
+
   protected _render(delta: number): void {
-    // Apply the animation state based on the delta time.
-    if (this.state === undefined || this.skeleton === undefined) return
-    if (this.playing === false && this.animationQueue.length > 0) this.playNextAnimation()
     // 防抖
     delta = 1 / 120 * this.speed
+
+    if (this.state === undefined || this.skeleton === undefined) return
+    if (this.currentDelay > 0) {
+      this.currentDelay -= delta
+      if (this.currentDelay < 0) {
+        this.currentDelay = 0
+        this.playNextAnimation()
+      }
+    } else {
+      if (this.playingQueue === false && this.animationCount + 1 < this.animationQueue.length) {
+        this.playNextAnimation()
+      }
+    }
 
     this.mangedGl.gl.clearColor(1, 1, 1, 0);
     this.mangedGl.gl.clear(this.mangedGl.gl.COLOR_BUFFER_BIT);
@@ -147,26 +202,6 @@ export default class SpineSprite extends Sprite {
     Game.render.ctx.drawImage(this.canvas2D, 0, 0);
   }
 
-  protected playNextAnimation() {
-    if (this.animationQueue.length > 0 && this.state) {
-      const nextData = this.animationQueue[0]
-      this.speed = nextData.speed
-      this.playing = true
-      if (nextData.times === -1) {
-        this.state.setAnimation(0, nextData.animationName, true)
-        this.animationQueue.shift()
-      } else if (nextData.times > 0) {
-        nextData.times -= 1
-        this.state.setAnimation(0, nextData.animationName, false)
-        if (nextData.times === 0) {
-          this.animationQueue.shift()
-        }
-      }
-    } else {
-      this.playing = false
-    }
-  }
-
   protected onLoad() { }
 
   protected onAnimStart() { }
@@ -180,11 +215,10 @@ export default class SpineSprite extends Sprite {
   protected onAnimEvent(event: spine.Event) { }
 
 
-  public addAnimation(options: AnimationData) {
-    this.animationQueue.push({
-      animationName: options.animationName,
-      times: options.times,
-      speed: options.speed,
-    })
+  public addAnimation(animationName: string, options?: { speed?: number, times?: number, delay?: number }) {
+    const speed = options?.speed || 1
+    const times = options?.times || -1
+    const delay = options?.delay || 0
+    this.animationQueue.push({ animationName, times, speed, delay })
   }
 }
