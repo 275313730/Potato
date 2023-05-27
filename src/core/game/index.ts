@@ -83,7 +83,7 @@ export default class Game {
     const currentTime = new Date().getTime()
     let delta = (currentTime - this.lastTime) / 1000;
     this.lastTime = currentTime
-    
+
     // 刷新画布
     if (!this.start) return
     if (!this.paused) {
