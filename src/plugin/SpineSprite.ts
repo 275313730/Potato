@@ -19,9 +19,9 @@ export default class SpineSprite extends Sprite {
 
   protected currentDelay: number = 0
 
-  protected canvas2D: HTMLCanvasElement
-  protected ctx: CanvasRenderingContext2D
-  protected canvas3D: HTMLCanvasElement
+  protected canvas2D: OffscreenCanvas
+  protected ctx: OffscreenCanvasRenderingContext2D
+  protected canvas3D: OffscreenCanvas
   protected mangedGl: spine.webgl.ManagedWebGLRenderingContext
 
   protected shader: spine.webgl.Shader
@@ -41,16 +41,12 @@ export default class SpineSprite extends Sprite {
     this.spineName = spineName
     this.premultipliedAlpha = premultipliedAlpha
 
-    this.canvas2D = document.createElement("canvas")
-    this.canvas2D.width = Game.canvas.resolution.x
-    this.canvas2D.height = Game.canvas.resolution.y
+    this.canvas2D = new OffscreenCanvas(Game.canvas.resolution.x, Game.canvas.resolution.y)
+    this.ctx = this.canvas2D.getContext("2d") as OffscreenCanvasRenderingContext2D
 
-    this.ctx = this.canvas2D.getContext("2d") as CanvasRenderingContext2D
-    this.canvas3D = document.createElement("canvas")
-    this.canvas3D.width = Game.canvas.resolution.x
-    this.canvas3D.height = Game.canvas.resolution.y
-
+    this.canvas3D = new OffscreenCanvas(Game.canvas.resolution.x, Game.canvas.resolution.y)
     this.mangedGl = new spine.webgl.ManagedWebGLRenderingContext(this.canvas3D, { premultipliedAlpha: false })
+    this.mangedGl.gl.clearColor(1, 1, 1, 0);
 
     this.shader = spine.webgl.Shader.newTwoColoredTextured(this.mangedGl);
     this.batcher = new spine.webgl.PolygonBatcher(this.mangedGl);
@@ -131,7 +127,7 @@ export default class SpineSprite extends Sprite {
         this.state.setAnimation(0, animationData.animationName, true)
       } else {
         animationData.times -= 1
-        if (animationData.times === -1) this.checkQueue()
+        if (animationData.times === 0) this.checkQueue()
         this.state.setAnimation(0, animationData.animationName, false)
       }
     } else {
@@ -147,11 +143,7 @@ export default class SpineSprite extends Sprite {
     }
   }
 
-
   protected _render(delta: number): void {
-    // 防抖
-    delta = 1 / 120 * this.speed
-
     if (this.state === undefined || this.skeleton === undefined) return
     if (this.currentDelay > 0) {
       this.currentDelay -= delta
@@ -165,7 +157,6 @@ export default class SpineSprite extends Sprite {
       }
     }
 
-    this.mangedGl.gl.clearColor(1, 1, 1, 0);
     this.mangedGl.gl.clear(this.mangedGl.gl.COLOR_BUFFER_BIT);
 
     this.canvas3D.width = Game.canvas.viewSize.x
@@ -176,7 +167,7 @@ export default class SpineSprite extends Sprite {
     this.skeleton.x = this.position.x + this.skeleton.data.width * this.skeleton.scaleX
     this.skeleton.y = this.position.y + this.skeleton.data.height * -this.skeleton.scaleY
 
-    this.state.update(delta);
+    this.state.update(delta * this.speed);
     this.state.apply(this.skeleton);
     this.skeleton.updateWorldTransform();
 
@@ -198,6 +189,7 @@ export default class SpineSprite extends Sprite {
     const imageData = new ImageData(drawingBufferWidth, drawingBufferHeight)
     imageData.data.set(pixels);
 
+
     this.ctx.putImageData(imageData, 0, 0)
     Game.render.ctx.drawImage(this.canvas2D, 0, 0);
   }
@@ -213,7 +205,6 @@ export default class SpineSprite extends Sprite {
   protected onAnimComplete() { }
 
   protected onAnimEvent(event: spine.Event) { }
-
 
   public addAnimation(animationName: string, options?: { speed?: number, times?: number, delay?: number }) {
     const speed = options?.speed || 1

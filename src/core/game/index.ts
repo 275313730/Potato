@@ -10,6 +10,8 @@ export default class Game {
   public static assetPath: string = './assets/';
   protected static spriteID: number = 10000;
 
+  protected static lastTime: number = 0
+
   private static _canvas: Canvas;
 
   public static get canvas() {
@@ -54,6 +56,7 @@ export default class Game {
     this._camera = this.canvas.camera;
     this.listenInputEvent();
     this.pauseSetting();
+    this.lastTime = new Date().getTime()
     this.loop();
   }
 
@@ -73,22 +76,25 @@ export default class Game {
   }
 
   protected static loop() {
-    const startTime = new Date().getTime();
-    // 刷新画布
     window.requestAnimationFrame(() => {
-      if (!this.start) return this.loop();
-      let timePassed = (new Date().getTime() - startTime) / 1000;
-      if (!this.paused) {
-        if (this.pausedCushion) {
-          timePassed = 0;
-          this.pausedCushion = false;
-          this.canvas.resume.emit();
-        }
-        this.render.clear({ x: this.canvas.viewSize.x, y: this.canvas.viewSize.y });
-        this.canvas.update.emit(timePassed);
+      this.loop()
+    })
+
+    const currentTime = new Date().getTime()
+    let delta = (currentTime - this.lastTime) / 1000;
+    this.lastTime = currentTime
+    
+    // 刷新画布
+    if (!this.start) return
+    if (!this.paused) {
+      if (this.pausedCushion) {
+        delta = 0;
+        this.pausedCushion = false;
+        this.canvas.resume.emit();
       }
-      this.loop();
-    });
+      this.render.clear({ x: this.canvas.viewSize.x, y: this.canvas.viewSize.y });
+      this.canvas.update.emit(delta);
+    }
   }
 
   /**

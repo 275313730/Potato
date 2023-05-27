@@ -44,19 +44,16 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 var index_1 = __webpack_require__(1);
 (function () { return __awaiter(void 0, void 0, void 0, function () {
-    var idleAmiya, attckAmiya;
+    var amiya;
     return __generator(this, function (_a) {
         index_1.default.generate("potato");
         index_1.default.resolution = { x: 1920, y: 1080 };
-        idleAmiya = new index_1.Plugin.SpineSprite("char_002_amiya");
-        idleAmiya.scale = { x: 0.5, y: 0.5 };
-        idleAmiya.addAnimation("Idle");
-        attckAmiya = new index_1.Plugin.SpineSprite("char_002_amiya");
-        attckAmiya.scale = { x: 0.5, y: 0.5 };
-        attckAmiya.position.x = 200;
-        attckAmiya.addAnimation("Idle");
-        attckAmiya.addAnimation("Attack", { times: 5, speed: 8, delay: 3 });
-        attckAmiya.addAnimation("Idle");
+        amiya = new index_1.Plugin.SpineSprite("char_002_amiya");
+        amiya.scale = { x: 0.5, y: 0.5 };
+        amiya.position.x = 200;
+        amiya.addAnimation("Idle");
+        amiya.addAnimation("Attack", { times: 5, speed: 8, delay: 2 });
+        amiya.addAnimation("Idle");
         return [2];
     });
 }); })();
@@ -141,6 +138,7 @@ var Game = (function () {
         this._camera = this.canvas.camera;
         this.listenInputEvent();
         this.pauseSetting();
+        this.lastTime = new Date().getTime();
         this.loop();
     };
     Game.generateId = function () {
@@ -159,22 +157,23 @@ var Game = (function () {
     };
     Game.loop = function () {
         var _this = this;
-        var startTime = new Date().getTime();
         window.requestAnimationFrame(function () {
-            if (!_this.start)
-                return _this.loop();
-            var timePassed = (new Date().getTime() - startTime) / 1000;
-            if (!_this.paused) {
-                if (_this.pausedCushion) {
-                    timePassed = 0;
-                    _this.pausedCushion = false;
-                    _this.canvas.resume.emit();
-                }
-                _this.render.clear({ x: _this.canvas.viewSize.x, y: _this.canvas.viewSize.y });
-                _this.canvas.update.emit(timePassed);
-            }
             _this.loop();
         });
+        var currentTime = new Date().getTime();
+        var delta = (currentTime - this.lastTime) / 1000;
+        this.lastTime = currentTime;
+        if (!this.start)
+            return;
+        if (!this.paused) {
+            if (this.pausedCushion) {
+                delta = 0;
+                this.pausedCushion = false;
+                this.canvas.resume.emit();
+            }
+            this.render.clear({ x: this.canvas.viewSize.x, y: this.canvas.viewSize.y });
+            this.canvas.update.emit(delta);
+        }
     };
     Game.listenInputEvent = function () {
         var _this = this;
@@ -288,6 +287,7 @@ var Game = (function () {
     };
     Game.assetPath = './assets/';
     Game.spriteID = 10000;
+    Game.lastTime = 0;
     Game._start = false;
     Game.paused = false;
     Game.pausedCushion = false;
@@ -874,14 +874,11 @@ var SpineSprite = (function (_super) {
         _this.loadStatus = false;
         _this.spineName = spineName;
         _this.premultipliedAlpha = premultipliedAlpha;
-        _this.canvas2D = document.createElement("canvas");
-        _this.canvas2D.width = game_1.default.canvas.resolution.x;
-        _this.canvas2D.height = game_1.default.canvas.resolution.y;
+        _this.canvas2D = new OffscreenCanvas(game_1.default.canvas.resolution.x, game_1.default.canvas.resolution.y);
         _this.ctx = _this.canvas2D.getContext("2d");
-        _this.canvas3D = document.createElement("canvas");
-        _this.canvas3D.width = game_1.default.canvas.resolution.x;
-        _this.canvas3D.height = game_1.default.canvas.resolution.y;
+        _this.canvas3D = new OffscreenCanvas(game_1.default.canvas.resolution.x, game_1.default.canvas.resolution.y);
         _this.mangedGl = new spine_webgl_1.default.webgl.ManagedWebGLRenderingContext(_this.canvas3D, { premultipliedAlpha: false });
+        _this.mangedGl.gl.clearColor(1, 1, 1, 0);
         _this.shader = spine_webgl_1.default.webgl.Shader.newTwoColoredTextured(_this.mangedGl);
         _this.batcher = new spine_webgl_1.default.webgl.PolygonBatcher(_this.mangedGl);
         _this.mvp = new spine_webgl_1.default.webgl.Matrix4();
@@ -953,7 +950,7 @@ var SpineSprite = (function (_super) {
             }
             else {
                 animationData.times -= 1;
-                if (animationData.times === -1)
+                if (animationData.times === 0)
                     this.checkQueue();
                 this.state.setAnimation(0, animationData.animationName, false);
             }
@@ -971,7 +968,6 @@ var SpineSprite = (function (_super) {
         }
     };
     SpineSprite.prototype._render = function (delta) {
-        delta = 1 / 120 * this.speed;
         if (this.state === undefined || this.skeleton === undefined)
             return;
         if (this.currentDelay > 0) {
@@ -986,7 +982,6 @@ var SpineSprite = (function (_super) {
                 this.playNextAnimation();
             }
         }
-        this.mangedGl.gl.clearColor(1, 1, 1, 0);
         this.mangedGl.gl.clear(this.mangedGl.gl.COLOR_BUFFER_BIT);
         this.canvas3D.width = game_1.default.canvas.viewSize.x;
         this.canvas3D.height = game_1.default.canvas.viewSize.y;
@@ -994,7 +989,7 @@ var SpineSprite = (function (_super) {
         this.skeleton.scaleY = -this.scale.y * game_1.default.canvas.scale;
         this.skeleton.x = this.position.x + this.skeleton.data.width * this.skeleton.scaleX;
         this.skeleton.y = this.position.y + this.skeleton.data.height * -this.skeleton.scaleY;
-        this.state.update(delta);
+        this.state.update(delta * this.speed);
         this.state.apply(this.skeleton);
         this.skeleton.updateWorldTransform();
         this.shader.bind();
