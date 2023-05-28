@@ -7,8 +7,8 @@
     "lib/**/*"
   ],
   "scripts": {
-    "webpack-demo": "webpack --watch",
-    "server-demo": "ts-node ./dist/Server.ts",
+    "dev": "webpack --watch",
+    "server": "ts-node ./dist/Server.ts",
     "build": "tsc",
     "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
     "lint": "tslint -p tsconfig.json"

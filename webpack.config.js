@@ -4,7 +4,7 @@ module.exports = {
   mode: 'none',
   entry: './Demo.ts', // 指定入口文件
   output: {
-    path: path.resolve(__dirname, 'dist'), // 指定打包文件的目录
+    path: path.resolve(__dirname, 'dev'), // 指定打包文件的目录
     filename: 'bundle.js' // 打包后文件的名称
   },
   // 指定webpack打包时要使用的模块
@@ -13,7 +13,12 @@ module.exports = {
     rules: [
       {
         test: /\.ts$/, // 指定规则生效的文件：以ts结尾的文件
-        use: 'ts-loader', // 要使用的loader
+        use: [{
+          loader: 'ts-loader',
+          options: {
+            configFile: path.resolve(__dirname, "./tsconfig.dev.json")
+          }
+        }], // 要使用的loader
         exclude: /node-modules/ // 要排除的文件
       }
     ]

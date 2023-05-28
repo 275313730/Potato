@@ -14,7 +14,7 @@
       "ES6"
     ],
     "target": "ES5",
-    "outDir": "./lib"
+    "outDir": "./dev"
   },
   "include": [
     "src/**/*.ts"
