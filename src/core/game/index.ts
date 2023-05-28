@@ -1,6 +1,6 @@
 import Camera from '../canvas/Camera';
 import Canvas from '../canvas/Canvas';
-import Render from '../canvas/Render';
+import Renderer from '../canvas/Renderer';
 import EventType from '../enums/EventType';
 import KeyboardInputEvent from '../variant_types/KeyboardInput';
 import MouseEventInput from '../variant_types/MouseEventInput';
@@ -9,13 +9,17 @@ import Vector2 from '../variant_types/Vector2';
 export default class Game {
   public static assetPath: string = './assets/';
   protected static spriteID: number = 10000;
-
   protected static lastTime: number = 0
+  protected static fps: number = 0
 
   private static _canvas: Canvas;
 
   public static get canvas() {
     return this._canvas;
+  }
+
+  public static get resolution() {
+    return this._canvas.resolution
   }
 
   public static set resolution(value: Vector2) {
@@ -28,10 +32,10 @@ export default class Game {
     return this._canvasElement;
   }
 
-  private static _render: Render;
+  private static _renderer: Renderer;
 
-  public static get render() {
-    return this._render;
+  public static get renderer() {
+    return this._renderer;
   }
 
   private static _camera: Camera;
@@ -49,11 +53,12 @@ export default class Game {
   protected static paused: boolean = false;
   protected static pausedCushion: boolean = false;
 
-  public static generate(canvasId: string) {
-    this._canvas = new Canvas(canvasId);
+  public static generate(canvasId: string, resolution: Vector2) {
+    this._canvas = new Canvas(canvasId, resolution);
     this._canvasElement = this.canvas.canvasElement;
-    this._render = this.canvas.rendering;
+    this._renderer = this.canvas.renderer;
     this._camera = this.canvas.camera;
+
     this.listenInputEvent();
     this.pauseSetting();
     this.lastTime = new Date().getTime()
@@ -77,6 +82,7 @@ export default class Game {
 
   protected static loop() {
     window.requestAnimationFrame(() => {
+      this.fps = Math.round(1 / delta)
       this.loop()
     })
 
@@ -92,8 +98,9 @@ export default class Game {
         this.pausedCushion = false;
         this.canvas.resume.emit();
       }
-      this.render.clear({ x: this.canvas.viewSize.x, y: this.canvas.viewSize.y });
+      this.renderer.clear({ x: this.canvas.viewSize.x, y: this.canvas.viewSize.y });
       this.canvas.update.emit(delta);
+      this.canvas.render.emit(delta);
     }
   }
 

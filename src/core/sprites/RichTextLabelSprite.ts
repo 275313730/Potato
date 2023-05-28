@@ -20,7 +20,7 @@ export default class RichTextLabelSprite extends Sprite {
 
   protected _render(delta: number): void {
     this.container.style.display = 'block';
-    const finalRect = Game.render.getFinalRect(this.transform);
+    const finalRect = Game.renderer.getFinalRect(this.transform);
     this.container.style.left = Game.canvasElement.offsetLeft + finalRect.x + 'px';
     this.container.style.top = Game.canvasElement.offsetTop + finalRect.y + 'px';
     this.container.style.width = finalRect.width + 'px';
@@ -28,7 +28,7 @@ export default class RichTextLabelSprite extends Sprite {
     if (this.lastContent !== this.content) {
       this.lastContent = this.content;
       this.container.innerHTML = bbobHTML(
-        `[style color=${Game.render.rgba2hex({ r: 150, g: 200, b: 150, a: 1 })}]bbcode富文本[/style]`,
+        `[style color=${Game.renderer.rgba2hex({ r: 150, g: 200, b: 150, a: 1 })}]bbcode富文本[/style]`,
         presetHTML5(),
       );
     }

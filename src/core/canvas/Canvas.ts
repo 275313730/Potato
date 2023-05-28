@@ -1,17 +1,14 @@
-import Pause from '../signals/Pause';
-import Resume from '../signals/Resume';
-import Update from '../signals/Update';
-import UserInput from '../signals/UserInput';
+import { Pause, Resume, Update, UserInput, Render } from '../signals';
 import Vector2 from '../variant_types/Vector2';
 import Camera from './Camera';
-import Render from './Render';
+import Renderer from './Renderer';
 
 /**
  * 画布
  */
 export default class Canvas {
   readonly canvasElement: HTMLCanvasElement;
-  readonly rendering: Render;
+  readonly renderer: Renderer;
   readonly camera: Camera;
   public resolution: Vector2 = { x: 1920, y: 1080 };
   public viewSize: Vector2 = { x: 0, y: 0 };
@@ -28,18 +25,16 @@ export default class Canvas {
 
   // signals
   public readonly update: Update = new Update();
+  public readonly render: Render = new Render();
   public readonly userInput: UserInput = new UserInput();
   public readonly pause: Pause = new Pause();
   public readonly resume: Resume = new Resume();
 
-  constructor(elementId: string = '') {
-    if (elementId === '') {
-      this.canvasElement = document.createElement('canvas');
-    } else {
-      this.canvasElement = document.getElementById(elementId) as HTMLCanvasElement;
-    }
+  constructor(elementId: string, resolution: Vector2) {
+    this.canvasElement = document.getElementById(elementId) as HTMLCanvasElement;
     this.camera = new Camera(this);
-    this.rendering = new Render(this);
+    this.renderer = new Renderer(this);
+    this.resolution = resolution
 
     window.onresize = window.onload = () => {
       this.resize();

@@ -10,6 +10,14 @@ interface AnimationData {
 }
 
 export default class SpineSprite extends Sprite {
+  protected static offscreenCanvas2D: OffscreenCanvas
+  protected static offscreenCtx2D: OffscreenCanvasRenderingContext2D
+
+  protected static offscreenCanvas3D: OffscreenCanvas
+  protected static offscreenWebgl: WebGLRenderingContext
+
+  protected static mangedGl: spine.webgl.ManagedWebGLRenderingContext
+
   protected spineName: string
   protected playingQueue: boolean = false
   protected currentAnimation: AnimationData | undefined
@@ -18,11 +26,6 @@ export default class SpineSprite extends Sprite {
   protected animationCount: number = 0
 
   protected currentDelay: number = 0
-
-  protected canvas2D: OffscreenCanvas
-  protected ctx: OffscreenCanvasRenderingContext2D
-  protected canvas3D: OffscreenCanvas
-  protected mangedGl: spine.webgl.ManagedWebGLRenderingContext
 
   protected shader: spine.webgl.Shader
   protected batcher: spine.webgl.PolygonBatcher
@@ -36,26 +39,46 @@ export default class SpineSprite extends Sprite {
   protected premultipliedAlpha: boolean;
   protected loadStatus = false;
 
+  public static generate() {
+    this.offscreenCanvas2D = new OffscreenCanvas(Game.resolution.x, Game.resolution.y)
+    this.offscreenCtx2D = this.offscreenCanvas2D.getContext("2d") as OffscreenCanvasRenderingContext2D
+    this.offscreenCanvas3D = new OffscreenCanvas(Game.resolution.x, Game.resolution.y)
+    this.offscreenWebgl = this.offscreenCanvas3D.getContext("webgl") as WebGLRenderingContext
+    this.offscreenWebgl.clearColor(1, 1, 1, 0)
+    this.mangedGl = new spine.webgl.ManagedWebGLRenderingContext(SpineSprite.offscreenWebgl, { premultipliedAlpha: false })
+    Game.canvas.update.connect(-300, (delta: number) => this.clear())
+    Game.canvas.render.connect(-300, (delta: number) => this.webglToContext())
+  }
+
+  protected static clear() {
+    this.offscreenWebgl.clear(this.offscreenWebgl.COLOR_BUFFER_BIT)
+  }
+
+  protected static webglToContext() {
+    const { drawingBufferWidth: w, drawingBufferHeight: h, RGBA, UNSIGNED_BYTE } = this.offscreenWebgl
+    const pixels = new Uint8ClampedArray(w * h * 4);
+
+    this.offscreenWebgl.readPixels(0, 0, w, h, RGBA, UNSIGNED_BYTE, pixels);
+
+    const imageData = new ImageData(w, h)
+    imageData.data.set(pixels);
+
+    this.offscreenCtx2D.putImageData(imageData, 0, 0)
+  }
+
   constructor(spineName: string, premultipliedAlpha: boolean = false) {
     super()
     this.spineName = spineName
     this.premultipliedAlpha = premultipliedAlpha
 
-    this.canvas2D = new OffscreenCanvas(Game.canvas.resolution.x, Game.canvas.resolution.y)
-    this.ctx = this.canvas2D.getContext("2d") as OffscreenCanvasRenderingContext2D
-
-    this.canvas3D = new OffscreenCanvas(Game.canvas.resolution.x, Game.canvas.resolution.y)
-    this.mangedGl = new spine.webgl.ManagedWebGLRenderingContext(this.canvas3D, { premultipliedAlpha: false })
-    this.mangedGl.gl.clearColor(1, 1, 1, 0);
-
-    this.shader = spine.webgl.Shader.newTwoColoredTextured(this.mangedGl);
-    this.batcher = new spine.webgl.PolygonBatcher(this.mangedGl);
+    this.shader = spine.webgl.Shader.newTwoColoredTextured(SpineSprite.mangedGl);
+    this.batcher = new spine.webgl.PolygonBatcher(SpineSprite.mangedGl);
     this.mvp = new spine.webgl.Matrix4();
-    this.mvp.ortho2d(0, 0, this.canvas3D.width - 1, this.canvas3D.height - 1);
-    this.skeletonRenderer = new spine.webgl.SkeletonRenderer(this.mangedGl);
-    this.assetManager = new spine.webgl.AssetManager(this.mangedGl);
+    this.mvp.ortho2d(0, 0, Game.resolution.x - 1, Game.resolution.y - 1);
+    this.skeletonRenderer = new spine.webgl.SkeletonRenderer(SpineSprite.mangedGl);
+    this.assetManager = new spine.webgl.AssetManager(SpineSprite.mangedGl);
 
-    this.shapes = new spine.webgl.ShapeRenderer(this.mangedGl);
+    this.shapes = new spine.webgl.ShapeRenderer(SpineSprite.mangedGl);
 
     this.assetManager.loadBinary("assets/" + spineName + ".skel");
     this.assetManager.loadTextureAtlas("assets/" + spineName + ".atlas");
@@ -63,10 +86,13 @@ export default class SpineSprite extends Sprite {
 
   protected _update(delta: number): void {
     super._update(delta)
-    if (this.skeleton) return
-    if (this.assetManager.isLoadingComplete() === false) return
-    this.loadSkeleton();
-    this.onLoad()
+    if (this.skeleton) {
+      this.updateSkeleton(delta)
+    } else {
+      if (this.assetManager.isLoadingComplete() === false) return
+      this.loadSkeleton();
+      this.onLoad()
+    }
   }
 
   protected loadSkeleton(skin: string | undefined = undefined) {
@@ -106,32 +132,30 @@ export default class SpineSprite extends Sprite {
   }
 
   protected playNextAnimation() {
-    if (this.state) {
-      this.playingQueue = true
+    if (this.state === undefined) return
 
-      const animationData = this.animationQueue[this.animationCount]
+    this.playingQueue = true
 
-      if (this.currentAnimation !== animationData) {
-        // 播放下一组动画
-        this.currentAnimation = animationData
-        if (animationData.delay > 0) {
-          this.currentDelay = animationData.delay
-          return
-        }
+    const animationData = this.animationQueue[this.animationCount]
+
+    if (this.currentAnimation !== animationData) {
+      // 播放下一组动画
+      this.currentAnimation = animationData
+      if (animationData.delay > 0) {
+        this.currentDelay = animationData.delay
+        return
       }
+    }
 
-      this.speed = animationData.speed
+    this.speed = animationData.speed
 
-      if (animationData.times < 0) {
-        this.checkQueue()
-        this.state.setAnimation(0, animationData.animationName, true)
-      } else {
-        animationData.times -= 1
-        if (animationData.times === 0) this.checkQueue()
-        this.state.setAnimation(0, animationData.animationName, false)
-      }
+    if (animationData.times < 0) {
+      this.checkQueue()
+      this.state.setAnimation(0, animationData.animationName, true)
     } else {
-      this.playingQueue = false
+      animationData.times -= 1
+      if (animationData.times === 0) this.checkQueue()
+      this.state.setAnimation(0, animationData.animationName, false)
     }
   }
 
@@ -143,8 +167,32 @@ export default class SpineSprite extends Sprite {
     }
   }
 
-  protected _render(delta: number): void {
+  protected updateSkeleton(delta: number) {
     if (this.state === undefined || this.skeleton === undefined) return
+    this.skeleton.scaleX = this.scale.x * Game.canvas.scale
+    this.skeleton.scaleY = -this.scale.y * Game.canvas.scale
+    this.skeleton.x = this.position.x * Game.canvas.scale + this.skeleton.data.width * this.skeleton.scaleX
+    this.skeleton.y = this.position.y * Game.canvas.scale + this.skeleton.data.height * -this.skeleton.scaleY
+
+    this.state.update(delta * this.speed);
+    this.state.apply(this.skeleton);
+    this.skeleton.updateWorldTransform();
+
+    this.shader.bind();
+    this.shader.setUniformi(spine.webgl.Shader.SAMPLER, 0);
+    this.shader.setUniform4x4f(spine.webgl.Shader.MVP_MATRIX, this.mvp.values);
+
+    this.batcher.begin(this.shader);
+    this.skeletonRenderer.premultipliedAlpha = this.premultipliedAlpha;
+    this.skeletonRenderer.draw(this.batcher, this.skeleton);
+    this.batcher.end();
+
+    this.shader.unbind();
+  }
+
+  protected _render(delta: number): void {
+    if (this.skeleton === undefined) return
+
     if (this.currentDelay > 0) {
       this.currentDelay -= delta
       if (this.currentDelay < 0) {
@@ -157,41 +205,11 @@ export default class SpineSprite extends Sprite {
       }
     }
 
-    this.mangedGl.gl.clear(this.mangedGl.gl.COLOR_BUFFER_BIT);
-
-    this.canvas3D.width = Game.canvas.viewSize.x
-    this.canvas3D.height = Game.canvas.viewSize.y
-
-    this.skeleton.scaleX = this.scale.x * Game.canvas.scale
-    this.skeleton.scaleY = -this.scale.y * Game.canvas.scale
-    this.skeleton.x = this.position.x + this.skeleton.data.width * this.skeleton.scaleX
-    this.skeleton.y = this.position.y + this.skeleton.data.height * -this.skeleton.scaleY
-
-    this.state.update(delta * this.speed);
-    this.state.apply(this.skeleton);
-    this.skeleton.updateWorldTransform();
-
-    this.shader.bind();
-    this.shader.setUniformi(spine.webgl.Shader.SAMPLER, 0);
-    this.shader.setUniform4x4f(spine.webgl.Shader.MVP_MATRIX, this.mvp.values);
-
-    // Start the batch and tell the SkeletonRenderer to render the active skeleton.
-    this.batcher.begin(this.shader);
-    this.skeletonRenderer.premultipliedAlpha = this.premultipliedAlpha;
-    this.skeletonRenderer.draw(this.batcher, this.skeleton);
-    this.batcher.end();
-
-    this.shader.unbind();
-
-    const { drawingBufferWidth, drawingBufferHeight, RGBA, UNSIGNED_BYTE } = this.mangedGl.gl
-    const pixels = new Uint8ClampedArray(drawingBufferWidth * drawingBufferHeight * 4);
-    this.mangedGl.gl.readPixels(0, 0, drawingBufferWidth, drawingBufferHeight, RGBA, UNSIGNED_BYTE, pixels);
-    const imageData = new ImageData(drawingBufferWidth, drawingBufferHeight)
-    imageData.data.set(pixels);
-
-
-    this.ctx.putImageData(imageData, 0, 0)
-    Game.render.ctx.drawImage(this.canvas2D, 0, 0);
+    const { x: dx, y: dy } = this.skeleton
+    const { width: dw, height: dh } = this.skeleton.data
+    const sx = this.position.x * Game.canvas.scale
+    const sy = this.position.y * Game.canvas.scale
+    Game.renderer.ctx.drawImage(SpineSprite.offscreenCanvas2D, sx, sy, dw, dh, dx, dy, dw, dh)
   }
 
   protected onLoad() { }

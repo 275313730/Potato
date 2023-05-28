@@ -6,6 +6,6 @@ export default class SubViewSprite extends Sprite {
   protected rendering: CanvasRenderingContext2D = this.canvasElement.getContext('2d') as CanvasRenderingContext2D;
 
   protected _render(delta: number): void {
-    Game.render.drawSubView(this);
+    Game.renderer.drawSubView(this);
   }
 }

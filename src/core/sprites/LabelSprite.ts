@@ -66,6 +66,6 @@ export default class LabelSprite extends Sprite {
   }
 
   protected _render(delta: number): void {
-    Game.render.drawLabel(this.transform, this.font, this.content);
+    Game.renderer.drawLabel(this.transform, this.font, this.content);
   }
 }

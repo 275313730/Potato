@@ -11,6 +11,9 @@ import MouseEventInput from '../variant_types/MouseEventInput';
 import Transform from '../variant_types/Transform';
 import UserInputEvent from '../variant_types/UserInputEvent';
 import Vector2 from '../variant_types/Vector2';
+import Canvas from '../canvas/Canvas';
+import Renderer from '../canvas/Renderer';
+import Camera from '../canvas/Camera';
 
 /**
  * 精灵构造函数
@@ -104,10 +107,12 @@ export default class Sprite {
   }
 
   protected _ready(): void {
-    Game.canvas.update.connect(this.id, this._update.bind(this));
-    Game.canvas.userInput.connect(this.id, this._input.bind(this));
-    Game.canvas.pause.connect(this.id, this._pause.bind(this));
-    Game.canvas.resume.connect(this.id, this._resume.bind(this));
+    const canvas = this.getCanvas()
+    canvas.update.connect(this.id, this._update.bind(this));
+    canvas.render.connect(this.id, this._render.bind(this));
+    canvas.userInput.connect(this.id, this._input.bind(this));
+    canvas.pause.connect(this.id, this._pause.bind(this));
+    canvas.resume.connect(this.id, this._resume.bind(this));
     this.onReady();
   }
 
@@ -135,34 +140,32 @@ export default class Sprite {
 
   protected _update(delta: number): void {
     this.beforeUpdate();
-    if (this.visible) this._render(delta);
     for (const component of this.components) {
       component.update();
     }
     this.onUpdate(delta);
   }
 
-  protected _pause() {
+  protected _pause(): void {
     this.paused = true;
   }
 
-  protected _resume() {
+  protected _resume(): void {
     this.paused = false;
   }
 
-  protected _render(delta: number): void {
-    return;
-  }
+  protected _render(delta: number): void { }
 
   public _destroy(): void {
     this.beforeDestroy();
     for (const component of this.components) {
       component.unregister();
     }
-    Game.canvas.update.disconnect(this.id);
-    Game.canvas.userInput.disconnect(this.id);
-    Game.canvas.pause.disconnect(this.id);
-    Game.canvas.resume.disconnect(this.id);
+    const canvas = this.getCanvas()
+    canvas.update.disconnect(this.id);
+    canvas.userInput.disconnect(this.id);
+    canvas.pause.disconnect(this.id);
+    canvas.resume.disconnect(this.id);
     this.onDestroy();
   }
 
@@ -188,6 +191,22 @@ export default class Sprite {
 
   public onDestroy(): void {
     return;
+  }
+
+  public getGame(): Game {
+    return Game
+  }
+
+  public getCanvas(): Canvas {
+    return Game.canvas
+  }
+
+  public getRenderer(): Renderer {
+    return Game.renderer
+  }
+
+  public getCamera(): Camera {
+    return Game.camera
   }
 
   public addChild(sprite: Sprite) {
@@ -221,6 +240,7 @@ export default class Sprite {
   }
 
   public hasPoint(point: Vector2): boolean {
+    const camera = this.getCamera()
     switch (this.locateMode) {
       case LocateMode.ABSOLUTE:
         if (point.x < this.position.x) return false;
@@ -229,10 +249,10 @@ export default class Sprite {
         if (point.y > this.position.y + this.size.y * this.scale.y) return false;
         return true;
       case LocateMode.REALATIVE:
-        if (point.x + Game.camera.position.x < this.position.x) return false;
-        if (point.x + Game.camera.position.x > this.position.x + this.size.x * this.scale.x) return false;
-        if (point.y + Game.camera.position.y < this.position.y) return false;
-        if (point.y + Game.camera.position.y > this.position.y + this.size.y * this.scale.y) return false;
+        if (point.x + camera.position.x < this.position.x) return false;
+        if (point.x + camera.position.x > this.position.x + this.size.x * this.scale.x) return false;
+        if (point.y + camera.position.y < this.position.y) return false;
+        if (point.y + camera.position.y > this.position.y + this.size.y * this.scale.y) return false;
         return true;
       default:
         return true;

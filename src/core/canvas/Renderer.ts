@@ -1,16 +1,10 @@
-import LocateMode from '../enums/LocateMode';
-import Sprite from '../sprites/Sprite';
-import SubViewSprite from '../sprites/SubViewSprite';
-import Color from '../variant_types/Color';
-import Font from "../variant_types/Font";
-import Rect from '../variant_types/Rect';
-import TextureRect from '../variant_types/TextureRect';
-import Transform from '../variant_types/Transform';
-import Vector2 from '../variant_types/Vector2';
+import { LocateMode } from '../enums';
+import { Sprite, SubViewSprite } from '../sprites';
+import { Color, Font, Rect, TextureRect, Transform, Vector2 } from '../variant_types';
 import Camera from './Camera';
 import Canvas from './Canvas';
 
-export default class Render {
+export default class Renderer {
   public readonly ctx: CanvasRenderingContext2D;
   protected readonly canvas: Canvas;
   protected readonly camera: Camera;

@@ -41,7 +41,7 @@ export default class AnimationSprite extends TextureSprite {
     if (!this.texture) return;
     const startX = (this.currentFrame % this.column) * this.frameWidth;
     const startY = Math.floor(this.currentFrame / this.column) * this.frameHeight;
-    Game.render.drawClipImage(this.transform, this.textureRect, {
+    Game.renderer.drawClipImage(this.transform, this.textureRect, {
       x: startX,
       y: startY,
       width: this.frameWidth,

@@ -39,6 +39,11 @@ export default class TextureSprite extends Sprite {
     this.textureRect.flipV = value;
   }
 
+  constructor(path?: string) {
+    super()
+    if (path) this.setTexture(path)
+  }
+
   protected onTextureLoad(): void {
     return;
   }
@@ -56,6 +61,7 @@ export default class TextureSprite extends Sprite {
 
   protected _render(delta: number): void {
     if (!this.texture) return;
-    Game.render.drawImage(this.transform, this.textureRect);
+    const renderer = this.getRenderer()
+    renderer.drawImage(this.transform, this.textureRect);
   }
 }
